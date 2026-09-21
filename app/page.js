@@ -6,6 +6,7 @@ import { slugify } from "./lib/slug";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 const DEFAULT_FILTERS = { type: "All", category: "All" };
+const PAGE_SIZE = 6; // max events per page — mix of Premier + Regular, per spec
 
 const UPCOMING_FEATURES = [
   { icon: "🎟️", title: "Ticketing & payments", desc: "Sell tickets right on the event page, with promo codes and door pricing." },
@@ -21,6 +22,7 @@ function SuperCalendarInner() {
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState({});
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetch("/api/events").then((r) => r.json()).then(setEvents);
@@ -39,6 +41,26 @@ function SuperCalendarInner() {
     if (q && !e.title.toLowerCase().includes(q)) return false;
     return true;
   });
+
+  // Premier events surface first, then Regular fills out the rest of each page —
+  // "system automatically displays a combo of as many Premier and Regular events
+  // that fit on the page" per spec. Sort is stable so order within each group holds.
+  const ordered = useMemo(() => {
+    const premier = filtered.filter((e) => e.premier);
+    const regular = filtered.filter((e) => !e.premier);
+    return [...premier, ...regular];
+  }, [filtered]);
+
+  const totalPages = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const pageItems = ordered.slice(pageStart, pageStart + PAGE_SIZE);
+
+  // Any time the filters or search change the result set, snap back to page 1
+  // instead of showing an empty page.
+  useEffect(() => {
+    setPage(1);
+  }, [filters.type, filters.category, q]);
 
   const activeFilters = [];
   if (filters.type !== "All") activeFilters.push({ key: "type", label: `Type: ${filters.type}` });
@@ -66,6 +88,11 @@ function SuperCalendarInner() {
     const next = { ...selected, [id]: !selected[id] };
     setSelected(next);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  }
+
+  function goToPage(p) {
+    setPage(Math.min(Math.max(1, p), totalPages));
+    document.getElementById("browse")?.scrollIntoView({ block: "start" });
   }
 
   return (
@@ -140,48 +167,87 @@ function SuperCalendarInner() {
             ))}
           </aside>
 
-          <div className="event-list">
-            {filtered.length === 0 && (
-              <div className="empty-state">
-                No events match these filters.
-                {activeFilters.length > 0 && (
-                  <>
-                    {" "}
-                    <button type="button" className="clear-filters-link" onClick={clearAllFilters}>
-                      Clear filters
-                    </button>{" "}
-                    to see everything.
-                  </>
-                )}
-              </div>
-            )}
-            {filtered.map((e) => (
-              <div
-                key={e.id}
-                className={`event-card ${e.premier ? "premier" : ""} ${
-                  selected[e.id] ? "selected" : ""
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={!!selected[e.id]}
-                  onChange={() => toggle(e.id)}
-                />
-                <div className="meta">
-                  <div className="title">
-                    <a href={`/event/${e.id}`} className="title-link">{e.title}</a>{" "}
-                    {e.premier && <span className="badge">PREMIER</span>}
-                  </div>
-                  <div className="sub">
-                    {e.date} · {e.time} · {e.city} · Hosted by{" "}
-                    <a href={`/organizer/${slugify(e.hostedBy)}`} className="host-link">
-                      {e.hostedBy}
-                    </a>
-                  </div>
+          <div>
+            <div className="event-list">
+              {pageItems.length === 0 && (
+                <div className="empty-state">
+                  No events match these filters.
+                  {activeFilters.length > 0 && (
+                    <>
+                      {" "}
+                      <button type="button" className="clear-filters-link" onClick={clearAllFilters}>
+                        Clear filters
+                      </button>{" "}
+                      to see everything.
+                    </>
+                  )}
                 </div>
-                <div className="sub">{e.cost}</div>
-              </div>
-            ))}
+              )}
+              {pageItems.map((e) => (
+                <div
+                  key={e.id}
+                  className={`event-card ${e.premier ? "premier" : ""} ${
+                    selected[e.id] ? "selected" : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={!!selected[e.id]}
+                    onChange={() => toggle(e.id)}
+                  />
+                  <div className="meta">
+                    <div className="title">
+                      <a href={`/event/${e.id}`} className="title-link">{e.title}</a>{" "}
+                      {e.premier && <span className="badge">PREMIER</span>}
+                    </div>
+                    <div className="sub">
+                      {e.date} · {e.time} · {e.city} · Hosted by{" "}
+                      <a href={`/organizer/${slugify(e.hostedBy)}`} className="host-link">
+                        {e.hostedBy}
+                      </a>
+                    </div>
+                  </div>
+                  <div className="sub">{e.cost}</div>
+                </div>
+              ))}
+            </div>
+
+            {ordered.length > 0 && (
+              <>
+                <div className="pagination">
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => goToPage(safePage - 1)}
+                    disabled={safePage <= 1}
+                  >
+                    ← Prev
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      className={`pagination-btn ${p === safePage ? "active" : ""}`}
+                      onClick={() => goToPage(p)}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => goToPage(safePage + 1)}
+                    disabled={safePage >= totalPages}
+                  >
+                    Next →
+                  </button>
+                </div>
+                <div className="pagination-summary">
+                  Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, ordered.length)} of{" "}
+                  {ordered.length} events · Page {safePage} of {totalPages}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

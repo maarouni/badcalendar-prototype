@@ -1,17 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+const USER_KEY = "mc_user_v1";
+
+function readUser() {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function initials(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  return parts
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join("");
+}
 
 export default function NavBar() {
   const router = useRouter();
   const [q, setQ] = useState("");
+  const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setUser(readUser());
+    const onChange = () => setUser(readUser());
+    window.addEventListener("mc-auth-changed", onChange);
+    window.addEventListener("storage", onChange);
+    return () => {
+      window.removeEventListener("mc-auth-changed", onChange);
+      window.removeEventListener("storage", onChange);
+    };
+  }, []);
 
   function submitSearch(e) {
     e.preventDefault();
     const params = new URLSearchParams();
     if (q.trim()) params.set("q", q.trim());
     router.push(`/${params.toString() ? `?${params.toString()}` : ""}`);
+  }
+
+  function logOut() {
+    localStorage.removeItem(USER_KEY);
+    window.dispatchEvent(new Event("mc-auth-changed"));
+    setMenuOpen(false);
+    router.push("/");
   }
 
   return (
@@ -57,7 +97,31 @@ export default function NavBar() {
           </svg>
           <span className="icon-dot" />
         </button>
-        <a href="/profile" className="nav-avatar" title="Masoud Arouni">MA</a>
+
+        {user ? (
+          <div className="nav-user-menu">
+            <button
+              type="button"
+              className="nav-avatar"
+              title={user.name}
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              {initials(user.name)}
+            </button>
+            {menuOpen && (
+              <div className="nav-user-dropdown">
+                <div className="nav-user-name">{user.name}</div>
+                <div className="nav-user-id">{user.identifier}</div>
+                <a href="/profile" onClick={() => setMenuOpen(false)}>Profile</a>
+                <button type="button" onClick={logOut}>Log out</button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <a href="/login" className="btn-primary nav-login-btn">
+            Log in
+          </a>
+        )}
       </div>
     </nav>
   );

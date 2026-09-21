@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import QRCode from "qrcode";
 import { slugify, categoryIcon } from "../../lib/slug";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
@@ -10,6 +11,7 @@ export default function EventDetail() {
   const { id } = useParams();
   const [event, setEvent] = useState(undefined);
   const [saved, setSaved] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState(null);
 
   useEffect(() => {
     fetch("/api/events")
@@ -19,6 +21,14 @@ export default function EventDetail() {
       });
     const sel = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     setSaved(!!sel[id]);
+  }, [id]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = `${window.location.origin}/event/${id}`;
+    QRCode.toDataURL(url, { width: 280, margin: 1 })
+      .then(setQrDataUrl)
+      .catch(() => setQrDataUrl(null));
   }, [id]);
 
   function toggleSaved() {
@@ -100,6 +110,20 @@ export default function EventDetail() {
               <div className="host-card-name">{event.hostedBy}</div>
             </div>
           </a>
+
+          <div className="qr-card">
+            {qrDataUrl ? (
+              <img src={qrDataUrl} alt={`QR code linking to ${event.title}`} />
+            ) : (
+              <div style={{ padding: 40 }}>Generating QR code…</div>
+            )}
+            <div className="qr-card-label">
+              Scan to open this event page — print it on flyers or table signs.
+            </div>
+            <a href={`/event/${id}/flyer`} className="qr-card-link">
+              → Get flyer &amp; email template
+            </a>
+          </div>
         </aside>
       </div>
     </div>
