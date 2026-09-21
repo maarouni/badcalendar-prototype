@@ -1,0 +1,67 @@
+[
+  {
+    "id": "1",
+    "title": "Business & Tech Networking Expo",
+    "hostedBy": "badcalendar",
+    "date": "2026-10-08",
+    "time": "18:00-21:00",
+    "city": "San Jose",
+    "type": "In Person",
+    "category": "Networking",
+    "cost": "Free RSVP / $10 Door",
+    "premier": true,
+    "description": "A large mixer bringing together founders, investors, and tech professionals from across the South Bay. Expect lightning intros, an exhibitor floor, and a cash bar."
+  },
+  {
+    "id": "2",
+    "title": "Workshop: Advanced Networking Techniques",
+    "hostedBy": "everyCircle",
+    "date": "2026-10-10",
+    "time": "18:00-21:00",
+    "city": "San Jose",
+    "type": "In Person",
+    "category": "Workshop",
+    "cost": "$10 RSVP / $20 Door",
+    "premier": false,
+    "description": "A hands-on session on building a referral engine for your business — scripts, follow-up cadences, and how to ask for introductions without it feeling awkward."
+  },
+  {
+    "id": "3",
+    "title": "3-Course Dinner & Networking",
+    "hostedBy": "badcalendar",
+    "date": "2026-10-14",
+    "time": "18:00-21:00",
+    "city": "Walnut Creek",
+    "type": "In Person",
+    "category": "Dinner",
+    "cost": "$25 RSVP / $35 Door",
+    "premier": false,
+    "description": "A seated dinner capped at a small group size so every table actually gets to talk business. Vegetarian option available on request."
+  },
+  {
+    "id": "4",
+    "title": "Online Founders Roundtable",
+    "hostedBy": "badcalendar",
+    "date": "2026-10-16",
+    "time": "12:00-13:00",
+    "city": "Online",
+    "type": "Online",
+    "category": "Roundtable",
+    "cost": "Free",
+    "premier": false,
+    "description": "A monthly video call for early-stage founders to trade notes on fundraising, hiring, and go-to-market — no pitching, just peer advice."
+  },
+  {
+    "id": "1789931878683",
+    "title": "Test",
+    "hostedBy": "Masoud",
+    "date": "2026-09-21",
+    "time": "",
+    "city": "Ptown",
+    "type": "In Person",
+    "category": "Networking",
+    "cost": "Free",
+    "premier": false,
+    "description": "Test event submitted through the prototype's event form."
+  }
+]
