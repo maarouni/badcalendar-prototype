@@ -21,9 +21,12 @@ export async function POST(request) {
     date: body.date || "",
     time: body.time || "",
     city: body.city || "",
+    region: body.type === "Online" ? "" : body.region || "",
     type: body.type || "In Person",
-    category: body.category || "General",
+    category: body.category || "Networking",
+    categories: Array.isArray(body.categories) ? body.categories : [],
     cost: body.cost || "Free",
+    price: Number(body.price) || 0,
     premier: false,
   };
 

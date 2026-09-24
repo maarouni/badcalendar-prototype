@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import QRCode from "qrcode";
 import { slugify, categoryIcon } from "../../lib/slug";
+import { googleCalendarUrl, eventCategories } from "../../lib/taxonomy";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 
@@ -69,10 +70,15 @@ export default function EventDetail() {
           <span className="badge" style={{ marginBottom: 10, display: "inline-block" }}>
             {event.category}
           </span>
+          {eventCategories(event).length > 1 && (
+            <div className="sub" style={{ marginBottom: 6 }}>
+              {eventCategories(event).join(" · ")}
+            </div>
+          )}
           <h1>{event.title}</h1>
           <div className="event-meta-row">
             <span>🗓️ {event.date}{event.time ? ` · ${event.time}` : ""}</span>
-            <span>{event.type === "Online" ? "💻 Online" : `📍 ${event.city}`}</span>
+            <span>{event.type === "Online" ? "💻 Online" : `📍 ${event.city}${event.region ? ` · ${event.region}` : ""}`}</span>
           </div>
 
           <h4 className="section-label" style={{ marginTop: 24 }}>About this event</h4>
@@ -99,6 +105,15 @@ export default function EventDetail() {
             >
               {saved ? "✓ On My Calendar" : "+ Add to My Calendar"}
             </button>
+            <a
+              className="btn secondary rsvp-save"
+              style={{ display: "block", textAlign: "center", textDecoration: "none", marginTop: 8 }}
+              href={googleCalendarUrl(event)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              + Add to Google Calendar
+            </a>
           </div>
 
           <a href={`/organizer/${slugify(event.hostedBy)}`} className="host-card">

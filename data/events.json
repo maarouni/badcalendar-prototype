@@ -6,9 +6,16 @@
     "date": "2026-10-08",
     "time": "18:00-21:00",
     "city": "San Jose",
+    "region": "Santa Clara",
     "type": "In Person",
     "category": "Networking",
+    "categories": [
+      "Expo, Trade Show",
+      "Networking",
+      "Emerging Tech"
+    ],
     "cost": "Free RSVP / $10 Door",
+    "price": 0,
     "premier": true,
     "description": "A large mixer bringing together founders, investors, and tech professionals from across the South Bay. Expect lightning intros, an exhibitor floor, and a cash bar."
   },
@@ -19,11 +26,17 @@
     "date": "2026-10-10",
     "time": "18:00-21:00",
     "city": "San Jose",
+    "region": "Santa Clara",
     "type": "In Person",
     "category": "Workshop",
+    "categories": [
+      "Seminar, Workshop",
+      "Networking"
+    ],
     "cost": "$10 RSVP / $20 Door",
+    "price": 10,
     "premier": false,
-    "description": "A hands-on session on building a referral engine for your business — scripts, follow-up cadences, and how to ask for introductions without it feeling awkward."
+    "description": "A hands-on session on building a referral engine for your business \u2014 scripts, follow-up cadences, and how to ask for introductions without it feeling awkward."
   },
   {
     "id": "3",
@@ -32,9 +45,16 @@
     "date": "2026-10-14",
     "time": "18:00-21:00",
     "city": "Walnut Creek",
+    "region": "Contra Costa",
     "type": "In Person",
     "category": "Dinner",
+    "categories": [
+      "Dinner",
+      "Networking",
+      "Food, Spirits, Wine"
+    ],
     "cost": "$25 RSVP / $35 Door",
+    "price": 25,
     "premier": false,
     "description": "A seated dinner capped at a small group size so every table actually gets to talk business. Vegetarian option available on request."
   },
@@ -45,23 +65,473 @@
     "date": "2026-10-16",
     "time": "12:00-13:00",
     "city": "Online",
+    "region": "",
     "type": "Online",
     "category": "Roundtable",
+    "categories": [
+      "Business Investor, Startup",
+      "Meeting"
+    ],
     "cost": "Free",
+    "price": 0,
     "premier": false,
-    "description": "A monthly video call for early-stage founders to trade notes on fundraising, hiring, and go-to-market — no pitching, just peer advice."
+    "description": "A monthly video call for early-stage founders to trade notes on fundraising, hiring, and go-to-market \u2014 no pitching, just peer advice."
   },
   {
-    "id": "1789931878683",
-    "title": "Test",
-    "hostedBy": "Masoud",
-    "date": "2026-09-21",
-    "time": "",
-    "city": "Ptown",
+    "id": "5",
+    "title": "Tri-Valley Morning Mixer",
+    "hostedBy": "Tri-Valley Chamber",
+    "date": "2026-09-24",
+    "time": "07:30-09:00",
+    "city": "Pleasanton",
+    "region": "Alameda",
     "type": "In Person",
     "category": "Networking",
+    "categories": [
+      "Networking",
+      "Business, Financial"
+    ],
     "cost": "Free",
+    "price": 0,
     "premier": false,
-    "description": "Test event submitted through the prototype's event form."
+    "description": "Coffee, pastries and quick intros with Tri-Valley business owners before the workday starts."
+  },
+  {
+    "id": "6",
+    "title": "AI for Small Business: Lunch & Learn",
+    "hostedBy": "Bay Area SBDC",
+    "date": "2026-09-24",
+    "time": "12:00-13:30",
+    "city": "Oakland",
+    "region": "Alameda",
+    "type": "In Person",
+    "category": "Workshop",
+    "categories": [
+      "Seminar, Workshop",
+      "AI",
+      "Education"
+    ],
+    "cost": "$15",
+    "price": 15,
+    "premier": true,
+    "description": "Practical ways small businesses are using AI tools for marketing, bookkeeping and customer service \u2014 with live demos."
+  },
+  {
+    "id": "7",
+    "title": "SF Startup Pitch Night",
+    "hostedBy": "Founders Circle SF",
+    "date": "2026-09-26",
+    "time": "18:30-21:00",
+    "city": "San Francisco",
+    "region": "San Francisco",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Business Investor, Startup",
+      "Networking",
+      "Emerging Tech"
+    ],
+    "cost": "$20 RSVP / $30 Door",
+    "price": 20,
+    "premier": true,
+    "description": "Six early-stage startups pitch to a panel of angels and VCs, followed by open networking."
+  },
+  {
+    "id": "8",
+    "title": "Women in Real Estate Brunch",
+    "hostedBy": "WIRE Bay Area",
+    "date": "2026-09-27",
+    "time": "10:30-12:30",
+    "city": "Palo Alto",
+    "region": "Santa Clara",
+    "type": "In Person",
+    "category": "Dinner",
+    "categories": [
+      "Female, Women",
+      "Business, Financial",
+      "Dinner"
+    ],
+    "cost": "$45",
+    "price": 45,
+    "premier": false,
+    "description": "Brunch and a panel on building a real estate portfolio, with agents, lenders and investors."
+  },
+  {
+    "id": "9",
+    "title": "Latino Business Alliance Mixer",
+    "hostedBy": "Hispanic Chamber of Silicon Valley",
+    "date": "2026-09-29",
+    "time": "17:30-19:30",
+    "city": "San Jose",
+    "region": "Santa Clara",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Hispanic, Latino, Latinx",
+      "Networking",
+      "Business, Financial"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": false,
+    "description": "Bilingual networking for Latino entrepreneurs, professionals and allies."
+  },
+  {
+    "id": "10",
+    "title": "Virtual Job Fair: Tech & Biotech",
+    "hostedBy": "Bay Area Careers Collective",
+    "date": "2026-09-30",
+    "time": "10:00-14:00",
+    "city": "Online",
+    "region": "",
+    "type": "Online",
+    "category": "Networking",
+    "categories": [
+      "Career",
+      "Biotechnology",
+      "Internet, IT, Web"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": true,
+    "description": "Meet recruiters from 40+ Bay Area tech and biotech employers in virtual booths."
+  },
+  {
+    "id": "11",
+    "title": "Marin Wine & Networking Evening",
+    "hostedBy": "Marin Business Circle",
+    "date": "2026-10-01",
+    "time": "17:30-20:00",
+    "city": "San Rafael",
+    "region": "Marin",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Food, Spirits, Wine",
+      "Networking",
+      "Social, Reunion"
+    ],
+    "cost": "$35",
+    "price": 35,
+    "premier": false,
+    "description": "Local wineries pour while Marin professionals mingle on the terrace."
+  },
+  {
+    "id": "12",
+    "title": "Real Estate Investor Meetup",
+    "hostedBy": "East Bay REIA",
+    "date": "2026-10-02",
+    "time": "18:30-20:30",
+    "city": "Fremont",
+    "region": "Alameda",
+    "type": "In Person",
+    "category": "Roundtable",
+    "categories": [
+      "Business, Financial",
+      "Meeting",
+      "Networking"
+    ],
+    "cost": "$10",
+    "price": 10,
+    "premier": false,
+    "description": "Deal reviews, lender Q&A and open networking for small multifamily and single-family investors."
+  },
+  {
+    "id": "13",
+    "title": "Peninsula Chamber Business Expo",
+    "hostedBy": "San Mateo Area Chamber",
+    "date": "2026-10-06",
+    "time": "11:00-16:00",
+    "city": "San Mateo",
+    "region": "San Mateo",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Expo, Trade Show",
+      "Business, Financial"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": true,
+    "description": "80+ local exhibitors, a speaker stage and B2B matchmaking tables."
+  },
+  {
+    "id": "14",
+    "title": "Napa Valley Harvest Social",
+    "hostedBy": "Napa Young Professionals",
+    "date": "2026-10-09",
+    "time": "17:00-20:00",
+    "city": "Napa",
+    "region": "Napa",
+    "type": "In Person",
+    "category": "Dinner",
+    "categories": [
+      "Festivals, Parade",
+      "Food, Spirits, Wine",
+      "Social, Reunion"
+    ],
+    "cost": "$60",
+    "price": 60,
+    "premier": false,
+    "description": "Harvest-season celebration with local food, wine and live music."
+  },
+  {
+    "id": "15",
+    "title": "Sustainability & Clean Energy Summit",
+    "hostedBy": "Bay Area Climate Forum",
+    "date": "2026-10-12",
+    "time": "09:00-17:00",
+    "city": "San Francisco",
+    "region": "San Francisco",
+    "type": "In Person",
+    "category": "Workshop",
+    "categories": [
+      "Conference",
+      "Sustainability",
+      "Energy"
+    ],
+    "cost": "$149",
+    "price": 149,
+    "premier": true,
+    "description": "Full-day summit on clean energy, building decarbonization and climate-tech investment."
+  },
+  {
+    "id": "16",
+    "title": "Asian American Professionals Mixer",
+    "hostedBy": "AAPN Bay Area",
+    "date": "2026-10-13",
+    "time": "18:00-20:30",
+    "city": "Cupertino",
+    "region": "Santa Clara",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Asian",
+      "Networking",
+      "Career"
+    ],
+    "cost": "$15",
+    "price": 15,
+    "premier": false,
+    "description": "Career-focused networking with panel Q&A from senior leaders across tech and finance."
+  },
+  {
+    "id": "17",
+    "title": "Sonoma County Small Business Workshop",
+    "hostedBy": "Sonoma SBDC",
+    "date": "2026-10-15",
+    "time": "09:30-12:00",
+    "city": "Santa Rosa",
+    "region": "Sonoma",
+    "type": "In Person",
+    "category": "Workshop",
+    "categories": [
+      "Seminar, Workshop",
+      "Education",
+      "Business, Financial"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": false,
+    "description": "Business plans, SBA loans and local grant programs explained by SBDC advisors."
+  },
+  {
+    "id": "18",
+    "title": "Solano Community Resource Fair",
+    "hostedBy": "Solano Community Network",
+    "date": "2026-10-17",
+    "time": "10:00-14:00",
+    "city": "Vacaville",
+    "region": "Solano",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Community",
+      "Health",
+      "Age: Seniors"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": false,
+    "description": "Nonprofits, health providers and county services under one roof."
+  },
+  {
+    "id": "19",
+    "title": "Sacramento Tech Meetup",
+    "hostedBy": "Sac Tech Collective",
+    "date": "2026-10-20",
+    "time": "18:00-20:30",
+    "city": "Sacramento",
+    "region": "Sacramento Valley",
+    "type": "In Person",
+    "category": "Roundtable",
+    "categories": [
+      "Internet, IT, Web",
+      "AI",
+      "Meeting"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": false,
+    "description": "Lightning talks from local engineers followed by pizza and networking."
+  },
+  {
+    "id": "20",
+    "title": "Online Workshop: LinkedIn for Business Owners",
+    "hostedBy": "everyCircle",
+    "date": "2026-10-21",
+    "time": "12:00-13:00",
+    "city": "Online",
+    "region": "",
+    "type": "Online",
+    "category": "Workshop",
+    "categories": [
+      "Seminar, Workshop",
+      "Communication",
+      "Business, Financial"
+    ],
+    "cost": "$25",
+    "price": 25,
+    "premier": false,
+    "description": "Profile, content and outreach tactics that turn LinkedIn into a steady referral source."
+  },
+  {
+    "id": "21",
+    "title": "Monterey Bay Tourism & Hospitality Mixer",
+    "hostedBy": "Central Coast Hospitality Assn",
+    "date": "2026-10-23",
+    "time": "17:00-19:00",
+    "city": "Monterey",
+    "region": "Central Coast",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Tourism",
+      "Travel",
+      "Networking"
+    ],
+    "cost": "$30",
+    "price": 30,
+    "premier": false,
+    "description": "Hotel, restaurant and tour operators meet local vendors and marketers."
+  },
+  {
+    "id": "22",
+    "title": "Oakland Black Business Expo",
+    "hostedBy": "Oakland Black Business Network",
+    "date": "2026-10-24",
+    "time": "11:00-17:00",
+    "city": "Oakland",
+    "region": "Alameda",
+    "type": "In Person",
+    "category": "Networking",
+    "categories": [
+      "Black",
+      "Expo, Trade Show",
+      "Community"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": true,
+    "description": "Shop, network and hear from founders at the East Bay's largest Black-owned business showcase."
+  },
+  {
+    "id": "23",
+    "title": "LA Proptech Conference",
+    "hostedBy": "Proptech West",
+    "date": "2026-11-05",
+    "time": "08:30-17:30",
+    "city": "Los Angeles",
+    "region": "Southern California",
+    "type": "In Person",
+    "category": "Workshop",
+    "categories": [
+      "Conference",
+      "Emerging Tech",
+      "Business Investor, Startup"
+    ],
+    "cost": "$295",
+    "price": 295,
+    "premier": false,
+    "description": "Two tracks on real estate technology, AI underwriting and capital markets."
+  },
+  {
+    "id": "24",
+    "title": "National Small Business Week Virtual Summit",
+    "hostedBy": "SBA Partners",
+    "date": "2026-11-10",
+    "time": "09:00-15:00",
+    "city": "Online",
+    "region": "",
+    "type": "Online",
+    "category": "Workshop",
+    "categories": [
+      "Conference",
+      "Education",
+      "Business, Financial"
+    ],
+    "cost": "Free",
+    "price": 0,
+    "premier": false,
+    "description": "Nationwide livestream with sessions on funding, exporting and government contracting."
+  },
+  {
+    "id": "25",
+    "title": "Contra Costa Holiday Networking Party",
+    "hostedBy": "Contra Costa Council",
+    "date": "2026-12-04",
+    "time": "18:00-21:00",
+    "city": "Concord",
+    "region": "Contra Costa",
+    "type": "In Person",
+    "category": "Dinner",
+    "categories": [
+      "Party, Wedding",
+      "Networking",
+      "Social, Reunion"
+    ],
+    "cost": "$75",
+    "price": 75,
+    "premier": true,
+    "description": "Year-end celebration with dinner stations, a DJ and a toy drive."
+  },
+  {
+    "id": "26",
+    "title": "Global Founders Summit \u2014 Lisbon",
+    "hostedBy": "Global Founders Network",
+    "date": "2026-11-18",
+    "time": "09:00-18:00",
+    "city": "Lisbon",
+    "region": "International",
+    "type": "In Person",
+    "category": "Workshop",
+    "categories": [
+      "Conference",
+      "Business Investor, Startup"
+    ],
+    "cost": "$450",
+    "price": 450,
+    "premier": false,
+    "description": "International founder and investor summit with a Bay Area delegation."
+  },
+  {
+    "id": "27",
+    "title": "Austin Real Estate Investor Retreat",
+    "hostedBy": "US Investor Circle",
+    "date": "2026-11-13",
+    "time": "09:00-17:00",
+    "city": "Austin, TX",
+    "region": "National",
+    "type": "In Person",
+    "category": "Roundtable",
+    "categories": [
+      "Business, Financial",
+      "Meeting",
+      "Travel"
+    ],
+    "cost": "$199",
+    "price": 199,
+    "premier": false,
+    "description": "Weekend retreat on out-of-state investing, syndications and 1031 exchanges."
   }
 ]

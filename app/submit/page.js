@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { REGION_GROUPS, CATEGORY_GROUPS } from "../lib/taxonomy";
 
 export default function SubmitEvent() {
   const router = useRouter();
@@ -11,10 +12,21 @@ export default function SubmitEvent() {
     date: "",
     time: "",
     city: "",
+    region: "Alameda",
     type: "In Person",
     category: "Networking",
+    categories: ["Networking"],
     cost: "Free",
+    price: 0,
   });
+
+  function toggleCat(c) {
+    setForm((f) => {
+      const has = f.categories.includes(c);
+      const categories = has ? f.categories.filter((x) => x !== c) : [...f.categories, c];
+      return { ...f, categories, category: categories[0] || "Networking" };
+    });
+  }
   const [saved, setSaved] = useState(false);
 
   function update(field, value) {
@@ -82,16 +94,48 @@ export default function SubmitEvent() {
             <option>Online</option>
           </select>
         </label>
+        {form.type !== "Online" && (
+          <label>
+            Region
+            <select value={form.region} onChange={(e) => update("region", e.target.value)}>
+              {REGION_GROUPS.map((g) => (
+                <optgroup key={g.group} label={g.group}>
+                  {g.options.map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+        )}
+        <div>
+          <label>Categories <span className="sub">(select all that apply)</span></label>
+          <div className="cats-grid">
+            {CATEGORY_GROUPS.map((g) => (
+              <div key={g.group} style={{ display: "contents" }}>
+                <div className="cats-group-title">{g.group}</div>
+                {g.options.map((c) => (
+                  <label key={c}>
+                    <input type="checkbox" checked={form.categories.includes(c)} onChange={() => toggleCat(c)} /> {c}
+                  </label>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
         <label>
-          Category
-          <input
-            value={form.category}
-            onChange={(e) => update("category", e.target.value)}
-          />
+          Cost (as shown to attendees)
+          <input value={form.cost} onChange={(e) => update("cost", e.target.value)} />
         </label>
         <label>
-          Cost
-          <input value={form.cost} onChange={(e) => update("cost", e.target.value)} />
+          Lowest ticket price in $ (used by the Cost filter)
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.price}
+            onChange={(e) => update("price", Number(e.target.value))}
+          />
         </label>
         <button className="btn" type="submit">
           Submit to Master Calendar

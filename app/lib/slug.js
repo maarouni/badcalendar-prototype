@@ -11,6 +11,8 @@ const CATEGORY_ICON = {
   Workshop: "🛠️",
   Dinner: "🍽️",
   Roundtable: "🎙️",
+  Expo: "🏛️",
+  Conference: "🎤",
 };
 
 export function categoryIcon(category) {

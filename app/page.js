@@ -3,9 +3,11 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { slugify } from "./lib/slug";
+import FilterPanel from "./components/FilterPanel";
+import { EMPTY_FILTERS, matches, orderEvents, googleCalendarUrl } from "./lib/taxonomy";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
-const DEFAULT_FILTERS = { type: "All", category: "All" };
+const FILTERS_KEY = "mc_current_filters_v1";
 const PAGE_SIZE = 6; // max events per page — mix of Premier + Regular, per spec
 
 const UPCOMING_FEATURES = [
@@ -21,35 +23,34 @@ function SuperCalendarInner() {
 
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState({});
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const today = useMemo(() => new Date(), []);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetch("/api/events").then((r) => r.json()).then(setEvents);
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     setSelected(saved);
+    try {
+      const f = JSON.parse(localStorage.getItem(FILTERS_KEY) || "null");
+      if (f) setFilters({ ...EMPTY_FILTERS, ...f });
+    } catch {}
   }, []);
 
-  const categories = useMemo(
-    () => ["All", ...new Set(events.map((e) => e.category))],
-    [events]
-  );
+  useEffect(() => {
+    try { localStorage.setItem(FILTERS_KEY, JSON.stringify(filters)); } catch {}
+  }, [filters]);
 
-  const filtered = events.filter((e) => {
-    if (filters.type !== "All" && e.type !== filters.type) return false;
-    if (filters.category !== "All" && e.category !== filters.category) return false;
-    if (q && !e.title.toLowerCase().includes(q)) return false;
-    return true;
-  });
+  const filtered = useMemo(
+    () => events.filter((e) => matches(e, filters, today, null, q)),
+    [events, filters, today, q]
+  );
 
   // Premier events surface first, then Regular fills out the rest of each page —
   // "system automatically displays a combo of as many Premier and Regular events
   // that fit on the page" per spec. Sort is stable so order within each group holds.
-  const ordered = useMemo(() => {
-    const premier = filtered.filter((e) => e.premier);
-    const regular = filtered.filter((e) => !e.premier);
-    return [...premier, ...regular];
-  }, [filtered]);
+  // Premier first, then chronological (spec notes rev 260923).
+  const ordered = useMemo(() => orderEvents(filtered), [filtered]);
 
   const totalPages = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -60,12 +61,13 @@ function SuperCalendarInner() {
   // instead of showing an empty page.
   useEffect(() => {
     setPage(1);
-  }, [filters.type, filters.category, q]);
+  }, [filters, q]);
 
   const activeFilters = [];
-  if (filters.type !== "All") activeFilters.push({ key: "type", label: `Type: ${filters.type}` });
-  if (filters.category !== "All") activeFilters.push({ key: "category", label: `Category: ${filters.category}` });
   if (q) activeFilters.push({ key: "q", label: `Search: "${q}"` });
+  const anyFilter =
+    filters.formats.length || filters.tiers.length || filters.date !== "all" ||
+    filters.costs.length || filters.regions.length || filters.categories.length;
 
   function clearFilter(key) {
     if (key === "q") {
@@ -73,11 +75,10 @@ function SuperCalendarInner() {
       window.location.reload();
       return;
     }
-    setFilters((f) => ({ ...f, [key]: "All" }));
   }
 
   function clearAllFilters() {
-    setFilters(DEFAULT_FILTERS);
+    setFilters(EMPTY_FILTERS);
     if (q) {
       window.history.replaceState({}, "", "/");
       window.location.reload();
@@ -140,39 +141,18 @@ function SuperCalendarInner() {
         )}
 
         <div className="layout-with-sidebar">
-          <aside className="sidebar">
-            <h4>Type</h4>
-            {["All", "In Person", "Online"].map((t) => (
-              <label key={t}>
-                <input
-                  type="radio"
-                  name="type"
-                  checked={filters.type === t}
-                  onChange={() => setFilters((f) => ({ ...f, type: t }))}
-                />{" "}
-                {t}
-              </label>
-            ))}
-            <h4 style={{ marginTop: 16 }}>Category</h4>
-            {categories.map((c) => (
-              <label key={c}>
-                <input
-                  type="radio"
-                  name="category"
-                  checked={filters.category === c}
-                  onChange={() => setFilters((f) => ({ ...f, category: c }))}
-                />{" "}
-                {c}
-              </label>
-            ))}
-          </aside>
+          <FilterPanel events={events} filters={filters} setFilters={setFilters} today={today} q={q} />
 
           <div>
+            <div className="results-bar">
+              <strong>{ordered.length}</strong> of {events.length} events match
+              {anyFilter ? " your filters" : ""}
+            </div>
             <div className="event-list">
               {pageItems.length === 0 && (
                 <div className="empty-state">
                   No events match these filters.
-                  {activeFilters.length > 0 && (
+                  {(activeFilters.length > 0 || anyFilter) && (
                     <>
                       {" "}
                       <button type="button" className="clear-filters-link" onClick={clearAllFilters}>
@@ -201,13 +181,24 @@ function SuperCalendarInner() {
                       {e.premier && <span className="badge">PREMIER</span>}
                     </div>
                     <div className="sub">
-                      {e.date} · {e.time} · {e.city} · Hosted by{" "}
+                      {e.date}{e.time ? ` · ${e.time}` : ""} · {e.type === "Online" ? "Online" : `${e.city}${e.region ? ` (${e.region})` : ""}`} · Hosted by{" "}
                       <a href={`/organizer/${slugify(e.hostedBy)}`} className="host-link">
                         {e.hostedBy}
                       </a>
                     </div>
                   </div>
-                  <div className="sub">{e.cost}</div>
+                  <div className="card-right">
+                    <div className="sub">{e.cost}</div>
+                    <a
+                      className="gcal-link"
+                      href={googleCalendarUrl(e)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Add to my Google Calendar"
+                    >
+                      + Google Cal
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>

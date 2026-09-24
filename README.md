@@ -5,12 +5,16 @@ no real database, no Cesar-facing deployment. Purpose: prove the core loop
 works before committing to the full engineering plan in the feasibility doc.
 
 ## What's here
-- **Super Calendar** (`/`) — public event list with Type/Category filters,
-  matching the "gold = public view" mode from Cesar's Figma spec. Select
-  events to add them to My Calendar.
-- **My Calendar** (`/my-calendar`) — your selected events with a per-event
-  attendance status (Interested / Going / Not Going), matching the "gray =
-  private edit mode" concept.
+- **Super Calendar** (`/`) — public event list with the full filter panel
+  from Cesar's spec (rev 260923): Event Types (In-Person/Online,
+  Premier/Regular), Dates, Costs, Regions (Bay Area counties, CA regions,
+  National/International) and Categories (6 groups). Multi-select; AND across
+  sections, OR within a section (spec "Matchmaking Algorithm"). Options with no
+  results are grayed out, "Online only" grays out Regions, and filters can be
+  saved as Filter Sets A/B/C. Premier events list first, then by date/time.
+  Taxonomy lives in `app/lib/taxonomy.js`.
+- **My Calendar** (`/my-calendar`) — your selected events with the spec's
+  8-state attendance status, a status filter bar, and "Add to Google Calendar".
 - **Submit Event** (`/submit`) — free event submission form, writes
   straight into the mock data file.
 
