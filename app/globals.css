@@ -1175,9 +1175,26 @@ input[type="radio"]:disabled { opacity: .45; cursor: default; }
 .nt-counter { font-size: 12px; color: var(--ink-soft); }
 .nt-preview { position: sticky; top: 90px; }
 .nt-preview-box { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: #fcfbf8; }
-.nt-preview-sec { border: 1.5px dashed #d8d8d8; border-radius: 6px; padding: 14px 8px; margin-bottom: 8px; font-size: 12px; color: #999; text-align: center; }
+.nt-preview-sec { border: 1.5px dashed #d8d8d8; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 12px; min-height: 34px; }
+.nt-preview-label { color: #999; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+.nt-preview-text { color: var(--ink); white-space: pre-wrap; font-size: 13px; }
+.nt-preview-item { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-top: 1px solid var(--border); color: var(--ink); font-size: 13px; }
+.nt-preview-item a { color: var(--gold-dark); font-weight: 700; text-decoration: none; }
+.nt-preview-head { font-weight: 800; font-size: 15px; margin-bottom: 10px; }
+.nt-preview-box.premier { border-color: var(--gold); background: #fffaf0; }
 .nt-preview-foot { font-size: 10px; color: #aaa; text-align: center; margin-top: 6px; }
 @media (max-width: 760px) {
   .nt-two-col { grid-template-columns: 1fr; }
   .nt-preview { position: static; }
 }
+
+.nt-title-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.nt-edit-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.nt-input { border: 1.5px solid var(--gold-light); border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 13px; background: #fffdf6; width: 100%; box-sizing: border-box; min-width: 0; }
+.nt-input.sm { font-size: 12px; padding: 3px 6px; }
+.nt-input:focus { outline: none; border-color: var(--gold-dark); box-shadow: 0 0 0 3px var(--gold-light); }
+.nt-edit-row { display: flex; gap: 6px; align-items: center; margin: 4px 0; }
+.nt-edit-row .nt-link { flex: 0 0 38%; }
+.nt-textarea:not(:disabled) { border-style: solid; border-color: var(--border); background: #fff; }
+.nt-add:not(:disabled) { cursor: pointer; color: var(--gold-dark); border-color: var(--gold); }
+.nt-add-card { border-style: dashed; color: var(--gold-dark); font-weight: 700; cursor: pointer; align-items: center; justify-content: center; min-height: 150px; font: inherit; }

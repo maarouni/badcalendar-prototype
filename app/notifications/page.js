@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { REGION_GROUPS, CATEGORY_GROUPS } from "../lib/taxonomy";
 import {
-  NOTIFICATION_FILTERS,
+  DEFAULT_LABELS,
   DELIVERY_CHANNELS,
-  DELIVERY_FREQUENCY,
   DELIVERY_DAYS,
-  BUSINESS_SECTIONS,
   MAX_LISTINGS_PER_NOTIFICATION,
   MAX_BUSINESSES_PER_USER,
-  SAMPLE_NOTIFICATION_CARDS,
 } from "../lib/notificationConfig";
+
+const LABELS_KEY = "cg_notification_labels_v1";
+const clone = (x) => JSON.parse(JSON.stringify(x));
 
 const TABS = [
   { id: "browse", label: "Browse Notifications" },
@@ -19,10 +19,21 @@ const TABS = [
   { id: "business", label: "Create Business Notification" },
 ];
 
-// Renders the label if filled in, otherwise a dashed "to be filled" slot.
-function Slot({ text, link, placeholder = "Label — to be filled" }) {
-  if (!text) return <span className="nt-slot">{placeholder}</span>;
-  return link ? <a href={link} className="title-link">{text}</a> : <span>{text}</span>;
+// A text value that is a typing box in Edit mode, and plain text (or a dashed
+// "to be filled" box if still empty) otherwise.
+function Field({ edit, value, onChange, placeholder, small, link }) {
+  if (edit) {
+    return (
+      <input
+        className={`nt-input ${small ? "sm" : ""}`}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    );
+  }
+  if (!value) return <span className={`nt-slot ${small ? "sm" : ""}`}>{placeholder}</span>;
+  return link ? <a href={link} className="title-link" target="_blank" rel="noreferrer">{value}</a> : <span>{value}</span>;
 }
 
 function Group({ title, hint, children }) {
@@ -43,19 +54,65 @@ function Group({ title, hint, children }) {
   );
 }
 
-function BrowseTab() {
+function BrowseTab({ edit, labels, update }) {
+  const [picked, setPicked] = useState({});
+  const togglePick = (gid, i, type) =>
+    setPicked((p) => {
+      const cur = p[gid] || [];
+      if (type === "radio") return { ...p, [gid]: [i] };
+      return { ...p, [gid]: cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i] };
+    });
+
   return (
     <div className="layout-with-sidebar">
       <aside className="sidebar filter-panel">
         <div className="fp-top"><h4>Notification filters</h4></div>
-        {NOTIFICATION_FILTERS.map((g) => (
-          <Group key={g.id} title={g.title} hint={g.hint}>
-            {g.options.map((o, i) => (
-              <label key={i} className="fp-option">
-                <input type={g.type} name={`nt-${g.id}`} disabled={!o.label} />
-                <span className="fp-label"><Slot text={o.label} link={o.link} /></span>
-              </label>
-            ))}
+        {labels.filters.map((g, gi) => (
+          <Group key={g.id} title={g.title} hint={edit ? "Type the option text. Link is optional." : g.hint}>
+            {g.options.map((o, i) =>
+              edit ? (
+                <div key={i} className="nt-edit-row">
+                  <input
+                    className="nt-input sm"
+                    value={o.label}
+                    placeholder={`Option ${i + 1}`}
+                    onChange={(e) => update((L) => { L.filters[gi].options[i].label = e.target.value; })}
+                  />
+                  <input
+                    className="nt-input sm nt-link"
+                    value={o.link}
+                    placeholder="link (optional)"
+                    onChange={(e) => update((L) => { L.filters[gi].options[i].link = e.target.value; })}
+                  />
+                  <button
+                    type="button"
+                    className="remove-link"
+                    title="Remove option"
+                    onClick={() => update((L) => { L.filters[gi].options.splice(i, 1); })}
+                  >✕</button>
+                </div>
+              ) : (
+                <label key={i} className="fp-option">
+                  <input
+                    type={g.type}
+                    name={`nt-${g.id}`}
+                    disabled={!o.label}
+                    checked={(picked[g.id] || []).includes(i)}
+                    onChange={() => togglePick(g.id, i, g.type)}
+                  />
+                  <span className="fp-label">
+                    <Field edit={false} value={o.label} link={o.link} placeholder="Label — to be filled" small />
+                  </span>
+                </label>
+              )
+            )}
+            {edit && (
+              <button
+                type="button"
+                className="nt-add"
+                onClick={() => update((L) => { L.filters[gi].options.push({ label: "", link: "" }); })}
+              >+ Add option</button>
+            )}
           </Group>
         ))}
         <Group title="Regions" hint="Same list as One Big Calendar">
@@ -73,28 +130,50 @@ function BrowseTab() {
       <div style={{ flex: 1 }}>
         <div className="results-bar">Notifications you can subscribe to</div>
         <div className="nt-card-grid">
-          {SAMPLE_NOTIFICATION_CARDS.map((c, i) => (
-            <div key={i} className="nt-card">
-              <div className="nt-card-title"><Slot text={c.label} link={c.link} placeholder="Notification name" /></div>
-              <div className="nt-card-row"><span className="nt-slot sm">Publisher</span></div>
-              <div className="nt-card-row">
-                <span className="nt-slot sm">Subscribers</span>
-                <span className="nt-slot sm">Frequency</span>
+          {labels.cards.map((c, i) => {
+            const set = (k) => (v) => update((L) => { L.cards[i][k] = v; });
+            return (
+              <div key={i} className="nt-card">
+                <div className="nt-card-title">
+                  <Field edit={edit} value={c.name} onChange={set("name")} placeholder="Notification name" />
+                </div>
+                <div className="nt-card-row">
+                  <Field edit={edit} value={c.publisher} onChange={set("publisher")} placeholder="Publisher" small />
+                </div>
+                <div className="nt-card-row">
+                  <Field edit={edit} value={c.subscribers} onChange={set("subscribers")} placeholder="Subscribers" small />
+                  <Field edit={edit} value={c.frequency} onChange={set("frequency")} placeholder="Frequency" small />
+                </div>
+                <div className="nt-card-row">
+                  <Field edit={edit} value={c.area} onChange={set("area")} placeholder="Region · Category" small />
+                </div>
+                {edit ? (
+                  <button type="button" className="remove-link" style={{ alignSelf: "flex-end" }}
+                    onClick={() => update((L) => { L.cards.splice(i, 1); })}>Remove card</button>
+                ) : (
+                  <button type="button" className="btn nt-sub-btn">Subscribe</button>
+                )}
               </div>
-              <div className="nt-card-row"><span className="nt-slot sm">Region · Category</span></div>
-              <button type="button" className="btn nt-sub-btn" disabled>Subscribe</button>
-            </div>
-          ))}
+            );
+          })}
+          {edit && (
+            <button type="button" className="nt-card nt-add-card"
+              onClick={() => update((L) => { L.cards.push({ name: "", publisher: "", subscribers: "", frequency: "", area: "" }); })}>
+              + Add card
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function MineTab() {
+function MineTab({ edit, labels, update }) {
   const [channel, setChannel] = useState("Email");
+  const [freq, setFreq] = useState(null);
   const [days, setDays] = useState(["Wed"]);
   const toggleDay = (d) => setDays((cur) => (cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d]));
+  const subs = labels.cards.filter((c) => c.name).slice(0, 3);
 
   return (
     <div className="nt-two-col">
@@ -102,26 +181,26 @@ function MineTab() {
         <h4 className="section-label">My subscriptions</h4>
         <table className="nt-table">
           <thead>
-            <tr><th>Notification</th><th>Publisher</th><th>Frequency</th><th>Filter set</th><th></th></tr>
+            <tr><th>Notification</th><th>Publisher</th><th>Frequency</th><th>Filter set</th></tr>
           </thead>
           <tbody>
-            {[0, 1, 2].map((i) => (
+            {(subs.length ? subs : [{}, {}, {}]).map((c, i) => (
               <tr key={i}>
-                <td><span className="nt-slot sm">Notification name</span></td>
-                <td><span className="nt-slot sm">Publisher</span></td>
-                <td><span className="nt-slot sm">Frequency</span></td>
+                <td>{c.name || <span className="nt-slot sm">Notification name</span>}</td>
+                <td>{c.publisher || <span className="nt-slot sm">Publisher</span>}</td>
+                <td>{c.frequency || <span className="nt-slot sm">Frequency</span>}</td>
                 <td>
-                  <select disabled defaultValue="">
-                    <option value="">Set A / B / C</option>
+                  <select defaultValue="">
+                    <option value="">None</option>
+                    <option>Set A</option><option>Set B</option><option>Set C</option>
                   </select>
                 </td>
-                <td><button type="button" className="remove-link" disabled title="Unsubscribe">✕</button></td>
               </tr>
             ))}
           </tbody>
         </table>
         <div className="nt-hint" style={{ marginTop: 8 }}>
-          Attaching a Filter Set (A/B/C) auto-fills a notification with matching listings.
+          Rows fill in from the cards on the Browse tab. Attaching a Filter Set (A/B/C) auto-fills a notification with matching listings.
         </div>
       </div>
 
@@ -137,12 +216,25 @@ function MineTab() {
         ))}
 
         <div className="nt-field-label">How often</div>
-        {DELIVERY_FREQUENCY.map((o, i) => (
-          <label key={i} className="fp-option">
-            <input type="radio" name="nt-freq" disabled={!o.label} />
-            <span className="fp-label"><Slot text={o.label} /></span>
-          </label>
-        ))}
+        {labels.deliveryFrequency.map((o, i) =>
+          edit ? (
+            <div key={i} className="nt-edit-row">
+              <input className="nt-input sm" value={o.label} placeholder={`Choice ${i + 1} (e.g. Weekly digest)`}
+                onChange={(e) => update((L) => { L.deliveryFrequency[i].label = e.target.value; })} />
+              <button type="button" className="remove-link"
+                onClick={() => update((L) => { L.deliveryFrequency.splice(i, 1); })}>✕</button>
+            </div>
+          ) : (
+            <label key={i} className="fp-option">
+              <input type="radio" name="nt-freq" disabled={!o.label} checked={freq === i} onChange={() => setFreq(i)} />
+              <span className="fp-label"><Field edit={false} value={o.label} placeholder="Label — to be filled" small /></span>
+            </label>
+          )
+        )}
+        {edit && (
+          <button type="button" className="nt-add"
+            onClick={() => update((L) => { L.deliveryFrequency.push({ label: "", link: "" }); })}>+ Add choice</button>
+        )}
 
         <div className="nt-field-label">Deliver on these days (batched)</div>
         <div className="nt-days">
@@ -153,8 +245,6 @@ function MineTab() {
             </label>
           ))}
         </div>
-
-        <button type="button" className="btn" disabled style={{ marginTop: 14 }}>Save preferences</button>
       </div>
     </div>
   );
@@ -162,15 +252,43 @@ function MineTab() {
 
 function BusinessTab() {
   const [tier, setTier] = useState("Free");
+  const [business, setBusiness] = useState("");
+  const [info, setInfo] = useState("");
+  const [lists, setLists] = useState({ B: [{ event: "", link: "" }], C: [{ event: "", link: "" }] });
+  const total = lists.B.length + lists.C.length;
+
+  const setItem = (sec, i, k, v) =>
+    setLists((L) => ({ ...L, [sec]: L[sec].map((x, j) => (j === i ? { ...x, [k]: v } : x)) }));
+  const addItem = (sec) =>
+    total < MAX_LISTINGS_PER_NOTIFICATION &&
+    setLists((L) => ({ ...L, [sec]: [...L[sec], { event: "", link: "" }] }));
+  const removeItem = (sec, i) => setLists((L) => ({ ...L, [sec]: L[sec].filter((_, j) => j !== i) }));
+
+  const Listings = ({ sec, title, hint }) => (
+    <div className="nt-section">
+      <div className="nt-section-head"><b>{title}</b><span className="nt-hint">{hint}</span></div>
+      {lists[sec].map((x, i) => (
+        <div key={i} className="nt-edit-row">
+          <input className="nt-input sm" placeholder="Event name" value={x.event} onChange={(e) => setItem(sec, i, "event", e.target.value)} />
+          <input className="nt-input sm nt-link" placeholder="RSVP link" value={x.link} onChange={(e) => setItem(sec, i, "link", e.target.value)} />
+          <button type="button" className="remove-link" onClick={() => removeItem(sec, i)}>✕</button>
+        </div>
+      ))}
+      <button type="button" className="nt-add" onClick={() => addItem(sec)} disabled={total >= MAX_LISTINGS_PER_NOTIFICATION}>
+        + Add listing
+      </button>
+    </div>
+  );
+
+  const previewList = (sec) => lists[sec].filter((x) => x.event);
+
   return (
     <div className="nt-two-col">
       <div>
         <div className="nt-builder-top">
           <label className="nt-field">
-            <span className="nt-field-label">Business</span>
-            <select disabled defaultValue="">
-              <option value="">Select business (up to {MAX_BUSINESSES_PER_USER})</option>
-            </select>
+            <span className="nt-field-label">Business name</span>
+            <input className="nt-input" placeholder={`Your business (up to ${MAX_BUSINESSES_PER_USER})`} value={business} onChange={(e) => setBusiness(e.target.value)} />
           </label>
           <div className="nt-field">
             <span className="nt-field-label">Listing type</span>
@@ -185,41 +303,41 @@ function BusinessTab() {
           </div>
         </div>
 
-        {BUSINESS_SECTIONS.map((s) => (
-          <div key={s.id} className="nt-section">
-            <div className="nt-section-head">
-              <b>{s.title}</b>
-              <span className="nt-hint">{s.hint}</span>
-            </div>
-            {s.kind === "text" ? (
-              <textarea className="nt-textarea" placeholder="Description text…" disabled />
-            ) : (
-              <>
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="nt-listing-slot">
-                    <span className="nt-slot sm">Event listing</span>
-                    <span className="nt-slot sm">RSVP link</span>
-                  </div>
-                ))}
-                <button type="button" className="nt-add" disabled>+ Add listing</button>
-              </>
-            )}
-          </div>
-        ))}
+        <div className="nt-section">
+          <div className="nt-section-head"><b>Section A — Information</b><span className="nt-hint">Free-text description box</span></div>
+          <textarea className="nt-textarea" placeholder="Description text…" value={info} onChange={(e) => setInfo(e.target.value)} />
+        </div>
+        {Listings({ sec: "B", title: "Section B — RSVP Today", hint: "Featured events with RSVP links" })}
+        {Listings({ sec: "C", title: "Section C — Other Events", hint: "Additional events feed" })}
 
         <div className="nt-footer-row">
-          <span className="nt-counter">0 / {MAX_LISTINGS_PER_NOTIFICATION} listings (premier + regular)</span>
-          <button type="button" className="btn" disabled>Add to shopping cart</button>
+          <span className="nt-counter">{total} / {MAX_LISTINGS_PER_NOTIFICATION} listings (premier + regular)</span>
+          <button type="button" className="btn" disabled title="Checkout comes with the shopping cart phase">Add to shopping cart</button>
         </div>
       </div>
 
       <div className="nt-panel nt-preview">
         <h4 className="section-label">Preview</h4>
-        <div className="nt-preview-box">
-          <div className="nt-slot" style={{ display: "block", marginBottom: 10 }}>Header / business logo</div>
-          <div className="nt-preview-sec">A · Information</div>
-          <div className="nt-preview-sec">B · RSVP Today</div>
-          <div className="nt-preview-sec">C · Other Events</div>
+        <div className={`nt-preview-box ${tier === "Premier" ? "premier" : ""}`}>
+          <div className="nt-preview-head">
+            {business || <span className="nt-slot">Business name</span>}
+            {tier === "Premier" && <span className="badge" style={{ marginLeft: 8 }}>PREMIER</span>}
+          </div>
+          <div className="nt-preview-sec">
+            <div className="nt-preview-label">A · Information</div>
+            {info ? <div className="nt-preview-text">{info}</div> : null}
+          </div>
+          {["B", "C"].map((sec) => (
+            <div key={sec} className="nt-preview-sec">
+              <div className="nt-preview-label">{sec === "B" ? "B · RSVP Today" : "C · Other Events"}</div>
+              {previewList(sec).map((x, i) => (
+                <div key={i} className="nt-preview-item">
+                  <span>{x.event}</span>
+                  {x.link && <a href={x.link} target="_blank" rel="noreferrer">RSVP</a>}
+                </div>
+              ))}
+            </div>
+          ))}
           <div className="nt-preview-foot">Unsubscribe · Manage preferences</div>
         </div>
         <div className="nt-hint" style={{ marginTop: 10 }}>
@@ -234,13 +352,75 @@ function BusinessTab() {
 
 export default function Notifications() {
   const [tab, setTab] = useState("browse");
+  const [edit, setEdit] = useState(false);
+  const [labels, setLabels] = useState(() => clone(DEFAULT_LABELS));
+  const [flash, setFlash] = useState("");
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LABELS_KEY) || "null");
+      if (saved && saved.filters) setLabels(saved);
+    } catch {}
+  }, []);
+
+  const update = (fn) =>
+    setLabels((prev) => {
+      const next = clone(prev);
+      fn(next);
+      try { localStorage.setItem(LABELS_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+
+  function download() {
+    const blob = new Blob([JSON.stringify(labels, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "calendarGold-notification-labels.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    setFlash("Downloaded — email this file to Masoud.");
+    setTimeout(() => setFlash(""), 3000);
+  }
+
+  function reset() {
+    setLabels(clone(DEFAULT_LABELS));
+    try { localStorage.removeItem(LABELS_KEY); } catch {}
+  }
+
   return (
     <div className="page nt-page">
       <div className="hint">
-        Prototype framework: layout and controls only. Grey dashed boxes are
-        labels/links still to be filled in. Nothing is emailed or texted.
+        {edit ? (
+          <>
+            <b>Edit mode:</b> type directly into the boxes. Your entries save
+            automatically in this browser. When done, click <b>Download my entries</b> and
+            email the file to Masoud.
+          </>
+        ) : (
+          <>
+            Prototype. Click <b>✏️ Edit labels</b> (top right) to fill in the grey
+            boxes. The <b>Create Business Notification</b> tab works as-is: type
+            in it and watch the preview. Nothing is emailed or texted.
+          </>
+        )}
       </div>
-      <h2 style={{ margin: "6px 0 14px" }}>Notifications</h2>
+
+      <div className="nt-title-row">
+        <h2 style={{ margin: "6px 0 14px" }}>Notifications</h2>
+        <div className="nt-edit-bar">
+          {flash && <span className="fp-flash">{flash}</span>}
+          {edit && (
+            <>
+              <button type="button" className="btn secondary" onClick={reset}>Reset</button>
+              <button type="button" className="btn secondary" onClick={download}>Download my entries</button>
+            </>
+          )}
+          <button type="button" className="btn" onClick={() => setEdit((e) => !e)}>
+            {edit ? "✓ Done editing" : "✏️ Edit labels"}
+          </button>
+        </div>
+      </div>
+
       <div className="status-legend">
         {TABS.map((t) => (
           <button
@@ -253,8 +433,8 @@ export default function Notifications() {
           </button>
         ))}
       </div>
-      {tab === "browse" && <BrowseTab />}
-      {tab === "mine" && <MineTab />}
+      {tab === "browse" && <BrowseTab edit={edit} labels={labels} update={update} />}
+      {tab === "mine" && <MineTab edit={edit} labels={labels} update={update} />}
       {tab === "business" && <BusinessTab />}
     </div>
   );
