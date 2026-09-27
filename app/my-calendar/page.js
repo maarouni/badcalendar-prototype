@@ -54,7 +54,7 @@ export default function MyCalendar() {
     <div className="page">
       <div className="hint">
         My Calendar Digest (gray / edit mode in the spec) — events you selected
-        from the Super Calendar, with your attendance status for each.
+        from the One Big Calendar, with your attendance status for each.
       </div>
 
       {myEvents.length > 0 && (
@@ -83,7 +83,7 @@ export default function MyCalendar() {
       <div className="event-list">
         {myEvents.length === 0 && (
           <div className="empty-state">
-            Nothing here yet — go to <a href="/">Super Calendar</a> and select some events.
+            Nothing here yet — go to <a href="/">One Big Calendar</a> and select some events.
           </div>
         )}
         {shown.map((e) => {

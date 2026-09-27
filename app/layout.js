@@ -2,7 +2,7 @@ import "./globals.css";
 import NavBar from "./components/NavBar";
 
 export const metadata = {
-  title: "BadCalendar (Prototype)",
+  title: "calendarGold (Prototype)",
   description: "Bay Area event calendar — internal prototype, not the live product",
 };
 
@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
             <div className="footer-brand">
               <a href="/" className="brand">
                 <span className="brand-mark">📅</span>
-                bad<span>calendar</span>
+                <span className="brand-word">calendar<b>Gold</b></span>
               </a>
               <p>
                 One place for every Bay Area networking event, meetup and
@@ -64,8 +64,9 @@ export default function RootLayout({ children }) {
 
             <div className="footer-col">
               <h5>Navigate</h5>
-              <a href="/">Super Calendar</a>
+              <a href="/">One Big Calendar</a>
               <a href="/my-calendar">My Calendar</a>
+              <a href="/notifications">Notifications</a>
               <a href="/submit">Submit an Event</a>
               <a href="/profile">My Profile</a>
             </div>
@@ -79,7 +80,7 @@ export default function RootLayout({ children }) {
           </div>
 
           <div className="footer-bottom">
-            <span>© 2026 badcalendar — internal prototype, not a live product</span>
+            <span>© 2026 calendarGold — internal prototype, not a live product</span>
             <span>Bay Area, CA</span>
           </div>
         </footer>

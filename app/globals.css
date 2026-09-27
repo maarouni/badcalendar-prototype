@@ -51,6 +51,8 @@ body {
   box-shadow: 0 2px 6px rgba(185,134,43,0.35);
 }
 .brand span { color: var(--gold-dark); }
+.brand .brand-word { color: var(--ink); }
+.brand-word b { color: var(--gold-dark); font-weight: inherit; }
 
 .nav-links { display: flex; align-items: center; gap: 28px; }
 .nav-links a { color: var(--ink-soft); text-decoration: none; font-weight: 600; font-size: 14px; transition: color 0.15s; }
@@ -1091,4 +1093,91 @@ form.event-form input:focus, form.event-form select:focus {
 @media (max-width: 760px) {
   .layout-with-sidebar { flex-direction: column; }
   .filter-panel { width: auto; position: static; max-height: none; }
+}
+
+/* ------------------------------------------------------------------
+   Selection controls — one standard look for every checkbox and radio
+   across the site (filter panel, event list, submit form, notifications).
+   Same size, border, and gold fill everywhere; all round.
+   Single-choice (radio) shows a dot, multi-choice (checkbox) shows a check.
+   To make them all square instead, set --sel-radius: 4px.
+   ------------------------------------------------------------------ */
+:root { --sel-size: 16px; --sel-radius: 50%; }
+input[type="checkbox"],
+input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex-shrink: 0;
+  width: var(--sel-size) !important;
+  height: var(--sel-size) !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1.5px solid #b8b8b8;
+  border-radius: var(--sel-radius) !important;
+  box-shadow: none;
+  background: #fff center / 10px 10px no-repeat;
+  cursor: pointer;
+  vertical-align: -3px;
+  transition: border-color .15s, background-color .15s, box-shadow .15s;
+}
+input[type="checkbox"]:hover,
+input[type="radio"]:hover { border-color: var(--gold-dark); }
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--gold-light); }
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  border-color: var(--gold-dark);
+  background-color: var(--gold-dark);
+}
+input[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-4.9' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+input[type="radio"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Ccircle cx='6' cy='6' r='2.6' fill='white'/%3E%3C/svg%3E");
+}
+input[type="checkbox"]:disabled,
+input[type="radio"]:disabled { opacity: .45; cursor: default; }
+
+/* Notifications page (framework) */
+.nt-page { max-width: 1100px; }
+.nt-slot {
+  display: inline-block; border: 1.5px dashed #cfcfcf; border-radius: 6px;
+  padding: 2px 8px; font-size: 12px; color: #9a9a9a; background: #fafafa; font-style: italic;
+}
+.nt-slot.sm { font-size: 11px; padding: 1px 6px; }
+.nt-hint { font-size: 11px; color: #999; margin: 0 0 6px; }
+.nt-subhead { font-size: 12px; color: var(--ink-soft); padding: 3px 2px; }
+.nt-subhead span { color: #aaa; }
+.nt-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.nt-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+.nt-card-title { font-weight: 700; }
+.nt-card-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.nt-sub-btn { align-self: flex-start; margin-top: 4px; }
+.btn:disabled { opacity: .5; cursor: default; transform: none; box-shadow: none; }
+.nt-two-col { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.nt-panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+.nt-field-label { display: block; font-size: 12px; font-weight: 700; color: var(--ink-soft); margin: 12px 0 4px; }
+.nt-table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; font-size: 13px; }
+.nt-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #999; padding: 8px 10px; border-bottom: 1px solid var(--border); background: #fcfbf8; }
+.nt-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.nt-days { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+.nt-day { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; }
+.nt-builder-top { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 8px; }
+.nt-field { display: flex; flex-direction: column; }
+.nt-section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-top: 12px; }
+.nt-section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.nt-section-head .nt-hint { margin: 0; }
+.nt-textarea { width: 100%; min-height: 70px; border: 1.5px dashed #cfcfcf; border-radius: 8px; padding: 8px; font: inherit; font-size: 13px; background: #fafafa; resize: vertical; box-sizing: border-box; }
+.nt-listing-slot { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+.nt-add { margin-top: 8px; background: none; border: 1px dashed #cfcfcf; border-radius: 6px; padding: 4px 10px; font-size: 12px; color: #999; }
+.nt-footer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 12px; flex-wrap: wrap; }
+.nt-counter { font-size: 12px; color: var(--ink-soft); }
+.nt-preview { position: sticky; top: 90px; }
+.nt-preview-box { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: #fcfbf8; }
+.nt-preview-sec { border: 1.5px dashed #d8d8d8; border-radius: 6px; padding: 14px 8px; margin-bottom: 8px; font-size: 12px; color: #999; text-align: center; }
+.nt-preview-foot { font-size: 10px; color: #aaa; text-align: center; margin-top: 6px; }
+@media (max-width: 760px) {
+  .nt-two-col { grid-template-columns: 1fr; }
+  .nt-preview { position: static; }
 }

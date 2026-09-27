@@ -58,7 +58,7 @@ export default function NavBar() {
     <nav className="navbar">
       <a href="/" className="brand">
         <span className="brand-mark">📅</span>
-        bad<span>calendar</span>
+        <span className="brand-word">calendar<b>Gold</b></span>
       </a>
 
       <form className="nav-search" onSubmit={submitSearch}>
@@ -81,7 +81,7 @@ export default function NavBar() {
       </form>
 
       <div className="nav-links">
-        <a href="/">Super Calendar</a>
+        <a href="/">One Big Calendar</a>
         <a href="/my-calendar">My Calendar</a>
         <a href="/submit" className="nav-cta">+ Create Event</a>
 
@@ -90,13 +90,13 @@ export default function NavBar() {
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10Z" />
           </svg>
         </button>
-        <button type="button" className="icon-btn" title="Notifications — coming soon">
+        <a href="/notifications" className="icon-btn" title="Notifications">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z" />
             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
           <span className="icon-dot" />
-        </button>
+        </a>
 
         {user ? (
           <div className="nav-user-menu">

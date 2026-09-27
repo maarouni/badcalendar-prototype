@@ -48,7 +48,7 @@ See you there!
 ${event.hostedBy}
 
 —
-Sent via badcalendar.com. Scan the flyer QR code or click the link above to view full event details and add it to your calendar.`;
+Sent via calendarGold.com. Scan the flyer QR code or click the link above to view full event details and add it to your calendar.`;
   }, [event, eventUrl]);
 
   function copyEmail() {
@@ -70,7 +70,7 @@ Sent via badcalendar.com. Scan the flyer QR code or click the link above to view
     return (
       <div className="page">
         <div className="empty-state">
-          Couldn't find that event. <a href="/">Back to Super Calendar</a>
+          Couldn't find that event. <a href="/">Back to One Big Calendar</a>
         </div>
       </div>
     );

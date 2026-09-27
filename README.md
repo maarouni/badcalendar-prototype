@@ -1,11 +1,11 @@
-# Master Calendar — Local Prototype (v0)
+# calendarGold — Local Prototype (v0)
 
 This is a throwaway local prototype, not the production build. No accounts,
 no real database, no Cesar-facing deployment. Purpose: prove the core loop
 works before committing to the full engineering plan in the feasibility doc.
 
 ## What's here
-- **Super Calendar** (`/`) — public event list with the full filter panel
+- **One Big Calendar** (`/`) — public event list with the full filter panel
   from Cesar's spec (rev 260923): Event Types (In-Person/Online,
   Premier/Regular), Dates, Costs, Regions (Bay Area counties, CA regions,
   National/International) and Categories (6 groups). Multi-select; AND across
@@ -15,6 +15,10 @@ works before committing to the full engineering plan in the feasibility doc.
   Taxonomy lives in `app/lib/taxonomy.js`.
 - **My Calendar** (`/my-calendar`) — your selected events with the spec's
   8-state attendance status, a status filter bar, and "Add to Google Calendar".
+- **Notifications** (`/notifications`) — framework only (9/24 agreement):
+  Browse / My Notifications / Create Business Notification tabs with empty
+  label slots. Cesar's text goes in `app/lib/notificationConfig.js`. No email
+  or SMS is sent.
 - **Submit Event** (`/submit`) — free event submission form, writes
   straight into the mock data file.
 

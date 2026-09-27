@@ -38,7 +38,7 @@ export default function Profile() {
         <div className="profile-info">
           <h2>Masoud Arouni</h2>
           <div className="profile-meta">
-            <span>✉️ masoud@badcalendar.com</span>
+            <span>✉️ masoud@calendargold.com</span>
             <span>📍 Pleasanton, CA</span>
             <span>🗓️ Joined Sep 2026</span>
           </div>
@@ -77,7 +77,7 @@ export default function Profile() {
       <div className="event-card" style={{ alignItems: "center" }}>
         <div className="feature-icon" style={{ marginBottom: 0 }}>🏢</div>
         <div className="meta">
-          <div className="title">badcalendar</div>
+          <div className="title">calendarGold</div>
           <div className="sub">Organizer page, verified badge, and event history — coming soon</div>
         </div>
       </div>

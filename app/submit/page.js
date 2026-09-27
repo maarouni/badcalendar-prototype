@@ -138,9 +138,9 @@ export default function SubmitEvent() {
           />
         </label>
         <button className="btn" type="submit">
-          Submit to Master Calendar
+          Submit to One Big Calendar
         </button>
-        {saved && <div className="hint">Saved — redirecting to Super Calendar…</div>}
+        {saved && <div className="hint">Saved — redirecting to One Big Calendar…</div>}
       </form>
     </div>
   );

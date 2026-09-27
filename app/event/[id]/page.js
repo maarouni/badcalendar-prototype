@@ -47,7 +47,7 @@ export default function EventDetail() {
     return (
       <div className="page">
         <div className="empty-state">
-          Couldn't find that event. <a href="/">Back to Super Calendar</a>
+          Couldn't find that event. <a href="/">Back to One Big Calendar</a>
         </div>
       </div>
     );
