@@ -11,6 +11,7 @@ import {
 } from "../lib/notificationConfig";
 
 const LABELS_KEY = "cg_notification_labels_v1";
+const MASOUD_EMAIL = "maarouni@gmail.com";
 const clone = (x) => JSON.parse(JSON.stringify(x));
 
 const TABS = [
@@ -378,8 +379,55 @@ export default function Notifications() {
     a.download = "calendarGold-notification-labels.json";
     a.click();
     URL.revokeObjectURL(a.href);
-    setFlash("Downloaded — email this file to Masoud.");
+    setFlash(`Downloaded. Attach it to an email to ${MASOUD_EMAIL}.`);
     setTimeout(() => setFlash(""), 3000);
+  }
+
+  const hasEntries =
+    labels.filters.some((g) => g.options.some((o) => o.label)) ||
+    labels.cards.some((c) => Object.values(c).some(Boolean)) ||
+    labels.deliveryFrequency.some((o) => o.label);
+
+  function entriesText() {
+    const lines = ["calendarGold - Notification labels", ""];
+    labels.filters.forEach((g) => {
+      const opts = g.options.filter((o) => o.label);
+      if (!opts.length) return;
+      lines.push(`${g.title}:`);
+      opts.forEach((o) => lines.push(`  - ${o.label}${o.link ? ` (${o.link})` : ""}`));
+    });
+    const cards = labels.cards.filter((c) => Object.values(c).some(Boolean));
+    if (cards.length) {
+      lines.push("", "Notification cards:");
+      cards.forEach((c) =>
+        lines.push(`  - ${[c.name, c.publisher, c.subscribers, c.frequency, c.area].filter(Boolean).join(" | ")}`)
+      );
+    }
+    const freq = labels.deliveryFrequency.filter((o) => o.label);
+    if (freq.length) {
+      lines.push("", "How often (delivery choices):");
+      freq.forEach((o) => lines.push(`  - ${o.label}`));
+    }
+    lines.push("", "--- data for Masoud (do not edit) ---", JSON.stringify(labels));
+    return lines.join("\n");
+  }
+
+  function emailMasoud() {
+    const subject = "calendarGold - my notification labels";
+    window.location.href =
+      `mailto:${MASOUD_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(entriesText())}`;
+    setFlash("Your email app should open. If it didn't, use Copy entries and paste into an email.");
+    setTimeout(() => setFlash(""), 6000);
+  }
+
+  async function copyEntries() {
+    try {
+      await navigator.clipboard.writeText(entriesText());
+      setFlash(`Copied. Paste it into an email to ${MASOUD_EMAIL}.`);
+    } catch {
+      setFlash("Copy failed. Use Download my entries instead.");
+    }
+    setTimeout(() => setFlash(""), 5000);
   }
 
   function reset() {
@@ -393,14 +441,15 @@ export default function Notifications() {
         {edit ? (
           <>
             <b>Edit mode:</b> type directly into the boxes. Your entries save
-            automatically in this browser. When done, click <b>Download my entries</b> and
-            email the file to Masoud.
+            automatically in this browser. When done, click <b>📧 Email to Masoud</b>. It
+            opens your email with everything you typed, ready to send.
           </>
         ) : (
           <>
             Prototype. Click <b>✏️ Edit labels</b> (top right) to fill in the grey
-            boxes. The <b>Create Business Notification</b> tab works as-is: type
-            in it and watch the preview. Nothing is emailed or texted.
+            boxes, then <b>📧 Email to Masoud</b> to send them. The <b>Create Business
+            Notification</b> tab works as-is: type in it and watch the preview. No
+            newsletters are sent to subscribers yet.
           </>
         )}
       </div>
@@ -409,10 +458,12 @@ export default function Notifications() {
         <h2 style={{ margin: "6px 0 14px" }}>Notifications</h2>
         <div className="nt-edit-bar">
           {flash && <span className="fp-flash">{flash}</span>}
-          {edit && (
+          {edit && <button type="button" className="btn secondary" onClick={reset}>Reset</button>}
+          {hasEntries && (
             <>
-              <button type="button" className="btn secondary" onClick={reset}>Reset</button>
-              <button type="button" className="btn secondary" onClick={download}>Download my entries</button>
+              <button type="button" className="btn secondary" onClick={download}>Download</button>
+              <button type="button" className="btn secondary" onClick={copyEntries}>Copy entries</button>
+              <button type="button" className="btn" onClick={emailMasoud}>📧 Email to Masoud</button>
             </>
           )}
           <button type="button" className="btn" onClick={() => setEdit((e) => !e)}>
