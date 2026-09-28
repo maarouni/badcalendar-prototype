@@ -1199,3 +1199,13 @@ input[type="radio"]:disabled { opacity: .45; cursor: default; }
 .nt-textarea:not(:disabled) { border-style: solid; border-color: var(--border); background: #fff; }
 .nt-add:not(:disabled) { cursor: pointer; color: var(--gold-dark); border-color: var(--gold); }
 .nt-add-card { border-style: dashed; color: var(--gold-dark); font-weight: 700; cursor: pointer; align-items: center; justify-content: center; min-height: 150px; font: inherit; }
+.nt-card-pub { font-size: 12px; color: var(--ink-soft); margin-top: -4px; }
+.nt-chip { display: inline-block; font-size: 11px; background: #f6f1e6; color: #6b5a33; border-radius: 999px; padding: 2px 8px; }
+.nt-card-meta { font-size: 12px; color: #999; }
+.nt-card.nt-subbed { border-color: var(--gold); background: #fffaf0; }
+.nt-card select.nt-input { background: #fffdf6; }
+.nt-flash { background: #eaf6ec; border: 1px solid #bfe3c6; color: #2f7a3b; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; margin: -4px 0 12px; }
+.nt-add { white-space: nowrap; flex-shrink: 0; }
+.nt-send-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.nt-preview-col { min-width: 0; }
+.nt-done { background: #2f7a3b !important; }

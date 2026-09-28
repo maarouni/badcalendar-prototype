@@ -2,7 +2,7 @@
   {
     "id": "1",
     "title": "Business & Tech Networking Expo",
-    "hostedBy": "badcalendar",
+    "hostedBy": "calendarGold",
     "date": "2026-10-08",
     "time": "18:00-21:00",
     "city": "San Jose",
@@ -41,7 +41,7 @@
   {
     "id": "3",
     "title": "3-Course Dinner & Networking",
-    "hostedBy": "badcalendar",
+    "hostedBy": "calendarGold",
     "date": "2026-10-14",
     "time": "18:00-21:00",
     "city": "Walnut Creek",
@@ -61,7 +61,7 @@
   {
     "id": "4",
     "title": "Online Founders Roundtable",
-    "hostedBy": "badcalendar",
+    "hostedBy": "calendarGold",
     "date": "2026-10-16",
     "time": "12:00-13:00",
     "city": "Online",
