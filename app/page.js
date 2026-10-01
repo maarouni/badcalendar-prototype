@@ -17,6 +17,21 @@ const UPCOMING_FEATURES = [
   { icon: "📇", title: "QR check-in", desc: "Scan attendees in at the door instead of a paper sign-in sheet." },
 ];
 
+
+const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+
+// Circle date badge — the round "Every Circle" motif from Cesar's Figma.
+function DateCircle({ date, premier }) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(date || "");
+  if (!m) return null;
+  return (
+    <div className={`ec-date ${premier ? "premier" : ""}`} aria-hidden="true">
+      <span>{MONTHS[Number(m[2]) - 1]}</span>
+      <b>{Number(m[3])}</b>
+    </div>
+  );
+}
+
 function SuperCalendarInner() {
   const searchParams = useSearchParams();
   const q = (searchParams.get("q") || "").toLowerCase();
@@ -98,18 +113,33 @@ function SuperCalendarInner() {
 
   return (
     <>
-      <section className="hero">
-        <div className="hero-inner">
-          <span className="hero-eyebrow">Bay Area · Networking &amp; Events</span>
-          <h1>Every event worth going to, in one calendar.</h1>
-          <p>
-            Browse what's happening around the Bay, save the ones you care
-            about to your own calendar, and list your own event in under a
-            minute — free.
-          </p>
-          <div className="hero-actions">
-            <a href="/submit" className="btn-primary">+ Create Your First Event</a>
-            <a href="#browse" className="btn-ghost">Browse Events ↓</a>
+      <section className="hero ec-hero">
+        <div className="ec-arc" aria-hidden="true" />
+        <div className="ec-hero-inner">
+          <div className="ec-hero-copy">
+            <span className="hero-eyebrow">Bay Area · Networking &amp; Events</span>
+            <h1>It pays to be connected.</h1>
+            <p>
+              Every Bay Area networking event, meetup and workshop in One Big
+              Calendar. Save the ones you care about to My Calendar, and list
+              your own event for free.
+            </p>
+            <div className="hero-actions">
+              <a href="/submit" className="btn-primary">+ Add an Event</a>
+              <a href="#browse" className="btn-ghost">Browse Events ↓</a>
+            </div>
+          </div>
+
+          <div className="ec-orbit">
+            <svg className="ec-orbit-lines" viewBox="0 0 380 430" aria-hidden="true">
+              <line x1="75" y1="70" x2="245" y2="205" />
+              <line x1="70" y1="335" x2="245" y2="205" />
+              <line x1="324" y1="378" x2="245" y2="205" />
+            </svg>
+            <a href="#browse" className="ec-circle ec-c-orange ec-c-main">One Big<br />Calendar</a>
+            <a href="/submit" className="ec-circle ec-c-blue ec-c-add">Add<br />Event</a>
+            <a href="/login" className="ec-circle ec-c-purple ec-c-login">Log In</a>
+            <a href="/my-calendar" className="ec-circle ec-c-teal ec-c-mine">My<br />Calendar</a>
           </div>
         </div>
       </section>
@@ -175,6 +205,7 @@ function SuperCalendarInner() {
                     checked={!!selected[e.id]}
                     onChange={() => toggle(e.id)}
                   />
+                  <DateCircle date={e.date} premier={e.premier} />
                   <div className="meta">
                     <div className="title">
                       <a href={`/event/${e.id}`} className="title-link">{e.title}</a>{" "}

@@ -385,7 +385,7 @@ function newsletterText(d, b) {
 }
 
 function newsletterHtml(d, b) {
-  const gold = "#b9862b";
+  const gold = "#d97a00";
   const list = (items) =>
     items
       .filter((x) => x.event)
@@ -399,10 +399,10 @@ function newsletterHtml(d, b) {
   return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(d.business || "Notification")}</title></head>
 <body style="margin:0;background:#faf8f4;font-family:Helvetica,Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf8f4;padding:24px 0"><tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;border:1px solid ${d.tier === "Premier" ? "#d9a441" : "#ececec"};padding:28px">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;border:1px solid ${d.tier === "Premier" ? "#ff9500" : "#ececec"};padding:28px">
 <tr><td>
 <div style="font-size:13px;font-weight:800;color:${gold}">calendarGold</div>
-<h1 style="margin:10px 0 0;font-size:24px;color:#1a1a1a">${esc(d.business || "Your business")}${d.tier === "Premier" ? ` <span style="font-size:11px;background:#fff2d6;color:${gold};padding:3px 8px;border-radius:9px;vertical-align:middle">PREMIER</span>` : ""}</h1>
+<h1 style="margin:10px 0 0;font-size:24px;color:#1a1a1a">${esc(d.business || "Your business")}${d.tier === "Premier" ? ` <span style="font-size:11px;background:#fff1de;color:${gold};padding:3px 8px;border-radius:9px;vertical-align:middle">PREMIER</span>` : ""}</h1>
 ${section(b.sectionA, d.info ? `<p style="margin:0;font-size:15px;line-height:1.5;color:#333;white-space:pre-wrap">${esc(d.info)}</p>` : "")}
 ${section(b.sectionB, list(d.B) ? `<table width="100%" cellpadding="0" cellspacing="0">${list(d.B)}</table>` : "")}
 ${section(b.sectionC, list(d.C) ? `<table width="100%" cellpadding="0" cellspacing="0">${list(d.C)}</table>` : "")}

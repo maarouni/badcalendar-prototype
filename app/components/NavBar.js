@@ -57,7 +57,7 @@ export default function NavBar() {
   return (
     <nav className="navbar">
       <a href="/" className="brand">
-        <span className="brand-mark">📅</span>
+        <span className="brand-mark" aria-hidden="true"><i /><i /></span>
         <span className="brand-word">calendar<b>Gold</b></span>
       </a>
 

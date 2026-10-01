@@ -24,6 +24,14 @@ function SocialIcon({ href, label, children }) {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Alata&family=Lexend:wght@300;400;500;600;700&display=swap"
+        />
+      </head>
       <body>
         <NavBar />
 
@@ -33,7 +41,7 @@ export default function RootLayout({ children }) {
           <div className="footer-grid">
             <div className="footer-brand">
               <a href="/" className="brand">
-                <span className="brand-mark">📅</span>
+                <span className="brand-mark" aria-hidden="true"><i /><i /></span>
                 <span className="brand-word">calendar<b>Gold</b></span>
               </a>
               <p>
