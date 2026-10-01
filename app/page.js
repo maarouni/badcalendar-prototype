@@ -4,32 +4,43 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { slugify } from "./lib/slug";
 import FilterPanel from "./components/FilterPanel";
-import { EMPTY_FILTERS, matches, orderEvents, googleCalendarUrl } from "./lib/taxonomy";
+import { CountyMap, MonthCalendar } from "./components/Explore";
+import {
+  Poster, HostAvatar, Icon, fmtTime, startTime, dayLabel, shortDate, isoOf, parseDate,
+} from "./components/EventVisuals";
+import { EMPTY_FILTERS, matches, googleCalendarUrl } from "./lib/taxonomy";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 const FILTERS_KEY = "mc_current_filters_v1";
-const PAGE_SIZE = 6; // max events per page — mix of Premier + Regular, per spec
+const PAGE_SIZE = 8; // events per page in the timeline
 
-const UPCOMING_FEATURES = [
-  { icon: "🎟️", title: "Ticketing & payments", desc: "Sell tickets right on the event page, with promo codes and door pricing." },
-  { icon: "🔗", title: "Referral tracking", desc: "Give organizers and partners their own link and see who they bring in." },
-  { icon: "📰", title: "Newsletter engine", desc: "Send a weekly digest of what's happening, straight from your calendar." },
-  { icon: "📇", title: "QR check-in", desc: "Scan attendees in at the door instead of a paper sign-in sheet." },
+// Cesar's rule: keep marketing in groups of three.
+const HOW_IT_WORKS = [
+  { n: 1, color: "orange", title: "Find", desc: "Every Bay Area event in One Big Calendar, filtered by county, date, cost and category." },
+  { n: 2, color: "blue", title: "Save", desc: "Add events to My Calendar, set your attendance status, sync to Google Calendar." },
+  { n: 3, color: "purple", title: "Share", desc: "Organizers list free, go Premier for top placement, and reach subscribers through Notifications." },
 ];
 
+function chrono(a, b) {
+  return `${a.date} ${a.time || ""}`.localeCompare(`${b.date} ${b.time || ""}`);
+}
 
-const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-
-// Circle date badge — the round "Every Circle" motif from Cesar's Figma.
-function DateCircle({ date, premier }) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(date || "");
-  if (!m) return null;
+function SaveButton({ saved, onClick }) {
   return (
-    <div className={`ec-date ${premier ? "premier" : ""}`} aria-hidden="true">
-      <span>{MONTHS[Number(m[2]) - 1]}</span>
-      <b>{Number(m[3])}</b>
-    </div>
+    <button
+      type="button"
+      className={`save-circle ${saved ? "saved" : ""}`}
+      onClick={onClick}
+      aria-pressed={saved}
+      title={saved ? "In My Calendar — click to remove" : "Add to My Calendar"}
+    >
+      <Icon name={saved ? "check" : "plus"} />
+    </button>
   );
+}
+
+function PlaceLine({ e }) {
+  return e.type === "Online" ? "Online" : `${e.city}${e.region && e.region !== e.city ? `, ${e.region}` : ""}`;
 }
 
 function SuperCalendarInner() {
@@ -40,12 +51,15 @@ function SuperCalendarInner() {
   const [selected, setSelected] = useState({});
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const today = useMemo(() => new Date(), []);
+  const todayIso = isoOf(today);
+  const [month, setMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+  const [day, setDay] = useState("");
+  const [showPast, setShowPast] = useState(false);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetch("/api/events").then((r) => r.json()).then(setEvents);
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    setSelected(saved);
+    try { setSelected(JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); } catch {}
     try {
       const f = JSON.parse(localStorage.getItem(FILTERS_KEY) || "null");
       if (f) setFilters({ ...EMPTY_FILTERS, ...f });
@@ -56,44 +70,48 @@ function SuperCalendarInner() {
     try { localStorage.setItem(FILTERS_KEY, JSON.stringify(filters)); } catch {}
   }, [filters]);
 
+  // Everything matching the sidebar filters + search.
   const filtered = useMemo(
     () => events.filter((e) => matches(e, filters, today, null, q)),
     [events, filters, today, q]
   );
+  // Same, but ignoring the region filter — so the county map can show what
+  // each county would add.
+  const forMap = useMemo(
+    () => events.filter((e) => matches(e, filters, today, "regions", q)),
+    [events, filters, today, q]
+  );
 
-  // Premier events surface first, then Regular fills out the rest of each page —
-  // "system automatically displays a combo of as many Premier and Regular events
-  // that fit on the page" per spec. Sort is stable so order within each group holds.
-  // Premier first, then chronological (spec notes rev 260923).
-  const ordered = useMemo(() => orderEvents(filtered), [filtered]);
+  const pastCount = filtered.filter((e) => e.date < todayIso).length;
+  const visible = useMemo(() => {
+    let list = filtered;
+    if (day) list = list.filter((e) => e.date === day);
+    else if (!showPast) list = list.filter((e) => e.date >= todayIso);
+    return [...list].sort(chrono);
+  }, [filtered, day, showPast, todayIso]);
 
-  const totalPages = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
+  const featured = visible.filter((e) => e.premier).slice(0, 8);
+
+  const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageStart = (safePage - 1) * PAGE_SIZE;
-  const pageItems = ordered.slice(pageStart, pageStart + PAGE_SIZE);
+  const pageItems = visible.slice(pageStart, pageStart + PAGE_SIZE);
+  const groups = [];
+  for (const e of pageItems) {
+    const last = groups[groups.length - 1];
+    if (last && last.date === e.date) last.items.push(e);
+    else groups.push({ date: e.date, items: [e] });
+  }
 
-  // Any time the filters or search change the result set, snap back to page 1
-  // instead of showing an empty page.
-  useEffect(() => {
-    setPage(1);
-  }, [filters, q]);
+  useEffect(() => { setPage(1); }, [filters, q, day, showPast]);
 
-  const activeFilters = [];
-  if (q) activeFilters.push({ key: "q", label: `Search: "${q}"` });
   const anyFilter =
     filters.formats.length || filters.tiers.length || filters.date !== "all" ||
     filters.costs.length || filters.regions.length || filters.categories.length;
 
-  function clearFilter(key) {
-    if (key === "q") {
-      window.history.replaceState({}, "", "/");
-      window.location.reload();
-      return;
-    }
-  }
-
   function clearAllFilters() {
     setFilters(EMPTY_FILTERS);
+    setDay("");
     if (q) {
       window.history.replaceState({}, "", "/");
       window.location.reload();
@@ -106,10 +124,24 @@ function SuperCalendarInner() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   }
 
+  function pickDay(iso) {
+    setDay(iso);
+    if (iso) {
+      const d = parseDate(iso);
+      setMonth(new Date(d.getFullYear(), d.getMonth(), 1));
+    }
+  }
+
   function goToPage(p) {
     setPage(Math.min(Math.max(1, p), totalPages));
-    document.getElementById("browse")?.scrollIntoView({ block: "start" });
+    document.getElementById("timeline")?.scrollIntoView({ block: "start", behavior: "smooth" });
   }
+
+  const chips = [];
+  if (q) chips.push({ key: "q", label: `"${q}"`, clear: () => { window.history.replaceState({}, "", "/"); window.location.reload(); } });
+  if (day) chips.push({ key: "day", label: shortDate(day), clear: () => setDay("") });
+  for (const r of filters.regions) chips.push({ key: `r-${r}`, label: r, clear: () => setFilters((f) => ({ ...f, regions: f.regions.filter((x) => x !== r) })) });
+  if (filters.formats.includes("Online")) chips.push({ key: "online", label: "Online", clear: () => setFilters((f) => ({ ...f, formats: f.formats.filter((x) => x !== "Online") })) });
 
   return (
     <>
@@ -144,149 +176,168 @@ function SuperCalendarInner() {
         </div>
       </section>
 
-      <div className="page" id="browse">
-        <div className="hint">
-          Prototype: no accounts yet — "My Calendar" selections are saved to this
-          browser only, to demonstrate the flow described in the spec.
-        </div>
-
-        {activeFilters.length > 0 && (
-          <div className="active-filters">
-            <span className="active-filters-label">Filtering by:</span>
-            {activeFilters.map((f) => (
-              <button
-                key={f.key}
-                type="button"
-                className="filter-chip"
-                onClick={() => clearFilter(f.key)}
-                title="Click to remove this filter"
-              >
-                {f.label} ✕
-              </button>
-            ))}
-            <button type="button" className="clear-filters-btn" onClick={clearAllFilters}>
-              Clear filters
-            </button>
+      <section className="explore" id="browse">
+        <div className="explore-inner">
+          <div className="explore-intro">
+            <h2>What&rsquo;s happening around the Bay</h2>
+            <p>Pick a county, pick a day, or just scroll.</p>
           </div>
-        )}
+          <div className="explore-grid">
+            <CountyMap events={forMap} filters={filters} setFilters={setFilters} />
+            <MonthCalendar events={filtered} month={month} setMonth={setMonth} day={day} setDay={pickDay} today={today} />
+          </div>
+        </div>
+      </section>
 
+      {featured.length > 0 && (
+        <section className="featured">
+          <div className="featured-head">
+            <h2>Featured</h2>
+            <span className="featured-sub">Premier listings</span>
+          </div>
+          <div className="featured-row">
+            {featured.map((e) => (
+              <article key={e.id} className="feat-card">
+                <a href={`/event/${e.id}`} className="feat-poster">
+                  <Poster event={e} />
+                </a>
+                <div className="feat-body">
+                  <div className="feat-when">{shortDate(e.date)} · {startTime(e.time)}</div>
+                  <a href={`/event/${e.id}`} className="feat-title">{e.title}</a>
+                  <div className="feat-where"><PlaceLine e={e} /></div>
+                  <div className="feat-foot">
+                    <span className="feat-host"><HostAvatar name={e.hostedBy} size={20} />{e.hostedBy}</span>
+                    <span className="price-chip">{e.price ? `From $${e.price}` : "Free"}</span>
+                  </div>
+                </div>
+                <SaveButton saved={!!selected[e.id]} onClick={() => toggle(e.id)} />
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="page browse-page" id="timeline">
         <div className="layout-with-sidebar">
           <FilterPanel events={events} filters={filters} setFilters={setFilters} today={today} q={q} />
 
-          <div>
+          <div className="timeline-col">
             <div className="results-bar">
-              <strong>{ordered.length}</strong> of {events.length} events match
-              {anyFilter ? " your filters" : ""}
-            </div>
-            <div className="event-list">
-              {pageItems.length === 0 && (
-                <div className="empty-state">
-                  No events match these filters.
-                  {(activeFilters.length > 0 || anyFilter) && (
-                    <>
-                      {" "}
-                      <button type="button" className="clear-filters-link" onClick={clearAllFilters}>
-                        Clear filters
-                      </button>{" "}
-                      to see everything.
-                    </>
-                  )}
-                </div>
+              <div>
+                <strong>{visible.length}</strong> {visible.length === 1 ? "event" : "events"}
+                {day ? ` on ${shortDate(day)}` : showPast ? "" : " coming up"}
+              </div>
+              {!day && pastCount > 0 && (
+                <button type="button" className="link-btn" onClick={() => setShowPast((v) => !v)}>
+                  {showPast ? "Hide past events" : `Show ${pastCount} past`}
+                </button>
               )}
-              {pageItems.map((e) => (
-                <div
-                  key={e.id}
-                  className={`event-card ${e.premier ? "premier" : ""} ${
-                    selected[e.id] ? "selected" : ""
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={!!selected[e.id]}
-                    onChange={() => toggle(e.id)}
-                  />
-                  <DateCircle date={e.date} premier={e.premier} />
-                  <div className="meta">
-                    <div className="title">
-                      <a href={`/event/${e.id}`} className="title-link">{e.title}</a>{" "}
-                      {e.premier && <span className="badge">PREMIER</span>}
-                    </div>
-                    <div className="sub">
-                      {e.date}{e.time ? ` · ${e.time}` : ""} · {e.type === "Online" ? "Online" : `${e.city}${e.region ? ` (${e.region})` : ""}`} · Hosted by{" "}
-                      <a href={`/organizer/${slugify(e.hostedBy)}`} className="host-link">
-                        {e.hostedBy}
-                      </a>
-                    </div>
-                  </div>
-                  <div className="card-right">
-                    <div className="sub">{e.cost}</div>
-                    <a
-                      className="gcal-link"
-                      href={googleCalendarUrl(e)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Add to my Google Calendar"
-                    >
-                      + Google Cal
-                    </a>
-                  </div>
-                </div>
-              ))}
             </div>
 
-            {ordered.length > 0 && (
-              <>
-                <div className="pagination">
-                  <button
-                    type="button"
-                    className="pagination-btn"
-                    onClick={() => goToPage(safePage - 1)}
-                    disabled={safePage <= 1}
-                  >
-                    ← Prev
+            {(chips.length > 0 || anyFilter) && (
+              <div className="active-filters">
+                {chips.map((c) => (
+                  <button key={c.key} type="button" className="filter-chip" onClick={c.clear}>
+                    {c.label} <span aria-hidden="true">✕</span>
                   </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      className={`pagination-btn ${p === safePage ? "active" : ""}`}
-                      onClick={() => goToPage(p)}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    className="pagination-btn"
-                    onClick={() => goToPage(safePage + 1)}
-                    disabled={safePage >= totalPages}
-                  >
-                    Next →
-                  </button>
-                </div>
-                <div className="pagination-summary">
-                  Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, ordered.length)} of{" "}
-                  {ordered.length} events · Page {safePage} of {totalPages}
-                </div>
-              </>
+                ))}
+                <button type="button" className="clear-filters-btn" onClick={clearAllFilters}>Clear all</button>
+              </div>
+            )}
+
+            {pageItems.length === 0 && (
+              <div className="empty-state">
+                <div className="empty-circles" aria-hidden="true"><i /><i /><i /></div>
+                Nothing matches yet.{" "}
+                <button type="button" className="clear-filters-link" onClick={clearAllFilters}>Clear filters</button>{" "}
+                to see every event.
+              </div>
+            )}
+
+            <div className="timeline">
+              {groups.map((g) => {
+                const l = dayLabel(g.date, today);
+                return (
+                  <section key={g.date} className={`tl-day ${g.date < todayIso ? "past" : ""}`}>
+                    <header className="tl-date">
+                      <span className="tl-dot" aria-hidden="true" />
+                      <div>
+                        <div className="tl-day-main">{l.day}{l.tag && <em>{l.tag}</em>}</div>
+                        <div className="tl-weekday">{l.weekday}</div>
+                      </div>
+                    </header>
+                    <div className="tl-items">
+                      {g.items.map((e) =>
+                        e.premier ? (
+                          <article key={e.id} className={`tl-card premier ${selected[e.id] ? "saved" : ""}`}>
+                            <a href={`/event/${e.id}`} className="tl-thumb"><Poster event={e} label={false} /></a>
+                            <div className="tl-main">
+                              <div className="tl-kicker">Premier</div>
+                              <a href={`/event/${e.id}`} className="tl-title">{e.title}</a>
+                              <div className="tl-line"><Icon name="clock" />{fmtTime(e.time)}</div>
+                              <div className="tl-line"><Icon name={e.type === "Online" ? "globe" : "pin"} /><PlaceLine e={e} /></div>
+                              <div className="tl-line tl-host">
+                                <HostAvatar name={e.hostedBy} size={18} />
+                                <a href={`/organizer/${slugify(e.hostedBy)}`}>{e.hostedBy}</a>
+                                <span className="tl-sep">·</span>
+                                <Icon name="tag" />{e.cost}
+                              </div>
+                            </div>
+                            <div className="tl-actions">
+                              <SaveButton saved={!!selected[e.id]} onClick={() => toggle(e.id)} />
+                              <a className="gcal-link" href={googleCalendarUrl(e)} target="_blank" rel="noopener noreferrer">Google Cal</a>
+                            </div>
+                          </article>
+                        ) : (
+                          <article key={e.id} className={`tl-card regular ${selected[e.id] ? "saved" : ""}`}>
+                            <div className="tl-main">
+                              <div className="tl-reg-1">
+                                <span className="tl-time">{startTime(e.time)}</span>
+                                <a href={`/event/${e.id}`} className="tl-title">{e.title}</a>
+                              </div>
+                              <div className="tl-reg-2">
+                                <PlaceLine e={e} /> · <a href={`/organizer/${slugify(e.hostedBy)}`}>{e.hostedBy}</a> · {e.cost}
+                              </div>
+                            </div>
+                            <div className="tl-actions">
+                              <SaveButton saved={!!selected[e.id]} onClick={() => toggle(e.id)} />
+                            </div>
+                          </article>
+                        )
+                      )}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button type="button" className="pagination-btn" onClick={() => goToPage(safePage - 1)} disabled={safePage <= 1}>← Prev</button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button key={p} type="button" className={`pagination-btn ${p === safePage ? "active" : ""}`} onClick={() => goToPage(p)}>{p}</button>
+                ))}
+                <button type="button" className="pagination-btn" onClick={() => goToPage(safePage + 1)} disabled={safePage >= totalPages}>Next →</button>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      <section className="feature-strip">
-        <h2>More on the way</h2>
-        <p className="feature-sub">Part of the full spec — not built in this prototype yet.</p>
-        <div className="feature-grid">
-          {UPCOMING_FEATURES.map((f) => (
-            <div key={f.title} className="feature-card">
-              <span className="coming-soon-tag">Coming soon</span>
-              <div className="feature-icon">{f.icon}</div>
-              <h3>{f.title}</h3>
-              <p>{f.desc}</p>
+      <section className="how">
+        <h2>How it works</h2>
+        <div className="how-grid">
+          {HOW_IT_WORKS.map((h) => (
+            <div key={h.n} className="how-item">
+              <div className={`how-circle ${h.color}`}>{h.n}</div>
+              <h3>{h.title}</h3>
+              <p>{h.desc}</p>
             </div>
           ))}
         </div>
+        <p className="proto-note">
+          Prototype: My Calendar selections are saved in this browser only.
+        </p>
       </section>
     </>
   );
