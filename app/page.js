@@ -9,6 +9,7 @@ import {
   Poster, HostAvatar, Icon, fmtTime, startTime, dayLabel, shortDate, isoOf, parseDate,
 } from "./components/EventVisuals";
 import { EMPTY_FILTERS, matches, googleCalendarUrl } from "./lib/taxonomy";
+import { fetchEvents } from "./lib/events";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 const FILTERS_KEY = "mc_current_filters_v1";
@@ -58,7 +59,7 @@ function SuperCalendarInner() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    fetch("/api/events").then((r) => r.json()).then(setEvents);
+    fetchEvents().then(setEvents);
     try { setSelected(JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}")); } catch {}
     try {
       const f = JSON.parse(localStorage.getItem(FILTERS_KEY) || "null");

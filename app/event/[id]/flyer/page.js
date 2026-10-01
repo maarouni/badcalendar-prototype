@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import QRCode from "qrcode";
 import { slugify } from "../../../lib/slug";
+import { fetchEvents } from "../../../lib/events";
 
 export default function EventFlyer() {
   const { id } = useParams();
@@ -12,8 +13,7 @@ export default function EventFlyer() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetch("/api/events")
-      .then((r) => r.json())
+    fetchEvents()
       .then((events) => setEvent(events.find((e) => e.id === id) || null));
   }, [id]);
 

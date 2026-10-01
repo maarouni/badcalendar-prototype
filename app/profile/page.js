@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fetchEvents } from "../lib/events";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 
@@ -14,8 +15,7 @@ export default function Profile() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     setSavedCount(Object.values(saved).filter(Boolean).length);
 
-    fetch("/api/events")
-      .then((r) => r.json())
+    fetchEvents()
       .then((events) => {
         setHostedCount(events.filter((e) => e.hostedBy === "Masoud").length);
       });

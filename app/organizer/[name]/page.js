@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { slugify } from "../../lib/slug";
+import { fetchEvents } from "../../lib/events";
 
 export default function OrganizerPage() {
   const { name } = useParams();
   const [events, setEvents] = useState(undefined);
 
   useEffect(() => {
-    fetch("/api/events")
-      .then((r) => r.json())
+    fetchEvents()
       .then((all) => {
         setEvents(all.filter((e) => slugify(e.hostedBy) === name));
       });

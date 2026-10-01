@@ -10,6 +10,7 @@ import {
   MAX_LISTINGS_PER_NOTIFICATION,
   MAX_BUSINESSES_PER_USER,
 } from "../lib/notificationConfig";
+import { fetchEvents } from "../lib/events";
 
 const LABELS_KEY = "cg_notification_labels_v2";
 const SUBS_KEY = "cg_subscriptions_v1";
@@ -418,7 +419,7 @@ function BusinessTab({ edit, labels, update, flash }) {
 
   useEffect(() => {
     setD(load(DRAFT_KEY, EMPTY_DRAFT));
-    fetch("/api/events").then((r) => r.json()).then(setEvents).catch(() => {});
+    fetchEvents().then(setEvents).catch(() => {});
   }, []);
   const change = (fn) =>
     setD((prev) => {

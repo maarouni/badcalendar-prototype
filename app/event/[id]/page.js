@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import QRCode from "qrcode";
 import { slugify, categoryIcon } from "../../lib/slug";
 import { googleCalendarUrl, eventCategories } from "../../lib/taxonomy";
+import { fetchEvents } from "../../lib/events";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 
@@ -15,8 +16,7 @@ export default function EventDetail() {
   const [qrDataUrl, setQrDataUrl] = useState(null);
 
   useEffect(() => {
-    fetch("/api/events")
-      .then((r) => r.json())
+    fetchEvents()
       .then((events) => {
         setEvent(events.find((e) => e.id === id) || null);
       });
