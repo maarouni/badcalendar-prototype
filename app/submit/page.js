@@ -142,6 +142,22 @@ export default function SubmitEvent() {
         </button>
         {saved && <div className="hint">Saved — redirecting to One Big Calendar…</div>}
       </form>
+
+      <section id="skeleton" style={{ marginTop: 40 }}>
+        <h2>Page skeleton (from Oct 8 Figma review)</h2>
+        <p className="sub" style={{ marginBottom: 12 }}>
+          Every calendarGold page as empty boxes, in the order Cesar laid them out.
+          Masoud builds the boxes; Cesar fills in labels, filter lists and copy.
+          Red HOLD boxes wait on payments, email/SMS sending or the signed agreement.{" "}
+          <a href="/skeleton.html" target="_blank" rel="noopener noreferrer">Open full screen</a>
+        </p>
+        <iframe
+          src="/skeleton.html"
+          title="calendarGold page skeleton"
+          style={{ width: "100%", height: 920, border: "1px solid #ddd", borderRadius: 12 }}
+          loading="lazy"
+        />
+      </section>
     </div>
   );
 }
