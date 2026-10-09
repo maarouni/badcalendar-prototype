@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import DigestActions from "./DigestActions";
 import {
   EVENT_FORMATS,
   EVENT_TIERS,
@@ -214,6 +215,8 @@ export default function FilterPanel({ events, filters, setFilters, today, q }) {
           />
         ))}
       </Section>
+
+      <DigestActions digestLabel="My Calendar Digest" promptLabel="Add Listings to My Calendar Digest" />
     </aside>
   );
 }

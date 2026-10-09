@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { slugify } from "./lib/slug";
 import FilterPanel from "./components/FilterPanel";
+import IconNav from "./components/IconNav";
 import { CountyMap, MonthCalendar } from "./components/Explore";
 import {
   Poster, HostAvatar, Icon, fmtTime, startTime, dayLabel, shortDate, isoOf, parseDate,
@@ -217,6 +218,13 @@ function SuperCalendarInner() {
           </div>
         </section>
       )}
+
+      <section className="section-intro">
+        <IconNav active="calendar" />
+        <p className="section-intro-line">
+          <strong>Save Time!</strong> Set filters to organize, submit, and view many types of events.
+        </p>
+      </section>
 
       <div className="page browse-page" id="timeline">
         <div className="layout-with-sidebar">
