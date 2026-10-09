@@ -209,6 +209,7 @@ export default function SubmitEvent() {
   }
 
   return (
+    <>
     <form className="page ed-page" onSubmit={submit} noValidate>
       <header className="ed-head">
         <div>
@@ -482,5 +483,22 @@ export default function SubmitEvent() {
         </section>
       </div>
     </form>
+
+    <section id="skeleton" style={{ maxWidth: 1180, margin: "40px auto 0", padding: "0 16px" }}>
+      <h2>Page skeleton (from Oct 8 Figma review)</h2>
+      <p className="sub" style={{ marginBottom: 12 }}>
+        Every calendarGold page as empty boxes, in the order Cesar laid them out.
+        Masoud builds the boxes; Cesar fills in labels, filter lists and copy.
+        Red HOLD boxes wait on payments, email/SMS sending or the signed agreement.{" "}
+        <a href="/skeleton.html" target="_blank" rel="noopener noreferrer">Open full screen</a>
+      </p>
+      <iframe
+        src="/skeleton.html"
+        title="calendarGold page skeleton"
+        style={{ width: "100%", height: 920, border: "1px solid #ddd", borderRadius: 12 }}
+        loading="lazy"
+      />
+    </section>
+    </>
   );
 }

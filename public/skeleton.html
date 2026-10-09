@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>calendarGold Skeleton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: page index rail on the left, one phone-width screen on the right; every screen is a stack of labeled wireframe blocks */
+:root{
+  --bg:#f3f1ea; --panel:#ffffff; --ink:#1d1b16; --muted:#6c675a; --line:#d9d4c4;
+  --gold:#f2c200; --gold-ink:#2a2200; --slot:#fbf6df; --slot-line:#d6c56a; --hold:#b3401d;
+  --display:"Archivo",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16150f; --panel:#201e17; --ink:#efeadb; --muted:#a39c87; --line:#3a3628;
+  --gold:#e6b800; --gold-ink:#1d1700; --slot:#2a2715; --slot-line:#7d6e22; --hold:#ef8a64; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16150f; --panel:#201e17; --ink:#efeadb; --muted:#a39c87; --line:#3a3628;
+  --gold:#e6b800; --gold-ink:#1d1700; --slot:#2a2715; --slot-line:#7d6e22; --hold:#ef8a64; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--display);margin:0}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr);gap:28px;max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:28px}
+header.top{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline}
+header.top h1{font-size:1.5rem;margin:0;font-weight:800;letter-spacing:-.01em}
+header.top p{margin:0;color:var(--muted);max-width:62ch;line-height:1.45}
+.legend{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:14px;font:12px var(--mono);color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+nav.idx{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;display:flex;flex-direction:column;gap:2px}
+nav.idx h2{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+nav.idx h2:first-child{margin-top:0}
+nav.idx button{all:unset;cursor:pointer;padding:7px 10px;border-radius:6px;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+nav.idx button:hover{background:var(--panel)}
+nav.idx button:focus-visible{outline:2px solid var(--gold)}
+nav.idx button[aria-current="true"]{background:var(--gold);color:var(--gold-ink);font-weight:600}
+nav.idx small{font:11px var(--mono);opacity:.7}
+.pick{display:none}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px;min-width:0}
+.phone{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;min-height:640px}
+.url{font:11px var(--mono);color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.brand{display:flex;justify-content:space-between;align-items:center;padding:10px 14px}
+.brand b{font-size:18px;font-weight:800}.brand b i{font-style:normal;color:var(--gold)}
+.brand .av{width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--gold-ink);display:grid;place-items:center;font-weight:800;font-size:13px}
+.bar{background:var(--gold);color:var(--gold-ink);padding:8px 14px;font-weight:700;font-size:14px;display:flex;justify-content:space-between}
+.body{padding:14px;display:flex;flex-direction:column;gap:10px;flex:1}
+.blk{border:1px dashed var(--slot-line);background:var(--slot);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.blk h3{margin:0;font-size:13px;font-weight:700}
+.blk .note{font:11px var(--mono);color:var(--muted)}
+.blk.hold{border-color:var(--hold);background:transparent}
+.blk.hold h3::after{content:"  HOLD";font:600 10px var(--mono);color:var(--hold);letter-spacing:.06em}
+.rows{display:flex;flex-direction:column;gap:5px}
+.ph{height:10px;border-radius:3px;background:var(--line)}
+.field{border:1px solid var(--line);border-radius:5px;padding:6px 8px;font-size:12px;color:var(--muted);background:var(--panel)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:2px 8px;font:11px var(--mono);color:var(--muted);background:var(--panel)}
+.btn{align-self:flex-start;background:var(--gold);color:var(--gold-ink);border:0;border-radius:999px;padding:6px 14px;font:600 12px var(--display);cursor:pointer}
+.btn:focus-visible{outline:2px solid var(--ink)}
+.card{border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:var(--panel);display:flex;flex-direction:column;gap:4px}
+.card.prem{border-width:2px;border-color:var(--gold)}
+.card .t{font-size:12px;font-weight:700}
+.link{all:unset;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-size:12px}
+.foot{display:grid;grid-template-columns:repeat(5,1fr);background:var(--gold);color:var(--gold-ink);font:600 10px var(--mono);text-align:center}
+.foot button{all:unset;cursor:pointer;padding:9px 2px}
+.foot button:focus-visible{outline:2px solid var(--ink)}
+.meta{width:100%;max-width:400px;font:12px var(--mono);color:var(--muted);line-height:1.5}
+@media (max-width:760px){
+  .wrap{grid-template-columns:minmax(0,1fr);padding-inline:16px}
+  nav.idx{display:none}
+  .pick{display:block;width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:14px var(--display)}
+}
+@media (prefers-reduced-motion:no-preference){.phone{transition:opacity .15s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <h1>calendarGold skeleton</h1>
+    <p>Every page from the Figma walkthrough, built as empty boxes in the right order. Masoud builds the boxes; Cesar fills labels, filter lists and copy. Click any box link or the bottom bar to move between pages.</p>
+  </header>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--slot);border:1px dashed var(--slot-line)"></i>Skeleton box, ready for Cesar's content</span>
+    <span><i class="sw" style="border:1px dashed var(--hold)"></i>HOLD: needs payments, email sending or the signed split</span>
+  </div>
+  <nav class="idx" id="idx" aria-label="Pages"></nav>
+  <div class="stage">
+    <label for="pick" class="pick" style="display:none">Page</label>
+    <select id="pick" class="pick" aria-label="Choose page"></select>
+    <div class="phone" id="phone"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+</div>
+
+<script>
+const F = { // shared filter skeleton (Cesar fills each list)
+  type:"filters", groups:["Event type","Dates","Cost","Region (by county, 2-col city codes)","Category"]
+};
+const PAGES = [
+ {g:"Entry", id:"home", name:"Home", bar:"Welcome! How It Works", url:"/home", blocks:[
+  {h:"Connect · Promote · Earn", note:"Hero tagline + 1-line pitch"},
+  {h:"1. One Big Calendar", go:"obc"},{h:"2. My Calendar Digest", go:"digest"},
+  {h:"3. Discount / Gift Certificates", go:"discounts"},{h:"4. Employment Listings", go:"jobs"},
+  {h:"5. Notifications", go:"notify"},{h:"Innovative, Results-Based Marketing", go:"ads"},
+  {h:"Earn Money Too!", go:"refer"},{h:"Invite / Refer Others to Sign Up", go:"refer", note:"QR code + custom link"}]},
+ {g:"Entry", id:"signup", name:"Sign Up", bar:"Registration · Sign Up", url:"/registration/signup", blocks:[
+  {h:"Welcome!", form:["First name","Last name","Email","Mobile (text)","Password","Confirm password"]},
+  {h:"Terms + reCAPTCHA", note:"checkbox + captcha slot"},{h:"Continue", btn:"Continue", go:"digest"},
+  {h:"Or sign in with Google", note:"OAuth button slot"},{h:"Already have an account?", go:"login"}]},
+ {g:"Entry", id:"login", name:"Log In", bar:"Registration · Log In", url:"/registration/login", blocks:[
+  {h:"Welcome back!", form:["Email or mobile","Password"]},{h:"Log In", btn:"Log In", go:"obc"},
+  {h:"Forgot password", note:"reset flow"},{h:"New here?", go:"signup"}]},
+ {g:"Calendar", id:"obc", name:"One Big Calendar", bar:"One Big Calendar", url:"/onebigcalendar", blocks:[
+  {h:"Show / Hide filters", note:"toggle: Display Filters ↔ Hide Filters"},F,
+  {h:"Premier listings", cards:2, prem:true, note:"4-line, bold, icons"},
+  {h:"Regular listings", cards:3, note:"2-line format"},
+  {h:"Accordion page box", note:"auto-fit Premier + Regular per page"},
+  {h:"Footer", chips:["Prev / Next page","View all selections","Sync to Google Calendar"]}]},
+ {g:"Calendar", id:"digest", name:"My Calendar Digest", bar:"EDIT My Calendar Digest", url:"/mycalendar", blocks:[
+  F,{h:"My selected events", cards:3, note:"each row has attendance-status pulldown"},
+  {h:"Attendance status", chips:["Going","Maybe","Not going","Interested","Waitlist","Attended","No-show","Cancelled"]},
+  {h:"Edit icon per event", go:"edit"}]},
+ {g:"Calendar", id:"event", name:"Event Details", bar:"Event Details", url:"/event/[id]", blocks:[
+  {h:"Poster / image gallery", note:"upload limit TBD"},{h:"Title · date · location · cost", rows:4},
+  {h:"Map + QR code", note:"two slots"},{h:"RSVP / Get tickets", go:"tickets"},
+  {h:"Like + Share", chips:["Like (count TBD)","Share via email","Share via text"]},
+  {h:"Documents + created date", rows:2}]},
+ {g:"Calendar", id:"edit", name:"Edit / Submit Event", bar:"Edit My Events", url:"/event/edit", blocks:[
+  {h:"Event fields", form:["Title","Start / end","Location","Cost","Description","Category"]},
+  {h:"Listing level", chips:["Free (2-line)","Premier (4-line)"]},
+  {h:"Advertising dates", form:["Ad start date","Ad end date"]},
+  {h:"Add event to shopping cart", btn:"Add event to shopping cart", go:"cart"}]},
+ {g:"Commerce", id:"tickets", name:"Tickets / RSVP", bar:"Tickets", url:"/event/[id]/tickets", hold:true, blocks:[
+  {h:"Ticket types", chips:["Advance","VIP","General"]},
+  {h:"Promo code", form:["Promo code"], note:"invalid / expired popups"},
+  {h:"Attendee names + up to 10 custom questions", rows:3},
+  {h:"Subtotal · max per person", rows:2},{h:"Save for later / Add to cart", go:"cart"}]},
+ {g:"Commerce", id:"cart", name:"Shopping Cart", bar:"Shopping Cart", url:"/cart", hold:true, blocks:[
+  {h:"Cart items", cards:2},{h:"Checkout summary", rows:3},
+  {h:"Payment", note:"Stripe: blocked until split is signed", hold:true}]},
+ {g:"Modules", id:"notify", name:"Notifications", bar:"Notifications", url:"/notifications", blocks:[
+  {h:"Notification filters", chips:["Subscriber count","Revision frequency","Region","Category","Manual / auto adds"]},
+  {h:"Available notifications", cards:3},{h:"Subscribe / unsubscribe", note:"opt-in only"},
+  {h:"My Notifications", go:"mynotify"}]},
+ {g:"Modules", id:"mynotify", name:"My Notifications", bar:"My Notifications", url:"/notifications/mine", blocks:[
+  {h:"Delivery preferences", chips:["Email","Text","Both","Delivery day"]},
+  {h:"Business notification builder", rows:3, note:"A: info box · B: RSVP today · C: other events"},
+  {h:"Listing cap", note:"max 20 premier + regular"},
+  {h:"Send", hold:true, note:"email/SMS sending: HOLD"}]},
+ {g:"Modules", id:"discounts", name:"Discount / Gift Certificates", bar:"Discount / Gift Certificates", url:"/discounts", blocks:[
+  F,{h:"Certificates", cards:3},{h:"Redeem", chips:["In person (QR)","Online"]},
+  {h:"Buy certificate", hold:true, note:"payments: HOLD"}]},
+ {g:"Modules", id:"jobs", name:"Employment Listings", bar:"Employment Listings", url:"/jobs", blocks:[
+  {h:"Job filters", chips:["Industry","Type","Level","Salary range","Region"]},
+  {h:"Listings", cards:3},{h:"Add to My Jobs", note:"saved list"},
+  {h:"Submit / edit job", form:["Title","Company","Salary range","Description"]}]},
+ {g:"Modules", id:"ads", name:"Results-Based Marketing", bar:"Innovative, Results-Based Marketing", url:"/advertising", blocks:[
+  {h:"Budget inputs", form:["Budget","Views target","Clicks target","Weeks"]},
+  {h:"Rates", note:"$0.005/view/week · $0.35/click/week (Cesar to confirm)"},
+  {h:"Live view/click counts", rows:2},
+  {h:"Fund budget", hold:true, note:"payments + auto-downgrade: HOLD"}]},
+ {g:"Modules", id:"refer", name:"Earn / Invite & Refer", bar:"Invite / Refer Others", url:"/refer", blocks:[
+  {h:"Your QR code + custom link", note:"tracking only"},{h:"Referred-by list", rows:3},
+  {h:"Earnings", hold:true, note:"payout % not agreed: HOLD"}]},
+ {g:"Account", id:"dash", name:"Dashboard", bar:"Dashboards", url:"/dashboard", blocks:[
+  {h:"My events summary", rows:3},{h:"Attendee list", note:"export · sort · print · custom columns"},
+  {h:"QR check-in", note:"scan slot"},{h:"Views / clicks", rows:2}]},
+];
+const byId = Object.fromEntries(PAGES.map(p=>[p.id,p]));
+const FOOT = [["obc","Calendar"],["digest","Mine"],["notify","Alerts"],["dash","Dash"],["home","Menu"]];
+const idx = document.getElementById("idx"), pick = document.getElementById("pick");
+const phone = document.getElementById("phone"), meta = document.getElementById("meta");
+let lastG = null;
+PAGES.forEach(p=>{
+  if(p.g!==lastG){const h=document.createElement("h2");h.textContent=p.g;idx.appendChild(h);lastG=p.g;}
+  const b=document.createElement("button");b.dataset.id=p.id;
+  b.innerHTML=`<span>${p.name}</span>${p.hold?'<small>HOLD</small>':''}`;
+  b.onclick=()=>show(p.id);idx.appendChild(b);
+  const o=document.createElement("option");o.value=p.id;o.textContent=`${p.g} · ${p.name}`;pick.appendChild(o);
+});
+pick.onchange=()=>show(pick.value);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function block(b){
+  if(b.type==="filters") return `<div class="blk"><h3>Filters</h3>${b.groups.map(g=>`<div class="field">${esc(g)} ▾</div>`).join("")}<div class="note">Cesar fills the option lists</div></div>`;
+  let s=`<div class="blk${b.hold?" hold":""}"><h3>${esc(b.h)}</h3>`;
+  if(b.form) s+=b.form.map(f=>`<div class="field">${esc(f)}</div>`).join("");
+  if(b.chips) s+=`<div class="chips">${b.chips.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>`;
+  if(b.rows) s+=`<div class="rows">${Array.from({length:b.rows},(_,i)=>`<div class="ph" style="width:${90-i*12}%"></div>`).join("")}</div>`;
+  if(b.cards) s+=Array.from({length:b.cards},()=>`<div class="card${b.prem?" prem":""}"><span class="t">Event title</span><div class="ph" style="width:70%"></div>${b.prem?'<div class="ph" style="width:55%"></div>':''}</div>`).join("");
+  if(b.note) s+=`<div class="note">${esc(b.note)}</div>`;
+  if(b.btn) s+=`<button class="btn" data-go="${b.go||""}">${esc(b.btn)}</button>`;
+  else if(b.go) s+=`<button class="link" data-go="${b.go}">Open ${esc(byId[b.go].name)} →</button>`;
+  return s+"</div>";
+}
+function show(id){
+  const p=byId[id]||PAGES[0];
+  phone.innerHTML=`<div class="url">calendargold.com${p.url}</div>
+   <div class="brand"><b>calendar<i>Gold</i>.com</b><span class="av" aria-label="Signed in as M">M</span></div>
+   <div class="bar"><span>${esc(p.bar)}</span><span aria-hidden="true">⋯</span></div>
+   <div class="body">${p.blocks.map(block).join("")}</div>
+   <div class="foot">${FOOT.map(([g,l])=>`<button data-go="${g}">${l}</button>`).join("")}</div>`;
+  phone.querySelectorAll("[data-go]").forEach(el=>{if(el.dataset.go)el.onclick=()=>show(el.dataset.go);});
+  idx.querySelectorAll("button").forEach(b=>b.setAttribute("aria-current",b.dataset.id===p.id));
+  pick.value=p.id;
+  const holds=p.blocks.filter(b=>b.hold).length;
+  meta.textContent=`${p.blocks.length} boxes on this page${p.hold?" · whole page on HOLD":holds?` · ${holds} on HOLD`:""}. Route: ${p.url}`;
+  try{localStorage.setItem("cg-page",p.id)}catch(e){}
+  phone.scrollIntoView?.({block:"nearest"});
+}
+let start="home";
+const hash=location.hash.slice(1);
+if(byId[hash]) start=hash; else { try{const s=localStorage.getItem("cg-page"); if(byId[s]) start=s;}catch(e){} }
+show(start);
+</script>
+</body>
+</html>
