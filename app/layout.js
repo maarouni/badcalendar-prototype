@@ -74,16 +74,20 @@ export default function RootLayout({ children }) {
               <h5>Navigate</h5>
               <a href="/">One Big Calendar</a>
               <a href="/my-calendar">My Calendar</a>
+              <a href="/employment">Employment</a>
+              <a href="/discounts">Discount / Gift Certificates</a>
               <a href="/notifications">Notifications</a>
+              <a href="/dashboards">Dashboards</a>
               <a href="/submit">Submit an Event</a>
               <a href="/profile">My Profile</a>
             </div>
 
             <div className="footer-col">
               <h5>About</h5>
+              <a href="/info">About Us</a>
               <a href="#">For Organizers</a>
               <a href="#">For Attendees</a>
-              <a href="#">Contact</a>
+              <a href="/info">Contact</a>
             </div>
           </div>
 

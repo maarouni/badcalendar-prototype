@@ -112,6 +112,7 @@ export default function NavBar() {
               <div className="nav-user-dropdown">
                 <div className="nav-user-name">{user.name}</div>
                 <div className="nav-user-id">{user.identifier}</div>
+                <a href="/dashboards" onClick={() => setMenuOpen(false)}>Dashboards</a>
                 <a href="/profile" onClick={() => setMenuOpen(false)}>Profile</a>
                 <button type="button" onClick={logOut}>Log out</button>
               </div>

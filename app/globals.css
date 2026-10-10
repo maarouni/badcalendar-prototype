@@ -10,9 +10,9 @@
   --ec-teal: #00c7be;
   --ec-green: #bfe98c;
   --ec-field: #f5f5f5;
-  --ec-muted: #8a6a52;
-  --ink-soft: #5c4a3a;
-  --ec-faint: #a3907d;
+  --ec-muted: #a9662a;
+  --ink-soft: #7a431a;
+  --ec-faint: #c98f52;
   --bg: #ffffff;
   --card: #ffffff;
   --border: #ececec;
@@ -1997,3 +1997,56 @@ html, body { overflow-x: clip; }
   text-decoration: none;
 }
 .post-listing-link:hover { background: var(--gold-dark); }
+
+
+/* --- Premier advertising-cost calculator (Cesar's Oct 9 spec) --- */
+.prem-calc {
+  margin-top: 4px;
+  padding: 18px;
+  border: 1px solid rgba(255,149,0,0.35);
+  border-radius: 16px;
+  background: #fffaf3;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.prem-calc-head { display: flex; flex-direction: column; gap: 4px; }
+.prem-calc-head b { font-size: 16px; }
+.prem-calc-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.prem-calc-seg { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.prem-calc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.prem-calc-table th, .prem-calc-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid rgba(26,26,26,0.08); }
+.prem-calc-table th:last-child, .prem-calc-table td:last-child { text-align: right; }
+.prem-calc-table tfoot td { font-weight: 500; }
+.prem-calc-total td { font-weight: 700; font-size: 15px; color: var(--gold-dark); border-top: 1px solid rgba(26,26,26,0.15); }
+
+/* --- Dashboards page --- */
+.dash-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 18px; }
+.dash-card { border: 1px solid var(--border); border-radius: 18px; padding: 20px; background: var(--card); }
+.dash-card-wide { grid-column: 1 / -1; }
+.dash-card h3 { margin: 0 0 8px; }
+.dash-tagline { font-weight: 500; }
+.dash-plain-list { margin: 6px 0; padding-left: 18px; color: var(--ink); }
+.dash-qr-row { display: flex; gap: 16px; align-items: center; margin-top: 10px; }
+.dash-qr-box {
+  width: 72px; height: 72px; border-radius: 10px; border: 1.5px dashed var(--ec-faint);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--ec-faint); flex-shrink: 0;
+}
+.dash-referral-code { margin-bottom: 8px; }
+.dash-stat-row { display: flex; gap: 18px; margin-top: 10px; }
+.dash-stat { display: flex; flex-direction: column; }
+.dash-stat b { font-family: "Alata", sans-serif; font-size: 24px; }
+.dash-stat span { font-size: 12px; color: var(--ec-muted); }
+.dash-link-list { display: flex; flex-direction: column; gap: 8px; }
+.dash-link-list a { color: var(--ink); text-decoration: none; font-weight: 500; }
+.dash-link-list a:hover { color: var(--gold-dark); }
+@media (max-width: 760px) { .dash-grid { grid-template-columns: 1fr; } }
+
+/* --- Info / About page --- */
+.info-page { max-width: 880px; }
+.info-section { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--border); }
+.info-section h2 { margin: 0 0 8px; }
+.info-tier-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 14px; }
+.info-tier { border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+.info-tier h4 { margin: 0 0 6px; color: var(--gold-dark); }
+@media (max-width: 760px) { .info-tier-grid { grid-template-columns: 1fr; } }

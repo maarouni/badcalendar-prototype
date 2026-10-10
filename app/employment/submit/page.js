@@ -7,6 +7,7 @@ import {
 } from "../../lib/employmentTaxonomy";
 import { saveLocalJob } from "../../lib/jobs";
 import IconNav from "../../components/IconNav";
+import PremierCalculator from "../../components/PremierCalculator";
 
 const ALL_REGIONS = REGION_GROUPS.flatMap((g) => g.options);
 const todayIso = () => new Date().toISOString().slice(0, 10);
@@ -21,6 +22,7 @@ export default function PostJobPage() {
   const router = useRouter();
   const [f, setF] = useState(EMPTY);
   const [errors, setErrors] = useState({});
+  const [premierPaid, setPremierPaid] = useState(null);
 
   function set(key, value) {
     setF((cur) => ({ ...cur, [key]: value }));
@@ -57,6 +59,7 @@ export default function PostJobPage() {
       compMax: Number(f.compMax) || 0,
       posted: todayIso(),
       premier: f.premier,
+      premierCost: f.premier && premierPaid ? premierPaid.total : null,
     };
     saveLocalJob(job);
     router.push("/employment");
@@ -146,6 +149,8 @@ export default function PostJobPage() {
             <input type="checkbox" checked={f.premier} onChange={(e) => set("premier", e.target.checked)} />
             <span className="fp-label">Premier listing <em>(top placement)</em></span>
           </label>
+
+          {f.premier && <PremierCalculator onConfirm={setPremierPaid} />}
 
           <button type="submit" className="btn-primary" style={{ marginTop: 10 }}>Post Listing</button>
           <p className="proto-note">Prototype: posted listings are saved in this browser only, same as My Calendar.</p>
