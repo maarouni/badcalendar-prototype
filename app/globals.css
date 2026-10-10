@@ -1891,6 +1891,19 @@ html, body { overflow-x: clip; }
 }
 .section-intro-line strong { color: var(--ink); }
 
+/* Pages that render behind the hero arc (every .page except the browse-page
+   ones) need light text in their intro/subtitle area — the warm muted
+   browns read as near-unreadable (and look red) on the blue/teal/purple
+   arc. Scoped to just that text, not the page body below it. */
+.navbar ~ .page:not(#browse):not(.browse-page) .section-intro-line,
+.navbar ~ .page:not(#browse):not(.browse-page) .mc-head p,
+.navbar ~ .page:not(#browse):not(.browse-page) .ed-head p {
+  color: rgba(255,255,255,0.92);
+}
+.navbar ~ .page:not(#browse):not(.browse-page) .section-intro-line strong {
+  color: #fff;
+}
+
 /* ---------- Digest / Actions block (bottom of every filter panel) ---------- */
 
 .fp-static-head {
