@@ -52,6 +52,7 @@ function EmploymentInner() {
         <IconNav active="employment" />
         <p className="section-intro-line">
           <strong>Get Alerts!</strong> Set filters to organize, submit, and view many types of <em>Careers / Jobs</em>.
+          {" "}<a href="/employment/submit" className="post-listing-link">+ Post a Listing</a>
         </p>
       </section>
 
@@ -75,7 +76,7 @@ function EmploymentInner() {
             )}
 
             <FillInHere>
-              The 8 listings below are placeholders I wrote to test the layout — swap them for your real job postings (same fields: title, company, industry, city/region, level, type, compensation, posted date).
+              The 8 listings below are placeholders I wrote to test the layout. Click <strong>+ Post a Listing</strong> above to add a real one through the form — it'll show up here right away, same fields as these.
             </FillInHere>
 
             <div className="job-list">

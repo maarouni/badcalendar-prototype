@@ -82,6 +82,27 @@ const JOBS = [
   },
 ];
 
+// Jobs posted from this browser via /employment/submit are kept in
+// localStorage, same pattern as events — no real backend yet.
+const LOCAL_KEY = "mc_submitted_jobs_v1";
+
+export function localJobs() {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalJob(job) {
+  try {
+    const list = localJobs().filter((j) => j.id !== job.id);
+    list.unshift(job);
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+  } catch {}
+}
+
 export async function fetchJobs() {
-  return JOBS;
+  const ids = new Set(JOBS.map((j) => j.id));
+  return [...localJobs().filter((j) => !ids.has(j.id)), ...JOBS];
 }

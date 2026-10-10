@@ -1974,3 +1974,26 @@ html, body { overflow-x: clip; }
 .fih-cloud { color: var(--gold-dark); flex-shrink: 0; margin-top: 3px; }
 .fih-title { font-weight: 800; font-size: 14px; color: var(--gold-dark); }
 .fih-note { font-size: 13px; color: #7a5a3a; margin-top: 2px; line-height: 1.45; }
+
+/* ---------- Employment: Post a Listing form ---------- */
+
+.job-form { display: flex; flex-direction: column; }
+.job-form .ed-field + .ed-field,
+.job-form .fp-option.wide { margin-top: 14px; }
+.job-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 2px 10px;
+}
+.post-listing-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gold);
+  padding: 7px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+}
+.post-listing-link:hover { background: var(--gold-dark); }
