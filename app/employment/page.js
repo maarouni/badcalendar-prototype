@@ -7,6 +7,7 @@ import EmploymentFilterPanel from "../components/EmploymentFilterPanel";
 import { HostAvatar, shortDate } from "../components/EventVisuals";
 import { EMPTY_JOB_FILTERS, jobMatches, sortJobs } from "../lib/employmentTaxonomy";
 import { fetchJobs } from "../lib/jobs";
+import FillInHere from "../components/FillInHere";
 
 const PAGE_SIZE = 8;
 
@@ -72,6 +73,10 @@ function EmploymentInner() {
                 to see every listing.
               </div>
             )}
+
+            <FillInHere>
+              The 8 listings below are placeholders I wrote to test the layout — swap them for your real job postings (same fields: title, company, industry, city/region, level, type, compensation, posted date).
+            </FillInHere>
 
             <div className="job-list">
               {[...featured, ...pageItems].map((j) => (
