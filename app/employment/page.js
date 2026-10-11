@@ -10,6 +10,7 @@ import { fetchJobs } from "../lib/jobs";
 import FillInHere from "../components/FillInHere";
 
 const PAGE_SIZE = 8;
+const FEATURED_CAP = 1; // how many Premier listings show before "More Premier Listings" is needed
 
 function compLabel(j) {
   if (j.compType === "none") return "No Response";
@@ -28,6 +29,7 @@ function EmploymentInner() {
   const [jobs, setJobs] = useState([]);
   const [filters, setFilters] = useState(EMPTY_JOB_FILTERS);
   const [page, setPage] = useState(1);
+  const [showAllPremier, setShowAllPremier] = useState(false);
   const today = useMemo(() => new Date(), []);
 
   useEffect(() => { fetchJobs().then(setJobs); }, []);
@@ -39,12 +41,15 @@ function EmploymentInner() {
   const visible = useMemo(() => sortJobs(filtered, filters.sort), [filtered, filters.sort]);
   const featured = visible.filter((j) => j.premier);
   const regular = visible.filter((j) => !j.premier);
+  const hasMorePremier = featured.length > FEATURED_CAP;
+  const featuredShown = showAllPremier ? featured : featured.slice(0, FEATURED_CAP);
 
   const totalPages = Math.max(1, Math.ceil(regular.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageItems = regular.slice((safePage - 1) * PAGE_SIZE, (safePage - 1) * PAGE_SIZE + PAGE_SIZE);
 
   useEffect(() => { setPage(1); }, [filters, q]);
+  useEffect(() => { setShowAllPremier(false); }, [filters, q]);
 
   return (
     <>
@@ -80,7 +85,7 @@ function EmploymentInner() {
             </FillInHere>
 
             <div className="job-list">
-              {[...featured, ...pageItems].map((j) => (
+              {[...featuredShown, ...pageItems].map((j) => (
                 <article key={j.id} className={`job-card ${j.premier ? "premier" : ""}`}>
                   <HostAvatar name={j.company} size={40} />
                   <div className="job-body">
@@ -111,7 +116,17 @@ function EmploymentInner() {
               </div>
             )}
 
-            <a href="#" className="more-premier-link" onClick={(e) => e.preventDefault()}>More Premier Listings →</a>
+            {(hasMorePremier || showAllPremier) && (
+              <button
+                type="button"
+                className="more-premier-link"
+                onClick={() => setShowAllPremier((v) => !v)}
+              >
+                {showAllPremier
+                  ? "← Show fewer Premier listings"
+                  : `More Premier Listings (${featured.length - FEATURED_CAP} more) →`}
+              </button>
+            )}
           </div>
         </div>
       </div>
