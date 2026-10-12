@@ -14,7 +14,7 @@ const PUBLIC_PAGES = [
   ["/discounts", "Discount / Gift Certificates"], ["/info", "Info"], ["/login", "Registration – Sign Up / Log In"],
 ];
 const PERSONAL_PAGES = [
-  ["/my-calendar", "My Calendar Digest"], ["/submit", "EDIT My Events"], ["/employment/submit", "EDIT My Employment Listings"],
+  ["/my-calendar", "My Calendar Digest"], ["/submit", "EDIT My Events"], ["/employment/submit", "EDIT My Employment Listings"], ["/discounts/submit", "EDIT My Discount / Gift Certificates"],
   ["/dashboards", "My Dashboards"], ["/cart", "Account Shopping Cart"], ["/profile", "Settings"],
 ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { IconButton } from "./Icons";
 import { cartCount } from "../lib/cart";
 
@@ -27,6 +27,12 @@ function initials(name) {
 
 export default function NavBar() {
   const router = useRouter();
+  const path = usePathname() || "/";
+  const cta = path.startsWith("/discounts")
+    ? { href: "/discounts/submit", label: "+ Post Certificate" }
+    : path.startsWith("/employment")
+      ? { href: "/employment/submit", label: "+ Post a Job" }
+      : { href: "/submit", label: "+ Create Event" };
   const [q, setQ] = useState("");
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -90,7 +96,7 @@ export default function NavBar() {
       <div className="nav-links">
         <a href="/">One Big Calendar</a>
         <a href="/my-calendar">My Calendar</a>
-        <a href="/submit" className="nav-cta">+ Create Event</a>
+        <a href={cta.href} className="nav-cta" data-tip="Add New">{cta.label}</a>
 
         {/* Header icons per Cesar's Legend Icons (Info section, Rev 261012) */}
         <IconButton name="info" href="/info" />

@@ -2346,3 +2346,19 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 .send-masoud-actions .btn-primary, .send-masoud-actions .btn-ghost { display: inline-flex; align-items: center; gap: 6px; }
 /* Regular rows now carry the same icons as Premier rows */
 .tl-card.regular .tl-actions { flex-direction: row-reverse; gap: 4px; }
+
+/* Discount / Gift Certificates */
+.disc-desc { font-size: 13px; color: var(--ink); margin: 2px 0; }
+.disc-actions { display: flex; align-items: center; justify-content: flex-end; gap: 2px; margin-top: 6px; }
+.job-card.saved { background: #fff4e0; border-color: var(--gold); box-shadow: 0 0 0 1.5px var(--gold); }
+.disc-detail { display: grid; grid-template-columns: 1fr 280px; gap: 24px; }
+.disc-detail-side { display: flex; flex-direction: column; gap: 14px; }
+.disc-cert { border: 2px dashed var(--gold); border-radius: 14px; padding: 18px 20px; background: #fffaf0; }
+.disc-cert h1 { margin: 4px 0 6px; font-size: 26px; }
+.disc-cert-kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--gold-dark); }
+.disc-cert-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 10px; font-size: 14px; }
+.disc-value { font-weight: 700; font-size: 18px; color: var(--gold-dark); }
+.disc-thanks { margin-top: 18px; padding: 12px 14px; border-radius: 10px; background: #f6f6f6; font-size: 13px; }
+.disc-detail .section-label { margin-top: 18px; }
+@media (max-width: 760px) { .disc-detail { grid-template-columns: 1fr; } }
+.tpl-body-edit input[type="tel"], .tpl-body-edit input[type="email"], .tpl-body-edit input[type="url"] { background: #fff; }
