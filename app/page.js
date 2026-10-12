@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { slugify } from "./lib/slug";
 import FilterPanel from "./components/FilterPanel";
 import IconNav from "./components/IconNav";
-import { CountyMap, MonthCalendar } from "./components/Explore";
+import { CountyMap } from "./components/Explore";
 import {
   Poster, HostAvatar, Icon, fmtTime, dayLabel, shortDate, isoOf, parseDate,
 } from "./components/EventVisuals";
@@ -178,11 +178,19 @@ function SuperCalendarInner() {
         <div className="explore-inner">
           <div className="explore-intro">
             <h2>What&rsquo;s happening around the Bay</h2>
-            <p>Pick one or more counties, pick a day, or just scroll.</p>
+            <p>Pick one or more counties, or just scroll.</p>
           </div>
           <div className="explore-grid">
             <CountyMap events={forMap} filters={filters} setFilters={setFilters} />
-            <MonthCalendar events={filtered} month={month} setMonth={setMonth} day={day} setDay={pickDay} today={today} />
+            {/* Oct 10: Cesar isn't happy with the box calendar (multi-month ranges are
+                hard on phones). Placeholder until the date-filter design is settled;
+                MonthCalendar stays in Explore.js to restore later. */}
+            <div className="explore-card tbd-card" aria-label="Calendar under construction">
+              <div className="tbd-inner">
+                <span className="tbd-flag">Calendar Under Construction</span>
+                <b>TBD</b>
+              </div>
+            </div>
           </div>
         </div>
       </section>
