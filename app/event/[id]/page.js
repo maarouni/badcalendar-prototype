@@ -144,7 +144,7 @@ export default function EventDetail() {
         </div>
 
         <aside className="event-detail-side">
-          <div className="rsvp-card">
+          <div className="rsvp-card" id="tickets">
             <div className="rsvp-cost">{event.cost}</div>
             {paid ? (
               <>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const USER_KEY = "mc_user_v1";
@@ -8,6 +8,11 @@ const USER_KEY = "mc_user_v1";
 export default function Login() {
   const router = useRouter();
   const [mode, setMode] = useState("signup"); // "signup" | "login"
+  // Deep links: /login?mode=login or /login?mode=signup (&ref=CODE from a referral QR)
+  useEffect(() => {
+    const m = new URLSearchParams(window.location.search).get("mode");
+    if (m === "login" || m === "signup") setMode(m);
+  }, []);
   const [name, setName] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");

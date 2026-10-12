@@ -34,6 +34,7 @@ export default function InfoPage() {
       </header>
 
       <nav className="info-index" aria-label="Info index">
+        <a href="/pages"><b>All Pages →</b></a>
         {INDEX.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}
       </nav>
 

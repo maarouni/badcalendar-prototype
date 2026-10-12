@@ -594,6 +594,11 @@ function BusinessTab({ edit, labels, update, flash }) {
 
 export default function Notifications() {
   const [tab, setTab] = useState("browse");
+  // Deep link: /notifications?tab=mine (My Notifications) or ?tab=business
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("tab");
+    if (TABS.some((x) => x.id === t)) setTab(t);
+  }, []);
   const [edit, setEdit] = useState(false);
   const [labels, setLabels] = useState(() => clone(DEFAULT_LABELS));
   const [subs, setSubs] = useState([]);

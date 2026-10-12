@@ -22,7 +22,7 @@ export default function DashboardsPage() {
 
       <div className="dash-grid">
         <section className="dash-card dash-card-wide">
-          <h3>Invite &amp; Refer</h3>
+          <h3>Invite &amp; Refer <a href="/refer" className="nt-hint" style={{ fontWeight: 400, marginLeft: 8 }}>Open →</a></h3>
           <p>Invite / refer others to sign up with your QR code and custom marketing collateral. Sign up today to create an account, submit, and edit your listings.</p>
           <div className="dash-qr-row">
             <div className="dash-qr-box" aria-hidden="true">QR</div>
@@ -34,8 +34,8 @@ export default function DashboardsPage() {
         </section>
 
         <section className="dash-card">
-          <h3>Earn Money Too!</h3>
-          <p className="dash-tagline">Win&ndash;Win&ndash;Win! Share 10% of sales revenue with your referrals (2 levels):</p>
+          <h3>Earn Money Too! <a href="/refer" className="nt-hint" style={{ fontWeight: 400, marginLeft: 8 }}>How it works →</a></h3>
+          <p className="dash-tagline">Win&ndash;Win&ndash;Win! Share 10% of sales revenue with your referrals (up to 3 levels):</p>
           <ul className="dash-plain-list">
             <li>Event Ticket Fees</li>
             <li>Premier Event Listings</li>
@@ -71,7 +71,7 @@ export default function DashboardsPage() {
         <section className="dash-card">
           <h3>Innovative, Results-Based Marketing</h3>
           <p>Save $$$! Calculate and manage your advertising cost based on # weeks and # views or # clicks &mdash; full transparency, no pay-and-pray shotgun marketing.</p>
-          <a href="/employment/submit" className="nt-hint">See the advertising cost calculator on a Premier listing →</a>
+          <a href="/advertising" className="nt-hint">Calculator, rates and event participation →</a>
         </section>
       </div>
     </div>

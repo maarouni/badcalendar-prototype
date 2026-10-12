@@ -65,6 +65,7 @@ nav.idx small{font:11px var(--mono);opacity:.7}
 .foot button{all:unset;cursor:pointer;padding:9px 2px}
 .foot button:focus-visible{outline:2px solid var(--ink)}
 .meta{width:100%;max-width:400px;font:12px var(--mono);color:var(--muted);line-height:1.5}
+.meta .live{display:inline-block;margin-bottom:6px;padding:8px 14px;border-radius:999px;background:var(--gold);color:var(--gold-ink);font:600 13px var(--display);text-decoration:none}
 @media (max-width:760px){
   .wrap{grid-template-columns:minmax(0,1fr);padding-inline:16px}
   nav.idx{display:none}
@@ -168,6 +169,10 @@ const PAGES = [
   {h:"QR check-in", note:"scan slot"},{h:"Views / clicks", rows:2}]},
 ];
 const byId = Object.fromEntries(PAGES.map(p=>[p.id,p]));
+// Each skeleton screen now has a working page in the prototype.
+const LIVE = {home:"/",signup:"/login?mode=signup",login:"/login?mode=login",obc:"/#results",digest:"/my-calendar",
+  event:"/event/15",edit:"/submit",tickets:"/event/15#tickets",cart:"/cart",notify:"/notifications",
+  mynotify:"/notifications?tab=mine",discounts:"/discounts",jobs:"/employment",ads:"/advertising",refer:"/refer",dash:"/dashboards"};
 const FOOT = [["obc","Calendar"],["digest","Mine"],["notify","Alerts"],["dash","Dash"],["home","Menu"]];
 const idx = document.getElementById("idx"), pick = document.getElementById("pick");
 const phone = document.getElementById("phone"), meta = document.getElementById("meta");
@@ -204,7 +209,7 @@ function show(id){
   idx.querySelectorAll("button").forEach(b=>b.setAttribute("aria-current",b.dataset.id===p.id));
   pick.value=p.id;
   const holds=p.blocks.filter(b=>b.hold).length;
-  meta.textContent=`${p.blocks.length} boxes on this page${p.hold?" · whole page on HOLD":holds?` · ${holds} on HOLD`:""}. Route: ${p.url}`;
+  meta.innerHTML=`<a class="live" href="${LIVE[p.id]}" target="_top">Open the working page &rarr;</a><br>${p.blocks.length} boxes on this page${p.hold?" · checkout on HOLD":holds?` · ${holds} on HOLD`:""}. Live route: ${LIVE[p.id]}`;
   try{localStorage.setItem("cg-page",p.id)}catch(e){}
   phone.scrollIntoView?.({block:"nearest"});
 }
