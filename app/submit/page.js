@@ -200,8 +200,10 @@ export default function SubmitEvent() {
               ? `Premier listing, ${money(done.adBudget?.total || 0)} advertising budget. Checkout and payment come with the next build — for this demo it's live on One Big Calendar as Premier.`
               : "It's on One Big Calendar now, as a free Regular listing."}
           </p>
+          <p className="nt-hint">Until the shared database is set up, this event only shows on this computer — use
+            <b> Send my events to Masoud</b> on One Big Calendar to make it permanent for everyone.</p>
           <div className="ed-done-actions">
-            <a className="btn-primary" href="/#timeline">See it on One Big Calendar</a>
+            <a className="btn-primary" href="/#results">See it on One Big Calendar</a>
             <button type="button" className="btn-ghost" onClick={() => { setF(EMPTY); setDone(null); }}>Add another event</button>
           </div>
         </div>

@@ -12,7 +12,8 @@ import {
   Poster, HostAvatar, Icon, fmtTime, fmtWhen, dayLabel, shortDate, isoOf,
 } from "./components/EventVisuals";
 import { EMPTY_FILTERS, matches, googleCalendarUrl } from "./lib/taxonomy";
-import { fetchEvents } from "./lib/events";
+import { fetchEvents, localEvents } from "./lib/events";
+import SendToMasoud from "./components/SendToMasoud";
 import { addToCart } from "./lib/cart";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
@@ -47,6 +48,9 @@ function PlaceLine({ e }) {
 
 const multiDay = (e) => e.endDate && e.endDate > e.date;
 const isPrivate = (e) => e.privacy === "Private";
+
+const fmtEvent = (e) =>
+  `${e.title} — hosted by ${e.hostedBy}\n   ${fmtWhen(e)} · ${e.type === "Online" ? "Online" : `${e.city}, ${e.region}`}\n   ${e.cost}${e.premier ? " · PREMIER" : ""}${e.privacy === "Private" ? " · PRIVATE" : ""}`;
 
 function addTicket(e, setFlash) {
   addToCart({ kind: "tickets", refId: e.id, title: e.title, when: fmtWhen(e), price: e.price || 0 });
@@ -158,7 +162,7 @@ function SuperCalendarInner() {
   for (const r of filters.regions) chips.push({ key: `r-${r}`, label: r, clear: () => setFilters((f) => ({ ...f, regions: f.regions.filter((x) => x !== r) })) });
   if (filters.formats.includes("Online")) chips.push({ key: "online", label: "Online", clear: () => setFilters((f) => ({ ...f, formats: f.formats.filter((x) => x !== "Online") })) });
 
-  const premierActions = (e) => (
+  const listingActions = (e) => (
     <div className="tl-actions">
       <SelectRadio saved={!!selected[e.id]} onClick={() => toggle(e.id)} title={e.title} />
       <div className="tl-icon-row">
@@ -272,7 +276,7 @@ function SuperCalendarInner() {
               )}
             </div>
 
-            {(chips.length > 0 || anyFilter) && (
+            {(chips.length > 0 || !!anyFilter) && (
               <div className="active-filters">
                 {chips.map((c) => (
                   <button key={c.key} type="button" className="filter-chip" onClick={c.clear}>
@@ -283,6 +287,7 @@ function SuperCalendarInner() {
               </div>
             )}
             {flash && <div className="fp-flash fp-flash-block">{flash}</div>}
+            <SendToMasoud load={localEvents} noun="events" format={fmtEvent} subject="calendarGold - my events" />
 
             {pageItems.length === 0 && (
               <div className="empty-state">
@@ -325,7 +330,7 @@ function SuperCalendarInner() {
                                 <Icon name="tag" />{e.cost}
                               </div>
                             </div>
-                            {premierActions(e)}
+                            {listingActions(e)}
                           </article>
                         ) : (
                           <article key={e.id} className={`tl-card regular ${selected[e.id] ? "saved" : ""}`}>
@@ -341,9 +346,7 @@ function SuperCalendarInner() {
                                 <PlaceLine e={e} /> · <a href={`/organizer/${slugify(e.hostedBy)}`}>{e.hostedBy}</a> · {e.cost}
                               </div>
                             </div>
-                            <div className="tl-actions">
-                              <SelectRadio saved={!!selected[e.id]} onClick={() => toggle(e.id)} title={e.title} />
-                            </div>
+                            {listingActions(e)}
                           </article>
                         )
                       )}

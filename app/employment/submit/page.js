@@ -153,7 +153,7 @@ export default function PostJobPage() {
           {f.premier && <PremierCalculator onConfirm={setPremierPaid} />}
 
           <button type="submit" className="btn-primary" style={{ marginTop: 10 }}>Post Listing</button>
-          <p className="proto-note">Prototype: posted listings are saved in this browser only, same as My Calendar.</p>
+          <p className="proto-note">Until the shared database is set up, listings you post show only on this computer. After posting, use <b>Send my listings to Masoud</b> on the Employment page to make them permanent for everyone.</p>
         </form>
     </PageTemplate>
   );

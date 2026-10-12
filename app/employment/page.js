@@ -10,6 +10,11 @@ import { HostAvatar, shortDate } from "../components/EventVisuals";
 import { EMPTY_JOB_FILTERS, jobMatches, sortJobs } from "../lib/employmentTaxonomy";
 import { fetchJobs } from "../lib/jobs";
 import FillInHere from "../components/FillInHere";
+import SendToMasoud from "../components/SendToMasoud";
+import { localJobs } from "../lib/jobs";
+
+const fmtJob = (j) =>
+  `${j.title} — ${j.company} (${j.industry})\n   ${j.city}, ${j.region} · ${j.level} · ${(j.types || []).join(", ")}\n   Pay: ${compLabel(j)} · Posted ${j.posted}${j.premier ? " · PREMIER" : ""}`;
 
 const PAGE_SIZE = 8;
 const FEATURED_CAP = 1; // how many Premier listings show before "More Premier Listings" is needed
@@ -96,8 +101,12 @@ function EmploymentInner() {
             )}
 
             <FillInHere>
-              The 8 listings below are placeholders I wrote to test the layout. Click <strong>+ Post a Listing</strong> above to add a real one through the form — it'll show up here right away, same fields as these.
+              These 8 listings are placeholders. Click <strong>+ Post a Listing</strong> to enter real ones. They&rsquo;ll appear on
+              your screen right away. When you&rsquo;re done, click <strong>Send my listings to Masoud</strong> so I can make them
+              permanent for everyone. <em>(Until we set up the database, listings you post are only visible on your computer.)</em>
             </FillInHere>
+
+            <SendToMasoud load={localJobs} noun="listings" format={fmtJob} subject="calendarGold - my employment listings" />
 
             <div className="job-list">
               {[...featuredShown, ...pageItems].map((j) => (

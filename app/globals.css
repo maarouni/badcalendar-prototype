@@ -2339,3 +2339,10 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 @media (max-width: 760px) {
   .nav-links > a.icon-btn[href="/login"] { display: none; }
 }
+
+/* Send-to-Masoud block (until there's a shared database) */
+.send-masoud { border: 1px solid var(--gold); background: #fff8ec; border-radius: 12px; padding: 12px 14px; margin: 0 0 14px; font-size: 13px; color: var(--ink); }
+.send-masoud-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.send-masoud-actions .btn-primary, .send-masoud-actions .btn-ghost { display: inline-flex; align-items: center; gap: 6px; }
+/* Regular rows now carry the same icons as Premier rows */
+.tl-card.regular .tl-actions { flex-direction: row-reverse; gap: 4px; }
