@@ -1,28 +1,23 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Icon, isoOf, parseDate } from "./EventVisuals";
+import { BAY_COUNTIES, NORCAL_CONTEXT, MAP_W, MAP_H } from "../lib/norcalCounties";
 
-// Rough geographic placement of Cesar's nine Bay Area counties, drawn as
-// Every Circle bubbles. Bubble size grows with the number of matching events.
-const COUNTIES = [
-  { name: "Sonoma", short: "Sonoma", x: 62, y: 52 },
-  { name: "Napa", short: "Napa", x: 156, y: 38 },
-  { name: "Solano", short: "Solano", x: 262, y: 66 },
-  { name: "Marin", short: "Marin", x: 52, y: 146 },
-  { name: "Contra Costa", short: "Contra Costa", x: 262, y: 158 },
-  { name: "San Francisco", short: "SF", x: 112, y: 206 },
-  { name: "Alameda", short: "Alameda", x: 246, y: 248 },
-  { name: "San Mateo", short: "San Mateo", x: 98, y: 296 },
-  { name: "Santa Clara", short: "Santa Clara", x: 236, y: 342 },
-];
-
+// Cesar (Oct 10): use a natural, real-shape map of the Bay Area counties
+// instead of the AI-style bubbles. Hover changes color; click (or
+// shift-click) toggles a county, so several can be selected at once.
+// Surrounding NorCal counties are drawn as faded context only.
 const ELSEWHERE = [
   { label: "Online", kind: "format", value: "Online" },
   { label: "Rest of California", kind: "regions", value: ["North Coast", "Shasta Cascades", "Sacramento Valley", "Gold Country", "Sierra Nevada", "Central Coast", "San Joaquin Valley", "Southern California", "Desert"] },
   { label: "National", kind: "regions", value: ["National"] },
   { label: "International", kind: "regions", value: ["International"] },
 ];
+
+const SHORT = { "San Francisco": "SF", "Contra Costa": "Contra Costa", "Santa Clara": "Santa Clara", "San Mateo": "San Mateo" };
+// Nudge a few labels off busy edges so they stay readable.
+const LABEL_NUDGE = { "San Francisco": [-22, 0], "San Mateo": [-14, 4], Marin: [-6, 0], Alameda: [6, 2], "Contra Costa": [4, -2] };
 
 export function CountyMap({ events, filters, setFilters }) {
   const counts = useMemo(() => {
@@ -31,6 +26,8 @@ export function CountyMap({ events, filters, setFilters }) {
     return c;
   }, [events]);
   const onlineCount = events.filter((e) => e.type === "Online").length;
+  const bayNames = BAY_COUNTIES.map((c) => c.name);
+  const pickedBay = bayNames.filter((n) => filters.regions.includes(n));
 
   function toggleRegions(values) {
     setFilters((f) => {
@@ -45,38 +42,64 @@ export function CountyMap({ events, filters, setFilters }) {
       formats: f.formats.includes("Online") ? f.formats.filter((x) => x !== "Online") : [...f.formats, "Online"],
     }));
   }
+  function clearBay() {
+    setFilters((f) => ({ ...f, regions: f.regions.filter((r) => !bayNames.includes(r)) }));
+  }
 
   return (
     <div className="explore-card">
       <div className="explore-head">
-        <h3>The Bay in circles</h3>
-        <span>Tap a county</span>
+        <h3>Bay Area counties</h3>
+        <span className="map-actions">
+          <button type="button" className="link-btn" onClick={() => toggleRegions(bayNames)} title="Select all nine Bay Area counties">All</button>
+          {pickedBay.length > 0 && (
+            <button type="button" className="link-btn" onClick={clearBay} title="Clear county selection">Clear ({pickedBay.length})</button>
+          )}
+        </span>
       </div>
-      <svg className="county-map" viewBox="0 0 320 395" role="group" aria-label="Filter by county">
-        <path className="bay-water" d="M150 92 C 168 140 158 190 176 236 S 206 300 214 318" />
-        {COUNTIES.map((c) => {
-          const n = counts[c.name] || 0;
-          const r = n ? 15 + 7 * Math.sqrt(n) : 12;
-          const on = filters.regions.includes(c.name);
-          return (
-            <g
-              key={c.name}
-              className={`county ${on ? "on" : ""} ${n ? "has" : "none"}`}
-              tabIndex={0}
-              role="button"
-              aria-pressed={on}
-              aria-label={`${c.name}: ${n} events`}
-              onClick={() => toggleRegions([c.name])}
-              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), toggleRegions([c.name]))}
-            >
-              <circle cx={c.x} cy={c.y} r={r} />
-              {n > 0 && (
-                <text className="county-n" x={c.x} y={c.y + 7} textAnchor="middle">{n}</text>
-              )}
-              <text className="county-name" x={c.x} y={c.y + r + 14} textAnchor="middle">{c.short}</text>
-            </g>
-          );
-        })}
+      <p className="map-hint">Click (or shift-click) counties to select several at once.</p>
+      <svg className="county-map" viewBox={`0 0 ${MAP_W} ${MAP_H}`} role="group" aria-label="Filter by county">
+        <defs>
+          <clipPath id="map-clip"><rect x="0" y="0" width={MAP_W} height={MAP_H} rx="12" /></clipPath>
+        </defs>
+        <g clipPath="url(#map-clip)">
+          <rect className="map-water" x="0" y="0" width={MAP_W} height={MAP_H} />
+          {NORCAL_CONTEXT.map((c) => (
+            <path key={c.name} className="county-ctx" d={c.d}>
+              <title>{`${c.name} County — outside the Bay Area (use "Rest of California")`}</title>
+            </path>
+          ))}
+          {BAY_COUNTIES.map((c) => {
+            const n = counts[c.name] || 0;
+            const on = filters.regions.includes(c.name);
+            return (
+              <path
+                key={c.name}
+                d={c.d}
+                className={`county-shape ${on ? "on" : ""} ${n ? "has" : "none"}`}
+                tabIndex={0}
+                role="checkbox"
+                aria-checked={on}
+                aria-label={`${c.name} County: ${n} events`}
+                onClick={() => toggleRegions([c.name])}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), toggleRegions([c.name]))}
+              >
+                <title>{`${c.name} County · ${n} event${n === 1 ? "" : "s"} — click to ${on ? "remove" : "add"}`}</title>
+              </path>
+            );
+          })}
+          {BAY_COUNTIES.map((c) => {
+            const n = counts[c.name] || 0;
+            const on = filters.regions.includes(c.name);
+            const [dx, dy] = LABEL_NUDGE[c.name] || [0, 0];
+            return (
+              <g key={c.name} className={`county-label ${on ? "on" : ""}`} transform={`translate(${c.cx + dx} ${c.cy + dy})`}>
+                <text className="county-name" textAnchor="middle" y="-2">{SHORT[c.name] || c.name}</text>
+                {n > 0 && <text className="county-n" textAnchor="middle" y="12">{n}</text>}
+              </g>
+            );
+          })}
+        </g>
       </svg>
       <div className="elsewhere">
         {ELSEWHERE.map((o) => {
@@ -102,6 +125,7 @@ const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export function MonthCalendar({ events, month, setMonth, day, setDay, today }) {
+  const [collapsed, setCollapsed] = useState(false);
   const byDay = useMemo(() => {
     const m = {};
     for (const e of events) {
@@ -130,10 +154,14 @@ export function MonthCalendar({ events, month, setMonth, day, setDay, today }) {
       <div className="explore-head">
         <h3>{MONTH_NAMES[month.getMonth()]} {month.getFullYear()}</h3>
         <div className="month-nav">
-          <button type="button" onClick={() => shift(-1)} aria-label="Previous month"><Icon name="chev-l" /></button>
-          <button type="button" onClick={() => shift(1)} aria-label="Next month"><Icon name="chev-r" /></button>
+          {!collapsed && <button type="button" onClick={() => shift(-1)} aria-label="Previous month" title="Previous month"><Icon name="chev-l" /></button>}
+          {!collapsed && <button type="button" onClick={() => shift(1)} aria-label="Next month" title="Next month"><Icon name="chev-r" /></button>}
+          <button type="button" className="collapse-btn" onClick={() => setCollapsed((c) => !c)} aria-expanded={!collapsed} title={collapsed ? "Expand calendar" : "Collapse calendar"}>
+            <Icon name={collapsed ? "chev-d" : "chev-u"} />
+          </button>
         </div>
       </div>
+      {!collapsed && <>
       <div className="month-grid">
         {WEEKDAYS.map((w, i) => (
           <div key={i} className="month-wd">{w}</div>
@@ -166,6 +194,7 @@ export function MonthCalendar({ events, month, setMonth, day, setDay, today }) {
         <span><i className="r" /> Regular</span>
         <span className="month-total">{monthTotal} this month</span>
       </div>
+      </>}
     </div>
   );
 }

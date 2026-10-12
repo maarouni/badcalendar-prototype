@@ -142,5 +142,9 @@ export function Icon({ name }) {
     return (<svg {...common}><path d="M15 6l-6 6 6 6" /></svg>);
   if (name === "chev-r")
     return (<svg {...common}><path d="M9 6l6 6-6 6" /></svg>);
+  if (name === "chev-u")
+    return (<svg {...common}><path d="M6 15l6-6 6 6" /></svg>);
+  if (name === "chev-d")
+    return (<svg {...common}><path d="M6 9l6 6 6-6" /></svg>);
   return null;
 }

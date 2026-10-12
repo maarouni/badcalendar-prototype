@@ -6,7 +6,7 @@ import {
   COMP_OPTIONS, EMPLOYMENT_LEVELS, EMPLOYMENT_TYPES, REGION_GROUPS, INDUSTRIES,
 } from "../../lib/employmentTaxonomy";
 import { saveLocalJob } from "../../lib/jobs";
-import IconNav from "../../components/IconNav";
+import PageTemplate from "../../components/PageTemplate";
 import PremierCalculator from "../../components/PremierCalculator";
 
 const ALL_REGIONS = REGION_GROUPS.flatMap((g) => g.options);
@@ -66,15 +66,15 @@ export default function PostJobPage() {
   }
 
   return (
-    <>
-      <section className="section-intro">
-        <IconNav active="employment" />
-        <p className="section-intro-line">
-          <strong>Post a Listing.</strong> This is where real job postings go in — fill this out and it appears on the Employment page right away.
-        </p>
-      </section>
-
-      <div className="page" style={{ maxWidth: 640, margin: "0 auto", padding: "0 24px 48px" }}>
+    <PageTemplate
+      section="employment"
+      mode="edit"
+      narrow
+      title="Employment Listings"
+      subtitle="Post a Listing"
+      intro="Fill this out and your job posting appears on the Employment page right away. Choose Premier for top placement."
+      actions={<a href="/employment" className="tpl-action" data-tip="Back to Employment Listings">View listings</a>}
+    >
         <form className="job-form" onSubmit={submit}>
           <label className={`ed-field wide ${errors.title ? "has-error" : ""}`}>
             <span className="ed-label">Position Title <em>Required</em></span>
@@ -155,7 +155,6 @@ export default function PostJobPage() {
           <button type="submit" className="btn-primary" style={{ marginTop: 10 }}>Post Listing</button>
           <p className="proto-note">Prototype: posted listings are saved in this browser only, same as My Calendar.</p>
         </form>
-      </div>
-    </>
+    </PageTemplate>
   );
 }

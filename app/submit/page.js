@@ -232,7 +232,7 @@ export default function SubmitEvent() {
           <article className="tl-card regular">
             <div className="tl-main">
               <div className="tl-reg-1">
-                <span className="tl-time">{startTime(preview.time)}</span>
+                <span className="tl-time">{fmtTime(preview.time)}</span>
                 <span className="tl-title">{preview.title}</span>
               </div>
               <div className="tl-reg-2">

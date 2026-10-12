@@ -245,7 +245,7 @@ export default function MyCalendar() {
                                 <div className="tl-line tl-host"><HostAvatar name={e.hostedBy} size={18} /><b>{e.hostedBy}</b><span className="tl-sep">·</span><Icon name="tag" />{e.cost}</div>
                               </>
                             ) : (
-                              <div className="tl-reg-2">{startTime(e.time)} · {e.type === "Online" ? "Online" : e.city} · {e.hostedBy} · {e.cost}</div>
+                              <div className="tl-reg-2">{fmtTime(e.time)} · {e.type === "Online" ? "Online" : e.city} · {e.hostedBy} · {e.cost}</div>
                             )}
                           </div>
                           <div className="mc-actions">

@@ -7,7 +7,7 @@ import FilterPanel from "./components/FilterPanel";
 import IconNav from "./components/IconNav";
 import { CountyMap, MonthCalendar } from "./components/Explore";
 import {
-  Poster, HostAvatar, Icon, fmtTime, startTime, dayLabel, shortDate, isoOf, parseDate,
+  Poster, HostAvatar, Icon, fmtTime, dayLabel, shortDate, isoOf, parseDate,
 } from "./components/EventVisuals";
 import { EMPTY_FILTERS, matches, googleCalendarUrl } from "./lib/taxonomy";
 import { fetchEvents } from "./lib/events";
@@ -16,28 +16,24 @@ const STORAGE_KEY = "mc_my_calendar_v1";
 const FILTERS_KEY = "mc_current_filters_v1";
 const PAGE_SIZE = 8; // events per page in the timeline
 
-// Cesar's rule: keep marketing in groups of three.
-const HOW_IT_WORKS = [
-  { n: 1, color: "orange", title: "Find", desc: "Every Bay Area event in One Big Calendar, filtered by county, date, cost and category." },
-  { n: 2, color: "blue", title: "Save", desc: "Add events to My Calendar, set your attendance status, sync to Google Calendar." },
-  { n: 3, color: "purple", title: "Share", desc: "Organizers list free, go Premier for top placement, and reach subscribers through Notifications." },
-];
-
 function chrono(a, b) {
   return `${a.date} ${a.time || ""}`.localeCompare(`${b.date} ${b.time || ""}`);
 }
 
-function SaveButton({ saved, onClick }) {
+// Oct 10 decision: a small radio-style selector on the right of each
+// listing (instead of the "+" circle), and the whole event box highlights
+// when it's selected. Multi-select, so it's a checkbox drawn as a radio.
+function SelectRadio({ saved, onClick, title }) {
   return (
-    <button
-      type="button"
-      className={`save-circle ${saved ? "saved" : ""}`}
-      onClick={onClick}
-      aria-pressed={saved}
-      title={saved ? "In My Calendar — click to remove" : "Add to My Calendar"}
-    >
-      <Icon name={saved ? "check" : "plus"} />
-    </button>
+    <label className="sel-radio-hit" title={saved ? "In My Selection — click to remove" : "Add to My Selection"}>
+      <input
+        type="checkbox"
+        className="sel-radio"
+        checked={saved}
+        onChange={onClick}
+        aria-label={`${saved ? "Remove" : "Add"} ${title} ${saved ? "from" : "to"} My Selection`}
+      />
+    </label>
   );
 }
 
@@ -182,7 +178,7 @@ function SuperCalendarInner() {
         <div className="explore-inner">
           <div className="explore-intro">
             <h2>What&rsquo;s happening around the Bay</h2>
-            <p>Pick a county, pick a day, or just scroll.</p>
+            <p>Pick one or more counties, pick a day, or just scroll.</p>
           </div>
           <div className="explore-grid">
             <CountyMap events={forMap} filters={filters} setFilters={setFilters} />
@@ -199,12 +195,12 @@ function SuperCalendarInner() {
           </div>
           <div className="featured-row">
             {featured.map((e) => (
-              <article key={e.id} className="feat-card">
+              <article key={e.id} className={`feat-card ${selected[e.id] ? "saved" : ""}`}>
                 <a href={`/event/${e.id}`} className="feat-poster">
                   <Poster event={e} />
                 </a>
                 <div className="feat-body">
-                  <div className="feat-when">{shortDate(e.date)} · {startTime(e.time)}</div>
+                  <div className="feat-when">{shortDate(e.date)} · {fmtTime(e.time)}</div>
                   <a href={`/event/${e.id}`} className="feat-title">{e.title}</a>
                   <div className="feat-where"><PlaceLine e={e} /></div>
                   <div className="feat-foot">
@@ -212,7 +208,7 @@ function SuperCalendarInner() {
                     <span className="price-chip">{e.price ? `From $${e.price}` : "Free"}</span>
                   </div>
                 </div>
-                <SaveButton saved={!!selected[e.id]} onClick={() => toggle(e.id)} />
+                <SelectRadio saved={!!selected[e.id]} onClick={() => toggle(e.id)} title={e.title} />
               </article>
             ))}
           </div>
@@ -293,7 +289,7 @@ function SuperCalendarInner() {
                               </div>
                             </div>
                             <div className="tl-actions">
-                              <SaveButton saved={!!selected[e.id]} onClick={() => toggle(e.id)} />
+                              <SelectRadio saved={!!selected[e.id]} onClick={() => toggle(e.id)} title={e.title} />
                               <a className="gcal-link" href={googleCalendarUrl(e)} target="_blank" rel="noopener noreferrer">Google Cal</a>
                             </div>
                           </article>
@@ -301,7 +297,7 @@ function SuperCalendarInner() {
                           <article key={e.id} className={`tl-card regular ${selected[e.id] ? "saved" : ""}`}>
                             <div className="tl-main">
                               <div className="tl-reg-1">
-                                <span className="tl-time">{startTime(e.time)}</span>
+                                <span className="tl-time">{fmtTime(e.time)}</span>
                                 <a href={`/event/${e.id}`} className="tl-title">{e.title}</a>
                               </div>
                               <div className="tl-reg-2">
@@ -309,7 +305,7 @@ function SuperCalendarInner() {
                               </div>
                             </div>
                             <div className="tl-actions">
-                              <SaveButton saved={!!selected[e.id]} onClick={() => toggle(e.id)} />
+                              <SelectRadio saved={!!selected[e.id]} onClick={() => toggle(e.id)} title={e.title} />
                             </div>
                           </article>
                         )
@@ -333,21 +329,6 @@ function SuperCalendarInner() {
         </div>
       </div>
 
-      <section className="how">
-        <h2>How it works</h2>
-        <div className="how-grid">
-          {HOW_IT_WORKS.map((h) => (
-            <div key={h.n} className="how-item">
-              <div className={`how-circle ${h.color}`}>{h.n}</div>
-              <h3>{h.title}</h3>
-              <p>{h.desc}</p>
-            </div>
-          ))}
-        </div>
-        <p className="proto-note">
-          Prototype: My Calendar selections are saved in this browser only.
-        </p>
-      </section>
     </>
   );
 }
