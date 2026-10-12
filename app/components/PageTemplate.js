@@ -19,10 +19,11 @@ export default function PageTemplate({
   actions,
   children,
   narrow = false,
+  legend = true,
 }) {
   const bar = status === "construction" ? "construction" : mode;
   return (
-    <div className={`tpl tpl-mode-${mode} ${narrow ? "tpl-narrow" : ""}`}>
+    <div className={`tpl tpl-mode-${mode} ${narrow ? "tpl-narrow" : ""} ${legend ? "" : "tpl-no-legend"}`}>
       <IconNav active={section} mode={mode} />
 
       <header className={`tpl-title tpl-${bar}`}>
@@ -39,13 +40,14 @@ export default function PageTemplate({
 
       {intro && <p className="tpl-intro">{intro}</p>}
 
-      <div className={`tpl-body ${mode === "edit" ? "tpl-body-edit" : ""}`}>{children}</div>
 
-      <div className="tpl-legend" aria-label="Color legend">
+      {children && <div className={`tpl-body ${mode === "edit" ? "tpl-body-edit" : ""}`}>{children}</div>}
+
+      {legend && <div className="tpl-legend" aria-label="Color legend">
         <span><i className="lg-construction" /> Under construction</span>
         <span><i className="lg-edit" /> Edit / input</span>
         <span><i className="lg-output" /> Output</span>
-      </div>
+      </div>}
     </div>
   );
 }

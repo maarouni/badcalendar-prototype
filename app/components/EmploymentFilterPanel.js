@@ -41,7 +41,7 @@ function Option({ type = "checkbox", name, checked, onChange, label, count }) {
   );
 }
 
-function SubGroup({ title, options, selected, onToggle, countOf, defaultOpen = false }) {
+function SubGroup({ title, options, selected, onToggle, onClearGroup, allLabel, countOf, defaultOpen = false }) {
   const picked = options.filter((o) => selected.includes(o)).length;
   const [open, setOpen] = useState(defaultOpen || picked > 0);
   return (
@@ -53,6 +53,9 @@ function SubGroup({ title, options, selected, onToggle, countOf, defaultOpen = f
         </span>
         <span className="fp-caret">{open ? "−" : "+"}</span>
       </button>
+      {open && allLabel && (
+        <Option type="radio" name={`all-${title}`} checked={picked === 0} onChange={() => onClearGroup && onClearGroup(options)} label={<>{allLabel} <em>(default)</em></>} />
+      )}
       {open && options.map((o) => (
         <Option key={o} checked={selected.includes(o)} onChange={() => onToggle(o)} label={o} count={countOf(o)} />
       ))}
@@ -60,7 +63,7 @@ function SubGroup({ title, options, selected, onToggle, countOf, defaultOpen = f
   );
 }
 
-export default function EmploymentFilterPanel({ jobs, filters, setFilters, today, q }) {
+export default function EmploymentFilterPanel({ jobs, filters, setFilters, today, q, onHide, onDisplay }) {
   const toggleIn = (key, value) =>
     setFilters((f) => {
       const cur = f[key];
@@ -77,15 +80,18 @@ export default function EmploymentFilterPanel({ jobs, filters, setFilters, today
   return (
     <aside className="sidebar filter-panel">
       <div className="fp-top">
-        <h4>Filters</h4>
-        {totalSelected > 0 && (
-          <button type="button" className="fp-clear" onClick={() => setFilters(EMPTY_JOB_FILTERS)}>
-            ✕ Clear all
-          </button>
-        )}
+        <h4><span className="step-badge" aria-hidden="true">1</span> Filters <em className="fp-top-hint">Select all that apply</em></h4>
+        <span className="fp-top-actions">
+          {totalSelected > 0 && (
+            <button type="button" className="fp-clear" data-tip="Clear All" onClick={() => setFilters(EMPTY_JOB_FILTERS)}>
+              ✕ Clear
+            </button>
+          )}
+          {onHide && <button type="button" className="fp-hide" data-tip="Hide filters" onClick={onHide}>Hide</button>}
+        </span>
       </div>
 
-      <DigestActions digestLabel="My Careers / Jobs Digest" promptLabel="Add Listings to My Careers / Jobs Digest" />
+      
 
       <Section title="Minimum Compensation" badge={filters.comp.length}>
         {COMP_OPTIONS.map((o) => (
@@ -115,9 +121,16 @@ export default function EmploymentFilterPanel({ jobs, filters, setFilters, today
             checked={filters.posted === o.id}
             onChange={() => setFilters((f) => ({ ...f, posted: o.id }))}
             label={o.label}
-            count={count("posted", o.id)}
+            count={o.id === "custom" ? undefined : count("posted", o.id)}
           />
         ))}
+        {filters.posted === "custom" && (
+          <div className="fp-range">
+            <input type="date" aria-label="Posted from" value={filters.postedFrom} onChange={(e) => setFilters((f) => ({ ...f, postedFrom: e.target.value }))} />
+            <span>–</span>
+            <input type="date" aria-label="Posted to" value={filters.postedTo} min={filters.postedFrom || undefined} onChange={(e) => setFilters((f) => ({ ...f, postedTo: e.target.value }))} />
+          </div>
+        )}
       </Section>
 
       <Section title="Employment Level" badge={filters.level.length}>
@@ -141,6 +154,8 @@ export default function EmploymentFilterPanel({ jobs, filters, setFilters, today
             selected={filters.region}
             onToggle={(o) => toggleIn("region", o)}
             countOf={(o) => count("region", o)}
+            onClearGroup={(opts) => setFilters((f) => ({ ...f, region: f.region.filter((r) => !opts.includes(r)) }))}
+            allLabel={g.allLabel}
             defaultOpen={i === 0}
           />
         ))}
@@ -152,6 +167,8 @@ export default function EmploymentFilterPanel({ jobs, filters, setFilters, today
         ))}
         <SubmitIndustry />
       </Section>
+
+      <DigestActions digestLabel="My Employment Digest" promptLabel="Add Selections to My Employment Digest" onDisplay={onDisplay} />
     </aside>
   );
 }

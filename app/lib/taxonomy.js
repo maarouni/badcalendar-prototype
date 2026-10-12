@@ -12,6 +12,7 @@ export const DATE_OPTIONS = [
   { id: "7", label: "Next 7 days" },
   { id: "15", label: "Next 15 days" },
   { id: "30", label: "Next 30+ days" },
+  { id: "custom", label: "MM/DD/YY - MM/DD/YY" },
 ];
 
 export const COST_OPTIONS = [
@@ -23,23 +24,27 @@ export const COST_OPTIONS = [
   { id: "100+", label: "$100+", min: 100, max: Infinity },
 ];
 
+// Cesar's Rev 261012 filter page splits regions into four groups, with
+// "All Bay Area" as the default for the first one.
 export const REGION_GROUPS = [
   {
-    group: "Bay Area Counties",
+    group: "Regions - CA Bay Area",
+    allLabel: "All Bay Area",
     options: [
       "Alameda", "Contra Costa", "Marin", "Napa", "San Francisco",
       "San Mateo", "Santa Clara", "Solano", "Sonoma",
     ],
   },
   {
-    group: "California",
+    group: "Regions - California",
     options: [
       "North Coast", "Shasta Cascades", "Sacramento Valley", "Gold Country",
       "Sierra Nevada", "Central Coast", "San Joaquin Valley",
       "Southern California", "Desert",
     ],
   },
-  { group: "Beyond California", options: ["National", "International"] },
+  { group: "Regions - US National", options: ["National"] },
+  { group: "Regions - International", options: ["International"] },
 ];
 
 export const CATEGORY_GROUPS = [
@@ -101,6 +106,8 @@ export const EMPTY_FILTERS = {
   formats: [],
   tiers: [],
   date: "all",
+  dateFrom: "",
+  dateTo: "",
   costs: [],
   regions: [],
   categories: [],
@@ -144,6 +151,13 @@ const SECTION_TESTS = {
     if (f.date === "all") return true;
     const d = eventDate(e);
     if (!d) return false;
+    if (f.date === "custom") {
+      // Multi-day events count if any day overlaps the typed range.
+      const end = e.endDate && e.endDate > e.date ? e.endDate : e.date;
+      if (f.dateFrom && end < f.dateFrom) return false;
+      if (f.dateTo && e.date > f.dateTo) return false;
+      return true;
+    }
     const t = startOfDay(today);
     const diff = Math.round((d - t) / 86400000);
     if (f.date === "today") return diff === 0;

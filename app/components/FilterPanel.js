@@ -48,7 +48,7 @@ function Option({ type = "checkbox", name, checked, onChange, label, count, disa
   );
 }
 
-function SubGroup({ title, options, selected, onToggle, countOf, disabled, defaultOpen = false }) {
+function SubGroup({ title, options, selected, onToggle, onClearGroup, allLabel, countOf, disabled, defaultOpen = false }) {
   const picked = options.filter((o) => selected.includes(o)).length;
   const [open, setOpen] = useState(defaultOpen || picked > 0);
   return (
@@ -60,6 +60,16 @@ function SubGroup({ title, options, selected, onToggle, countOf, disabled, defau
         </span>
         <span className="fp-caret">{open ? "−" : "+"}</span>
       </button>
+      {open && allLabel && (
+        <Option
+          type="radio"
+          name={`all-${title}`}
+          checked={picked === 0}
+          onChange={() => onClearGroup && onClearGroup(options)}
+          label={<>{allLabel} <em>(default)</em></>}
+          disabled={disabled}
+        />
+      )}
       {open &&
         options.map((o) => (
           <Option
@@ -75,7 +85,7 @@ function SubGroup({ title, options, selected, onToggle, countOf, disabled, defau
   );
 }
 
-export default function FilterPanel({ events, filters, setFilters, today, q }) {
+export default function FilterPanel({ events, filters, setFilters, today, q, onHide, onDisplay }) {
   const [sets, setSets] = useState({});
   const [activeSet, setActiveSet] = useState(null);
   const [flash, setFlash] = useState("");
@@ -126,12 +136,15 @@ export default function FilterPanel({ events, filters, setFilters, today, q }) {
   return (
     <aside className="sidebar filter-panel">
       <div className="fp-top">
-        <h4>Filters</h4>
-        {totalSelected > 0 && (
-          <button type="button" className="fp-clear" onClick={() => { setFilters(EMPTY_FILTERS); setActiveSet(null); }}>
-            ✕ Clear all
-          </button>
-        )}
+        <h4><span className="step-badge" aria-hidden="true">1</span> Filters <em className="fp-top-hint">Select all that apply</em></h4>
+        <span className="fp-top-actions">
+          {totalSelected > 0 && (
+            <button type="button" className="fp-clear" data-tip="Clear All" onClick={() => { setFilters(EMPTY_FILTERS); setActiveSet(null); }}>
+              ✕ Clear
+            </button>
+          )}
+          {onHide && <button type="button" className="fp-hide" data-tip="Hide filters" onClick={onHide}>Hide</button>}
+        </span>
       </div>
 
       <Section title="Filter Sets" badge={0} defaultOpen>
@@ -172,9 +185,16 @@ export default function FilterPanel({ events, filters, setFilters, today, q }) {
             checked={filters.date === o.id}
             onChange={() => setFilters((f) => ({ ...f, date: o.id }))}
             label={o.label}
-            count={count("date", o.id)}
+            count={o.id === "custom" ? undefined : count("date", o.id)}
           />
         ))}
+        {filters.date === "custom" && (
+          <div className="fp-range">
+            <input type="date" aria-label="From date" value={filters.dateFrom} onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value }))} />
+            <span>–</span>
+            <input type="date" aria-label="To date" value={filters.dateTo} min={filters.dateFrom || undefined} onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value }))} />
+          </div>
+        )}
       </Section>
 
       <Section title="Costs" badge={filters.costs.length}>
@@ -196,6 +216,8 @@ export default function FilterPanel({ events, filters, setFilters, today, q }) {
             options={g.options}
             selected={filters.regions}
             onToggle={(o) => toggleIn("regions", o)}
+            onClearGroup={(opts) => setFilters((f) => ({ ...f, regions: f.regions.filter((r) => !opts.includes(r)) }))}
+            allLabel={g.allLabel}
             countOf={(o) => count("regions", o)}
             disabled={onlineOnly}
             defaultOpen={i === 0}
@@ -216,7 +238,7 @@ export default function FilterPanel({ events, filters, setFilters, today, q }) {
         ))}
       </Section>
 
-      <DigestActions digestLabel="My Calendar Digest" promptLabel="Add Listings to My Calendar Digest" />
+      <DigestActions digestLabel="My Calendar Digest" promptLabel="Add Selections to My Calendar Digest" onDisplay={onDisplay} />
     </aside>
   );
 }

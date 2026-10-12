@@ -36,7 +36,7 @@
     "cost": "$10 RSVP / $20 Door",
     "price": 10,
     "premier": false,
-    "description": "A hands-on session on building a referral engine for your business \u2014 scripts, follow-up cadences, and how to ask for introductions without it feeling awkward."
+    "description": "A hands-on session on building a referral engine for your business — scripts, follow-up cadences, and how to ask for introductions without it feeling awkward."
   },
   {
     "id": "3",
@@ -75,7 +75,7 @@
     "cost": "Free",
     "price": 0,
     "premier": false,
-    "description": "A monthly video call for early-stage founders to trade notes on fundraising, hiring, and go-to-market \u2014 no pitching, just peer advice."
+    "description": "A monthly video call for early-stage founders to trade notes on fundraising, hiring, and go-to-market — no pitching, just peer advice."
   },
   {
     "id": "5",
@@ -114,7 +114,7 @@
     "cost": "$15",
     "price": 15,
     "premier": true,
-    "description": "Practical ways small businesses are using AI tools for marketing, bookkeeping and customer service \u2014 with live demos."
+    "description": "Practical ways small businesses are using AI tools for marketing, bookkeeping and customer service — with live demos."
   },
   {
     "id": "7",
@@ -293,7 +293,8 @@
     "cost": "$149",
     "price": 149,
     "premier": true,
-    "description": "Full-day summit on clean energy, building decarbonization and climate-tech investment."
+    "description": "Full-day summit on clean energy, building decarbonization and climate-tech investment.",
+    "endDate": "2026-10-13"
   },
   {
     "id": "16",
@@ -433,7 +434,8 @@
     "cost": "Free",
     "price": 0,
     "premier": true,
-    "description": "Shop, network and hear from founders at the East Bay's largest Black-owned business showcase."
+    "description": "Shop, network and hear from founders at the East Bay's largest Black-owned business showcase.",
+    "endDate": "2026-10-25"
   },
   {
     "id": "23",
@@ -493,11 +495,12 @@
     "cost": "$75",
     "price": 75,
     "premier": true,
-    "description": "Year-end celebration with dinner stations, a DJ and a toy drive."
+    "description": "Year-end celebration with dinner stations, a DJ and a toy drive.",
+    "endDate": "2027-01-08"
   },
   {
     "id": "26",
-    "title": "Global Founders Summit \u2014 Lisbon",
+    "title": "Global Founders Summit — Lisbon",
     "hostedBy": "Global Founders Network",
     "date": "2026-11-18",
     "time": "09:00-18:00",
@@ -512,13 +515,14 @@
     "cost": "$450",
     "price": 450,
     "premier": false,
-    "description": "International founder and investor summit with a Bay Area delegation."
+    "description": "International founder and investor summit with a Bay Area delegation.",
+    "endDate": "2026-11-20"
   },
   {
     "id": "27",
     "title": "Austin Real Estate Investor Retreat",
     "hostedBy": "US Investor Circle",
-    "date": "2026-11-13",
+    "date": "2026-11-29",
     "time": "09:00-17:00",
     "city": "Austin, TX",
     "region": "National",
@@ -532,6 +536,7 @@
     "cost": "$199",
     "price": 199,
     "premier": false,
-    "description": "Weekend retreat on out-of-state investing, syndications and 1031 exchanges."
+    "description": "Weekend retreat on out-of-state investing, syndications and 1031 exchanges.",
+    "endDate": "2026-12-01"
   }
 ]

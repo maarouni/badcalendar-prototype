@@ -2,7 +2,9 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import IconNav from "../components/IconNav";
+import PageTemplate from "../components/PageTemplate";
+import { StepHead, NextStep } from "../components/Steps";
+import { Glyph } from "../components/Icons";
 import EmploymentFilterPanel from "../components/EmploymentFilterPanel";
 import { HostAvatar, shortDate } from "../components/EventVisuals";
 import { EMPTY_JOB_FILTERS, jobMatches, sortJobs } from "../lib/employmentTaxonomy";
@@ -31,6 +33,8 @@ function EmploymentInner() {
   const [page, setPage] = useState(1);
   const [showAllPremier, setShowAllPremier] = useState(false);
   const today = useMemo(() => new Date(), []);
+  const [showFilters, setShowFilters] = useState(true);
+  const scrollToResults = () => document.getElementById("results")?.scrollIntoView({ block: "start", behavior: "smooth" });
 
   useEffect(() => { fetchJobs().then(setJobs); }, []);
 
@@ -53,19 +57,30 @@ function EmploymentInner() {
 
   return (
     <>
-      <section className="section-intro">
-        <IconNav active="employment" />
-        <p className="section-intro-line">
-          <strong>Get Alerts!</strong> Set filters to organize, submit, and view many types of <em>Careers / Jobs</em>.
-          {" "}<a href="/employment/submit" className="post-listing-link">+ Post a Listing</a>
-        </p>
-      </section>
+      <PageTemplate
+        section="employment"
+        title="Employment Listings"
+        subtitle="Public"
+        legend={false}
+        actions={<a href="/employment/submit" className="tpl-action" data-tip="Add New listing">+ Post a Listing</a>}
+        intro={<><strong>Get Hired!</strong> Select filters to curate (organize, submit, view) employment listings. Assign your Application Status for each listing.</>}
+      />
 
-      <div className="page browse-page">
+      <div className={`page browse-page ${showFilters ? "" : "filters-hidden"}`}>
         <div className="layout-with-sidebar">
-          <EmploymentFilterPanel jobs={jobs} filters={filters} setFilters={setFilters} today={today} q={q} />
+          {showFilters && (
+            <EmploymentFilterPanel jobs={jobs} filters={filters} setFilters={setFilters} today={today} q={q}
+              onHide={() => setShowFilters(false)} onDisplay={scrollToResults} />
+          )}
 
-          <div className="timeline-col">
+          <div className="timeline-col" id="results">
+            <StepHead n={3} title="Results">
+              {!showFilters && (
+                <button type="button" className="btn-ghost btn-sm" onClick={() => setShowFilters(true)}>
+                  <Glyph name="expand" size={14} /> Display Filters
+                </button>
+              )}
+            </StepHead>
             <div className="results-bar">
               <div>
                 <strong>{visible.length}</strong> {visible.length === 1 ? "listing" : "listings"} match your filters
@@ -127,6 +142,8 @@ function EmploymentInner() {
                   : `More Premier Listings (${featured.length - FEATURED_CAP} more) →`}
               </button>
             )}
+
+            <NextStep noun="Listing" digest="My Employment Digest" digestHref="/employment" detailsHref="/employment" />
           </div>
         </div>
       </div>

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { IconButton } from "./Icons";
+import { cartCount } from "../lib/cart";
 
 const USER_KEY = "mc_user_v1";
 
@@ -28,15 +30,20 @@ export default function NavBar() {
   const [q, setQ] = useState("");
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartN, setCartN] = useState(0);
 
   useEffect(() => {
     setUser(readUser());
-    const onChange = () => setUser(readUser());
+    setCartN(cartCount());
+    const onCart = () => setCartN(cartCount());
+    window.addEventListener("mc-cart-changed", onCart);
+    const onChange = () => { setUser(readUser()); setCartN(cartCount()); };
     window.addEventListener("mc-auth-changed", onChange);
     window.addEventListener("storage", onChange);
     return () => {
       window.removeEventListener("mc-auth-changed", onChange);
       window.removeEventListener("storage", onChange);
+      window.removeEventListener("mc-cart-changed", onCart);
     };
   }, []);
 
@@ -85,42 +92,22 @@ export default function NavBar() {
         <a href="/my-calendar">My Calendar</a>
         <a href="/submit" className="nav-cta">+ Create Event</a>
 
-        <button type="button" className="icon-btn" data-tip="Download this page as PDF" aria-label="Download PDF" onClick={() => window.print()}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M12 3v12" /><path d="M7 10l5 5 5-5" /><path d="M4 19h16" />
-          </svg>
-        </button>
-        <button type="button" className="icon-btn" data-tip="Print this page" aria-label="Print" onClick={() => window.print()}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M6 9V3h12v6" /><rect x="3" y="9" width="18" height="8" rx="2" /><path d="M6 14h12v7H6z" />
-          </svg>
-        </button>
-        {!user && (
-          <a href="/login" className="icon-btn" data-tip="Register / sign up" aria-label="Register">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <circle cx="10" cy="8" r="4" /><path d="M2 21c0-4 3.6-7 8-7s8 3 8 7" /><path d="M19 8v6M16 11h6" />
-            </svg>
-          </a>
-        )}
-        <button type="button" className="icon-btn" data-tip="Messages — coming soon" aria-label="Messages">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10Z" />
-          </svg>
-        </button>
-        <a href="/notifications" className="icon-btn" data-tip="Notifications" aria-label="Notifications">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-          <span className="icon-dot" />
-        </a>
+        {/* Header icons per Cesar's Legend Icons (Info section, Rev 261012) */}
+        <IconButton name="info" href="/info" />
+        <IconButton name="pdf" onClick={() => window.print()} />
+        <IconButton name="print" onClick={() => window.print()} />
+        <IconButton name="cart" href="/cart" badge={cartN || null} tip={`My Shopping Cart${cartN ? ` (${cartN})` : ""}`} />
+        <IconButton name="notifications" href="/notifications" tip="Notifications" />
+        {user && <IconButton name="dashboards" href="/dashboards" />}
+        {user && <IconButton name="settings" href="/profile" />}
+        {!user && <IconButton name="register" href="/login" />}
 
         {user ? (
           <div className="nav-user-menu">
             <button
               type="button"
               className="nav-avatar"
-              title={user.name}
+              data-tip={`Logged in — ${user.name}`}
               onClick={() => setMenuOpen((v) => !v)}
             >
               {initials(user.name)}

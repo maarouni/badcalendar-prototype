@@ -7,7 +7,7 @@ import { useState } from "react";
 // Results / Submit buttons. Prototype-level — state lives here, nothing is
 // wired to a real digest yet.
 
-export default function DigestActions({ digestLabel, promptLabel }) {
+export default function DigestActions({ digestLabel, promptLabel, onDisplay }) {
   const [digestMode, setDigestMode] = useState("manual");
   const [action, setAction] = useState("view");
   const [flash, setFlash] = useState("");
@@ -17,7 +17,8 @@ export default function DigestActions({ digestLabel, promptLabel }) {
     if (action === "add") {
       setFlash(`Added your current selections to ${digestLabel}.`);
     } else {
-      setFlash("Showing all matching results below.");
+      setFlash("Showing all matching results.");
+      onDisplay && onDisplay();
     }
     setTimeout(() => setFlash(""), 2200);
   }
@@ -54,8 +55,9 @@ export default function DigestActions({ digestLabel, promptLabel }) {
       </div>
 
       <div className="fp-buttons">
+        <span className="step-badge" aria-hidden="true">2</span>
         <button type="submit" className="btn-primary fp-submit-btn">
-          {action === "add" ? "Submit" : "Display Results"}
+          {action === "add" ? "Submit" : "Submit · Display Results"}
         </button>
       </div>
       {flash && <div className="fp-flash fp-flash-block">{flash}</div>}

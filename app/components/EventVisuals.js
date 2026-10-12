@@ -30,16 +30,46 @@ export function isoOf(d) {
 
 function to12h(hhmm) {
   const [h, m] = hhmm.split(":").map(Number);
-  const suffix = h >= 12 ? "PM" : "AM";
+  const suffix = h >= 12 ? "pm" : "am";
   const hr = h % 12 || 12;
-  return m ? `${hr}:${String(m).padStart(2, "0")} ${suffix}` : `${hr} ${suffix}`;
+  return `${String(hr).padStart(2, "0")}:${String(m || 0).padStart(2, "0")}${suffix}`;
 }
 
-// "18:00-21:00" -> "6 PM – 9 PM"
+// Cesar's time format: "18:00-21:00" -> "06:00pm-09:00pm"
 export function fmtTime(t) {
   const m = String(t || "").match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
   if (!m) return t || "";
-  return `${to12h(m[1])} – ${to12h(m[2])}`;
+  return `${to12h(m[1])}-${to12h(m[2])}`;
+}
+
+const WD3 = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const yy = (d) => `\u2018${String(d.getFullYear()).slice(2)}`;
+const md = (d) => `${MONTHS[d.getMonth()]} ${String(d.getDate()).padStart(2, "0")}`;
+
+// Cesar's Components / Modules date formats (Figma Rev 261012):
+//   A  one day             Wed, Jun 10 \u201826 06:00pm-09:00pm
+//   B  same month          Jun 10-12 \u201826 06:00pm-09:00pm
+//   C  across months       Jun 10-Jul 07 \u201826 06:00pm-09:00pm
+//   D  across years        Jun 10 \u201826-Feb 07 \u201827 11:00am-10:00pm
+export function fmtDateRange(startIso, endIso) {
+  const s = parseDate(startIso);
+  if (!s) return "";
+  const e = parseDate(endIso);
+  if (!e || endIso <= startIso) return `${WD3[s.getDay()]}, ${md(s)} ${yy(s)}`;
+  if (s.getFullYear() !== e.getFullYear()) return `${md(s)} ${yy(s)}-${md(e)} ${yy(e)}`;
+  if (s.getMonth() !== e.getMonth()) return `${md(s)}-${md(e)} ${yy(s)}`;
+  return `${md(s)}-${String(e.getDate()).padStart(2, "0")} ${yy(s)}`;
+}
+
+export function dateFormatOf(e) {
+  if (!e.endDate || e.endDate <= e.date) return "A";
+  const s = parseDate(e.date), t = parseDate(e.endDate);
+  if (s.getFullYear() !== t.getFullYear()) return "D";
+  return s.getMonth() !== t.getMonth() ? "C" : "B";
+}
+
+export function fmtWhen(e) {
+  return `${fmtDateRange(e.date, e.endDate)} ${fmtTime(e.time)}`.trim();
 }
 
 export function startTime(t) {

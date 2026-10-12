@@ -29,6 +29,7 @@ export const DATE_POSTED_OPTIONS = [
   { id: "7", label: "Past 7 days" },
   { id: "15", label: "Past 15 days" },
   { id: "30", label: "Past 30+ days" },
+  { id: "custom", label: "MM/DD/YY - MM/DD/YY" },
 ];
 
 export const EMPLOYMENT_LEVELS = [
@@ -36,7 +37,7 @@ export const EMPLOYMENT_LEVELS = [
 ];
 
 export const EMPLOYMENT_TYPES = [
-  "Hybrid", "In-Person", "Remote", "Contract", "Fixed Term", "FT Full-Time",
+  "Hybrid", "In-Person", "Remote", "Contract", "Fixed Term", "Focus Study", "FT Full-Time",
   "PT Part-Time", "Affiliate", "Consultant", "Contractor", "Employee",
   "Entrepreneur", "Freelance", "Intern", "Volunteer",
 ];
@@ -82,6 +83,11 @@ const SECTION_TESTS = {
     if (f.posted === "all") return true;
     const d = postedDate(j);
     if (!d) return false;
+    if (f.posted === "custom") {
+      if (f.postedFrom && j.posted < f.postedFrom) return false;
+      if (f.postedTo && j.posted > f.postedTo) return false;
+      return true;
+    }
     const t = startOfDay(today);
     const diff = Math.round((t - d) / 86400000);
     if (f.posted === "today") return diff === 0;

@@ -31,6 +31,7 @@ export async function POST(request) {
     cost: text(body.cost, 60) || "Free",
     price: Number(body.price) || 0,
     premier: !!body.premier,
+    privacy: body.privacy === "Private" ? "Private" : "Public",
     tagline: text(body.tagline, 140),
     venue: text(body.venue, 120),
     address: text(body.address, 160),

@@ -17,6 +17,7 @@ const MAX_EXTRA_DATES = 6;
 
 const EMPTY = {
   premier: false,
+  privacy: "Public",
   type: "In Person",
   region: "Alameda",
   categories: ["Networking"],
@@ -321,6 +322,12 @@ export default function SubmitEvent() {
           <div className="ed-card">
             <Field label="Event title" required error={errors.title} wide>
               <input type="text" maxLength={140} value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="e.g. East Bay Founders Mixer" />
+            </Field>
+            <Field label="Privacy" hint="Private = only you see it, in your My Calendar Digest">
+              <select value={f.privacy} onChange={(e) => set("privacy", e.target.value)}>
+                <option value="Public">Public (default)</option>
+                <option value="Private">Private</option>
+              </select>
             </Field>
             <Field label="Tagline" hint="one line" wide>
               <input type="text" maxLength={140} value={f.tagline} onChange={(e) => set("tagline", e.target.value)} placeholder="What makes it worth going?" />

@@ -1,4 +1,22 @@
+"use client";
+
 import FillInHere from "../components/FillInHere";
+import { Glyph, LEGEND } from "../components/Icons";
+
+const INDEX = [
+  ["about", "About Us"], ["contact", "Contact Us"], ["legend", "Legend Icons"],
+  ["child-safety", "Child Safety Policy"], ["privacy", "Privacy Policy"], ["terms", "Terms & Conditions"],
+];
+
+// Site index from Cesar's Legend Icons page (Public vs Personal pages).
+const PUBLIC_PAGES = [
+  ["/", "HOME · One Big Calendar"], ["/notifications", "Notifications"], ["/employment", "Employment"],
+  ["/discounts", "Discount / Gift Certificates"], ["/info", "Info"], ["/login", "Registration – Sign Up / Log In"],
+];
+const PERSONAL_PAGES = [
+  ["/my-calendar", "My Calendar Digest"], ["/submit", "EDIT My Events"], ["/employment/submit", "EDIT My Employment Listings"],
+  ["/dashboards", "My Dashboards"], ["/cart", "Account Shopping Cart"], ["/profile", "Settings"],
+];
 
 // Cesar's wireframe (Figma, Oct 9 rev): "calendarGold.com Info" —
 // About Us / public info page. Copy below is lifted straight from his
@@ -10,10 +28,14 @@ export default function InfoPage() {
     <div className="page info-page">
       <header className="mc-head">
         <div>
-          <h1>About calendarGold</h1>
+          <h1>Info</h1>
           <p>Innovative, results-based marketing and revenue-sharing system. Connect &middot; Promote &middot; Earn.</p>
         </div>
       </header>
+
+      <nav className="info-index" aria-label="Info index">
+        {INDEX.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}
+      </nav>
 
       <FillInHere>
         This is his actual Figma copy, dropped in as-is — confirm the final wording with him before it goes live.
@@ -65,15 +87,62 @@ export default function InfoPage() {
         <p>Hosted in a conference room. Sponsor, Chocolate / Desserts Tasting, Wine / Spirits Tasting, or other &mdash; submit your workshop presenter's topic, title, description and bio.</p>
       </section>
 
-      <section className="info-section">
+      <section className="info-section" id="legend">
+        <h2>Legend Icons</h2>
+        <p className="nt-hint">Every icon on the site, with the tooltip it shows on hover. Same set Cesar defined in Figma (Info → Legend Icons).</p>
+        {LEGEND.map((g) => (
+          <div key={g.group} className="legend-group">
+            <h4>{g.group}</h4>
+            <ul className="legend-grid">
+              {g.items.map(([name, label]) => (
+                <li key={g.group + name} data-tip={label}>
+                  <span className="legend-icon"><Glyph name={name} size={20} /></span>
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        <div className="legend-group">
+          <h4>Color code</h4>
+          <ul className="legend-grid">
+            <li><span className="legend-swatch lg-construction" /> Yellow — page under construction</li>
+            <li><span className="legend-swatch lg-edit" /> Gray — edit page / editable inputs</li>
+            <li><span className="legend-swatch lg-output" /> White — output (view) page</li>
+          </ul>
+        </div>
+        <div className="legend-group info-site-index">
+          <div>
+            <h4><Glyph name="public" size={16} /> Public pages</h4>
+            {PUBLIC_PAGES.map(([h, l]) => <a key={h} href={h}>{l}</a>)}
+          </div>
+          <div>
+            <h4><Glyph name="private" size={16} /> Personal pages (private)</h4>
+            {PERSONAL_PAGES.map(([h, l]) => <a key={h} href={h}>{l}</a>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="info-section" id="about">
         <h2>About Us</h2>
         <p>
           One place for every Bay Area networking event, meetup and workshop &mdash; built for organizers who are
           tired of juggling five different tools. calendarGold is a collaboration between Masoud Arouni and Cesar
           Plata (everyCircle).
         </p>
+      </section>
+
+      <section className="info-section" id="contact">
+        <h2>Contact Us</h2>
         <p className="nt-hint">Contact: <a href="mailto:maarouni@gmail.com">maarouni@gmail.com</a></p>
       </section>
+
+      {[["child-safety", "Child Safety Policy"], ["privacy", "Privacy Policy"], ["terms", "Terms & Conditions"]].map(([id, t]) => (
+        <section key={id} className="info-section tbd-section" id={id}>
+          <h2>{t}</h2>
+          <p className="nt-hint"><span className="tbd-flag tbd-flag-sm">Under construction</span> Text to come from Cesar / counsel.</p>
+        </section>
+      ))}
     </div>
   );
 }
