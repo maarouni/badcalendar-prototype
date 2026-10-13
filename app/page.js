@@ -199,17 +199,10 @@ function SuperCalendarInner() {
       <section className="explore" id="browse">
         <div className="explore-inner">
           <div className="explore-grid">
+            {/* Oct 13: the "rest of California" regions map Cesar showed in Figma
+                goes in this second grid slot once it's built (see chat — blocked on
+                Figma MCP rate limit for now). CountyMap takes the full row until then. */}
             <CountyMap events={forMap} filters={filters} setFilters={setFilters} />
-            {/* Oct 10: Cesar isn't happy with the box calendar (multi-month ranges are
-                hard on phones). Date ranges are typed in the Dates filter instead
-                ("MM/DD/YY - MM/DD/YY"). MonthCalendar stays in Explore.js. */}
-            <div className="explore-card tbd-card" aria-label="Calendar under construction">
-              <div className="tbd-inner">
-                <span className="tbd-flag">Calendar Under Construction</span>
-                <b>TBD</b>
-                <span className="tbd-note">Use Dates → MM/DD/YY - MM/DD/YY in the filters for a custom range.</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>

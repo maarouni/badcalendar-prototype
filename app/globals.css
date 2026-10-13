@@ -1428,7 +1428,9 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ec-orange); }
 .explore-intro { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
 .explore-intro h2 { font-size: 34px; margin: 0; }
 .explore-intro p { margin: 0; color: var(--ec-muted); font-weight: 300; }
-.explore-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 20px; }
+.explore-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+/* Oct 13: was "1.05fr 1fr" for CountyMap + the old TBD card. Revert to a
+   2-column split once the California regions map is built for the second slot. */
 .explore-card {
   background: #fff;
   border: 1px solid rgba(26,26,26,0.12);
