@@ -93,7 +93,7 @@ export function CountyMap({ events, filters, setFilters }) {
             const on = filters.regions.includes(c.name);
             const [dx, dy] = LABEL_NUDGE[c.name] || [0, 0];
             return (
-              <g key={c.name} className={`county-label ${on ? "on" : ""}`} transform={`translate(${c.cx + dx} ${c.cy + dy})`}>
+              <g key={c.name} className={`county-label ${on ? "on" : ""} ${n ? "has" : "none"}`} transform={`translate(${c.cx + dx} ${c.cy + dy})`}>
                 <text className="county-name" textAnchor="middle" y="-2">{SHORT[c.name] || c.name}</text>
                 {n > 0 && <text className="county-n" textAnchor="middle" y="12">{n}</text>}
               </g>

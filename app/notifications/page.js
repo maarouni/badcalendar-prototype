@@ -73,7 +73,7 @@ function Group({ title, hint, badge, children, defaultOpen = true }) {
           {title}
           {badge > 0 && <span className="fp-badge">{badge}</span>}
         </span>
-        <span className="fp-caret">{open ? "−" : "+"}</span>
+        <span className="fp-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open && (
         <div className="fp-section-body">
@@ -107,7 +107,7 @@ function SubGroup({ title, options, selected, onToggle, countOf }) {
           {title} <span className="fp-count">({total})</span>
           {picked > 0 && <span className="fp-badge">{picked}</span>}
         </span>
-        <span className="fp-caret">{open ? "−" : "+"}</span>
+        <span className="fp-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open &&
         options.map((o) => (

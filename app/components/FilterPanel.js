@@ -25,7 +25,7 @@ function Section({ title, badge, defaultOpen = true, disabled, note, children })
           {title}
           {badge > 0 && <span className="fp-badge">{badge}</span>}
         </span>
-        <span className="fp-caret">{open ? "−" : "+"}</span>
+        <span className="fp-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open && (
         <div className="fp-section-body">
@@ -58,7 +58,7 @@ function SubGroup({ title, options, selected, onToggle, onClearGroup, allLabel, 
           {title}
           {picked > 0 && <span className="fp-badge">{picked}</span>}
         </span>
-        <span className="fp-caret">{open ? "−" : "+"}</span>
+        <span className="fp-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open && allLabel && (
         <Option

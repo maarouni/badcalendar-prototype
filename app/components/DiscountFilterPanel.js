@@ -13,7 +13,7 @@ function Section({ title, badge, defaultOpen = true, children }) {
     <div className="fp-section">
       <button type="button" className="fp-section-head" onClick={() => setOpen((o) => !o)}>
         <span>{title}{badge > 0 && <span className="fp-badge">{badge}</span>}</span>
-        <span className="fp-caret">{open ? "−" : "+"}</span>
+        <span className="fp-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open && <div className="fp-section-body">{children}</div>}
     </div>
@@ -38,7 +38,7 @@ function SubGroup({ title, options, selected, onToggle, onClearGroup, allLabel, 
     <div className="fp-subgroup">
       <button type="button" className="fp-subgroup-head" onClick={() => setOpen((o) => !o)}>
         <span>{title}{picked > 0 && <span className="fp-badge">{picked}</span>}</span>
-        <span className="fp-caret">{open ? "−" : "+"}</span>
+        <span className="fp-caret">{open ? "▾" : "▸"}</span>
       </button>
       {open && allLabel && (
         <Option type="radio" name={`d-all-${title}`} checked={picked === 0} onChange={() => onClearGroup(options)} label={<>{allLabel} <em>(default)</em></>} />

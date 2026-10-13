@@ -60,7 +60,7 @@ body {
   box-shadow: 0 2px 6px rgba(255,149,0,0.35);
 }
 .brand span { color: var(--gold-dark); }
-.brand .brand-word { color: var(--ink); }
+.brand .brand-word { color: var(--ink); font-family: "Poppins", "Lexend", sans-serif; }
 .brand-word b { color: var(--gold-dark); font-weight: inherit; }
 
 .nav-links { display: flex; align-items: center; gap: 28px; }
@@ -1058,7 +1058,7 @@ form.event-form input:focus, form.event-form select:focus {
 .fp-option:hover { background: #fbf5e6; }
 .fp-option input { margin: 0; accent-color: var(--gold-dark); }
 .fp-label { flex: 1; }
-.fp-count { font-size: 11px; color: var(--ec-faint); min-width: 16px; text-align: right; }
+.fp-count { display: none; }
 .fp-checked .fp-label { color: #7a1f1f; font-weight: 700; }
 .fp-empty { opacity: 0.4; }
 .fp-divider { height: 1px; background: var(--border); margin: 5px 0; }
@@ -1070,7 +1070,7 @@ form.event-form input:focus, form.event-form select:focus {
 .fp-set-load:disabled { color: var(--ec-faint); cursor: default; }
 .fp-set-load em { font-weight: 400; font-style: normal; }
 .fp-set.active .fp-set-load { border-color: var(--gold); background: #fff4e5; color: #7a1f1f; }
-.fp-set-save { background: #7a1f1f; color: #fff; border: none; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.fp-set-save { background: var(--gold-dark); color: #fff; border: none; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .fp-set-del { background: none; border: none; color: var(--ec-faint); cursor: pointer; font-size: 12px; }
 .fp-flash { font-size: 11px; color: #2f7a3b; }
 .nt-edit-bar .fp-flash { font-size: 13px; font-weight: 600; }
@@ -1451,7 +1451,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--ec-orange); }
 .county-n { font-family: "Alata", sans-serif; font-size: 20px; fill: #fff; pointer-events: none; }
 .county.on .county-n { fill: var(--ink); }
 .county-name { font-size: 11px; fill: var(--ink); font-weight: 500; pointer-events: none; }
-.county.none .county-name { fill: var(--ec-faint); }
 .elsewhere { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .elsewhere-chip {
   font: inherit; font-size: 12px; border: 1px solid rgba(26,26,26,0.15); background: #fff;
@@ -2082,7 +2081,7 @@ html, body { overflow-x: clip; }
      WCAG 1.4.11 (3:1 contrast for controls), so the stroke is 1px dark gray.
    - On touch screens (pointer: coarse) the circle grows to 18px and each
      option row gets a 44px min height. Desktop keeps the compact 12px. */
-:root { --sel-size: 12px; }
+:root { --sel-size: 10px; }
 input[type="checkbox"],
 input[type="radio"] {
   border: 1px solid #767676;
@@ -2094,9 +2093,9 @@ input.sel-radio:checked {
   background-image: none;
   background-color: var(--gold-dark);
   border-color: var(--gold-dark);
-  box-shadow: inset 0 0 0 2px #fff; /* filled dot with a hairline ring */
+  box-shadow: none; /* fully solid filled circle — no inner ring/tube look */
 }
-input[type="radio"]:checked:focus-visible { box-shadow: inset 0 0 0 2px #fff, 0 0 0 3px var(--gold-light); }
+input[type="radio"]:checked:focus-visible { box-shadow: 0 0 0 3px var(--gold-light); }
 input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 .fp-option, .sidebar label.fp-option { gap: 8px; min-height: 26px; }
 @media (pointer: coarse) {
@@ -2196,6 +2195,7 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 .county-shape:focus-visible { stroke: var(--ink); stroke-width: 2; }
 .county-label { pointer-events: none; }
 .county-label .county-name { font-size: 11px; font-weight: 600; fill: #1a1a1a; paint-order: stroke; stroke: rgba(255,255,255,.85); stroke-width: 3px; }
+.county-label.none .county-name { fill: var(--ec-faint); font-weight: 500; }
 .county-label .county-n { font-family: "Lexend", sans-serif; font-size: 11px; font-weight: 700; fill: var(--ec-blue); paint-order: stroke; stroke: #fff; stroke-width: 3px; }
 .county-label.on .county-n { fill: #1a1a1a; }
 .map-hint { margin: -4px 0 8px; font-size: 12px; color: var(--ink); opacity: .7; }
