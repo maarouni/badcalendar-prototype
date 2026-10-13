@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import PageTemplate from "../components/PageTemplate";
 import DiscountFilterPanel from "../components/DiscountFilterPanel";
 import { StepHead, NextStep } from "../components/Steps";
@@ -19,7 +18,8 @@ const fmtDiscount = (d) =>
   `${d.offer} — ${d.company} (${d.industry})\n   ${d.description}\n   ${d.city}, ${d.region} · Redeem: ${(d.redeem || []).join(" / ")} · ${discountLabel(d)} · Expires ${d.expires}${d.premier ? " · PREMIER" : ""}`;
 
 function DiscountsInner() {
-  const q = (useSearchParams().get("q") || "").toLowerCase();
+  const [qRaw, setQRaw] = useState("");
+  const q = qRaw.trim().toLowerCase();
   const [items, setItems] = useState([]);
   const [filters, setFilters] = useState(EMPTY_DISCOUNT_FILTERS);
   const [selected, setSelected] = useState({});
@@ -83,6 +83,22 @@ function DiscountsInner() {
                 </button>
               )}
             </StepHead>
+            <div className="table-search-row">
+              <label className="table-search">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search certificates..."
+                  value={qRaw}
+                  onChange={(e) => setQRaw(e.target.value)}
+                  aria-label="Search certificates"
+                />
+              </label>
+            </div>
+
             <div className="results-bar">
               <div><strong>{visible.length}</strong> {visible.length === 1 ? "certificate" : "certificates"} match your filters</div>
             </div>

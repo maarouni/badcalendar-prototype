@@ -442,6 +442,33 @@ form.event-form input:focus, form.event-form select:focus {
 }
 .nav-search-btn:hover { background: var(--gold-dark); }
 
+/* ---------- Table-specific search (Oct 13 review: Cesar wanted search
+   bars positioned directly above each page's own table/list, not as one
+   global box in the top header — the old .nav-search above is now unused). ---------- */
+.table-search-row { margin: 0 0 10px; }
+.table-search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  background: var(--ec-field);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  gap: 8px;
+}
+.table-search svg { flex-shrink: 0; color: var(--ec-faint); }
+.table-search input {
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 14px;
+  flex: 1;
+  min-width: 0;
+  color: var(--ink);
+}
+.table-search input::placeholder { color: var(--ec-faint); }
+
 .icon-btn {
   position: relative;
   background: none;

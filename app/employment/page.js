@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import PageTemplate from "../components/PageTemplate";
 import { StepHead, NextStep } from "../components/Steps";
 import { Glyph } from "../components/Icons";
@@ -30,8 +29,8 @@ function compLabel(j) {
 }
 
 function EmploymentInner() {
-  const searchParams = useSearchParams();
-  const q = (searchParams.get("q") || "").toLowerCase();
+  const [qRaw, setQRaw] = useState("");
+  const q = qRaw.trim().toLowerCase();
 
   const [jobs, setJobs] = useState([]);
   const [filters, setFilters] = useState(EMPTY_JOB_FILTERS);
@@ -86,6 +85,22 @@ function EmploymentInner() {
                 </button>
               )}
             </StepHead>
+            <div className="table-search-row">
+              <label className="table-search">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search listings..."
+                  value={qRaw}
+                  onChange={(e) => setQRaw(e.target.value)}
+                  aria-label="Search listings"
+                />
+              </label>
+            </div>
+
             <div className="results-bar">
               <div>
                 <strong>{visible.length}</strong> {visible.length === 1 ? "listing" : "listings"} match your filters

@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { slugify } from "./lib/slug";
 import FilterPanel from "./components/FilterPanel";
 import PageTemplate from "./components/PageTemplate";
@@ -59,8 +58,8 @@ function addTicket(e, setFlash) {
 }
 
 function SuperCalendarInner() {
-  const searchParams = useSearchParams();
-  const q = (searchParams.get("q") || "").toLowerCase();
+  const [qRaw, setQRaw] = useState("");
+  const q = qRaw.trim().toLowerCase();
 
   const [events, setEvents] = useState([]);
   const [selected, setSelected] = useState({});
@@ -157,7 +156,7 @@ function SuperCalendarInner() {
   const firstSelected = events.find((e) => selected[e.id]);
 
   const chips = [];
-  if (q) chips.push({ key: "q", label: `"${q}"`, clear: () => { window.history.replaceState({}, "", "/"); window.location.reload(); } });
+  if (q) chips.push({ key: "q", label: `"${q}"`, clear: () => setQRaw("") });
   if (customRange && (filters.dateFrom || filters.dateTo)) chips.push({ key: "range", label: `${filters.dateFrom ? shortDate(filters.dateFrom) : "…"} – ${filters.dateTo ? shortDate(filters.dateTo) : "…"}`, clear: () => setFilters((f) => ({ ...f, date: "all", dateFrom: "", dateTo: "" })) });
   for (const r of filters.regions) chips.push({ key: `r-${r}`, label: r, clear: () => setFilters((f) => ({ ...f, regions: f.regions.filter((x) => x !== r) })) });
   if (filters.formats.includes("Online")) chips.push({ key: "online", label: "Online", clear: () => setFilters((f) => ({ ...f, formats: f.formats.filter((x) => x !== "Online") })) });
@@ -257,6 +256,22 @@ function SuperCalendarInner() {
                 </button>
               )}
             </StepHead>
+            <div className="table-search-row">
+              <label className="table-search">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  value={qRaw}
+                  onChange={(e) => setQRaw(e.target.value)}
+                  aria-label="Search events"
+                />
+              </label>
+            </div>
+
             <div className="results-bar">
               <div>
                 <strong>{visible.length}</strong> {visible.length === 1 ? "event" : "events"}

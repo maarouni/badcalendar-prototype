@@ -33,7 +33,6 @@ export default function NavBar() {
     : path.startsWith("/employment")
       ? { href: "/employment/submit", label: "+ Post a Job" }
       : { href: "/submit", label: "+ Create Event" };
-  const [q, setQ] = useState("");
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartN, setCartN] = useState(0);
@@ -53,13 +52,6 @@ export default function NavBar() {
     };
   }, []);
 
-  function submitSearch(e) {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (q.trim()) params.set("q", q.trim());
-    router.push(`/${params.toString() ? `?${params.toString()}` : ""}`);
-  }
-
   function logOut() {
     localStorage.removeItem(USER_KEY);
     window.dispatchEvent(new Event("mc-auth-changed"));
@@ -73,25 +65,6 @@ export default function NavBar() {
         <span className="brand-mark" aria-hidden="true"><i /><i /></span>
         <span className="brand-word">calendar<b>Gold</b></span>
       </a>
-
-      <form className="nav-search" onSubmit={submitSearch}>
-        <input
-          type="text"
-          placeholder="Search events..."
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <span className="nav-search-divider" />
-        <span className="nav-search-location" title="Location detection — coming soon">
-          📍 Pleasanton, CA
-        </span>
-        <button type="submit" aria-label="Search" className="nav-search-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="7" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-        </button>
-      </form>
 
       <div className="nav-links">
         <a href="/">One Big Calendar</a>
