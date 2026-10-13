@@ -4,7 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { slugify } from "./lib/slug";
 import FilterPanel from "./components/FilterPanel";
 import PageTemplate from "./components/PageTemplate";
-import { CountyMap } from "./components/Explore";
+import { CountyMap, CaliforniaMap } from "./components/Explore";
 import { StepHead, NextStep } from "./components/Steps";
 import { Glyph, IconButton } from "./components/Icons";
 import {
@@ -198,10 +198,8 @@ function SuperCalendarInner() {
       <section className="explore" id="browse">
         <div className="explore-inner">
           <div className="explore-grid">
-            {/* Oct 13: the "rest of California" regions map Cesar showed in Figma
-                goes in this second grid slot once it's built (see chat — blocked on
-                Figma MCP rate limit for now). CountyMap takes the full row until then. */}
             <CountyMap events={forMap} filters={filters} setFilters={setFilters} />
+            <CaliforniaMap events={forMap} filters={filters} setFilters={setFilters} />
           </div>
         </div>
       </section>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Icon, isoOf, parseDate } from "./EventVisuals";
 import { BAY_COUNTIES, NORCAL_CONTEXT, MAP_W, MAP_H } from "../lib/norcalCounties";
+import { CALIFORNIA_REGIONS, CA_MAP_W, CA_MAP_H } from "../lib/californiaRegions";
 
 // Cesar (Oct 10): use a natural, real-shape map of the Bay Area counties
 // instead of the AI-style bubbles. Hover changes color; click (or
@@ -117,6 +118,82 @@ export function CountyMap({ events, filters, setFilters }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// Oct 13: the "rest of California" regions map Cesar showed in Figma
+// (Central Coast, San Diego, etc., grouped by county). The exact artwork is
+// still blocked by the Figma MCP's Starter-plan rate limit, so this draws
+// the same 9 regions from real US Census county boundaries instead (see
+// app/lib/californiaRegions.js) — swap in Cesar's version once it's
+// reachable. Same interaction model as the Bay Area map: click (or
+// shift-click) a region to toggle it in the filters.
+export function CaliforniaMap({ events, filters, setFilters }) {
+  const counts = useMemo(() => {
+    const c = {};
+    for (const e of events) if (e.region) c[e.region] = (c[e.region] || 0) + 1;
+    return c;
+  }, [events]);
+  const regionNames = CALIFORNIA_REGIONS.map((r) => r.name);
+  const picked = regionNames.filter((n) => filters.regions.includes(n));
+
+  function toggleRegions(values) {
+    setFilters((f) => {
+      const allOn = values.every((v) => f.regions.includes(v));
+      const regions = allOn ? f.regions.filter((r) => !values.includes(r)) : [...new Set([...f.regions, ...values])];
+      return { ...f, regions };
+    });
+  }
+  function clearRegions() {
+    setFilters((f) => ({ ...f, regions: f.regions.filter((r) => !regionNames.includes(r)) }));
+  }
+
+  return (
+    <div className="explore-card">
+      <div className="explore-head">
+        <h3>Rest of California</h3>
+        <span className="map-actions">
+          <button type="button" className="link-btn" onClick={() => toggleRegions(regionNames)} title="Select all nine California regions">All</button>
+          {picked.length > 0 && (
+            <button type="button" className="link-btn" onClick={clearRegions} title="Clear region selection">Clear ({picked.length})</button>
+          )}
+        </span>
+      </div>
+      <p className="map-hint">Click (or shift-click) regions to select several at once.</p>
+      <svg className="county-map ca-region-map" viewBox={`0 0 ${CA_MAP_W} ${CA_MAP_H}`} role="group" aria-label="Filter by California region">
+        <g>
+          {CALIFORNIA_REGIONS.map((r) => {
+            const n = counts[r.name] || 0;
+            const on = filters.regions.includes(r.name);
+            return (
+              <path
+                key={r.name}
+                d={r.d}
+                className={`region-shape ${on ? "on" : ""} ${n ? "has" : "none"}`}
+                tabIndex={0}
+                role="checkbox"
+                aria-checked={on}
+                aria-label={`${r.name}: ${n} events`}
+                onClick={() => toggleRegions([r.name])}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), toggleRegions([r.name]))}
+              >
+                <title>{`${r.name} · ${n} event${n === 1 ? "" : "s"} — click to ${on ? "remove" : "add"}`}</title>
+              </path>
+            );
+          })}
+          {CALIFORNIA_REGIONS.map((r) => {
+            const n = counts[r.name] || 0;
+            const on = filters.regions.includes(r.name);
+            return (
+              <g key={r.name} className={`region-label ${on ? "on" : ""} ${n ? "has" : "none"}`} transform={`translate(${r.cx} ${r.cy})`}>
+                <text className="region-name" textAnchor="middle" y="-2">{r.name}</text>
+                {n > 0 && <text className="region-n" textAnchor="middle" y="12">{n}</text>}
+              </g>
+            );
+          })}
+        </g>
+      </svg>
     </div>
   );
 }
