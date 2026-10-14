@@ -20,11 +20,13 @@ export default function PageTemplate({
   children,
   narrow = false,
   legend = true,
+  subnav = null, // optional second icon row under the section icons
 }) {
   const bar = status === "construction" ? "construction" : mode;
   return (
     <div className={`tpl tpl-mode-${mode} ${narrow ? "tpl-narrow" : ""} ${legend ? "" : "tpl-no-legend"}`}>
       <IconNav active={section} mode={mode} />
+      {subnav}
 
       <header className={`tpl-title tpl-${bar}`}>
         <div>

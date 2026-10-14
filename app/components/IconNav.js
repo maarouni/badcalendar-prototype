@@ -1,7 +1,8 @@
 "use client";
 
-// Shared 4-icon section row from Cesar's Home/Employment wireframes:
-// One Big Calendar · Discount / Gift Certificates · Employment Listings · Notifications
+// Shared section icon row from Cesar's wireframes (Oct 14 adds Organizations):
+// One Big Calendar · Discount / Gift Certificates · Organizations ·
+// Employment Listings · Notifications
 
 const ITEMS = [
   {
@@ -28,6 +29,18 @@ const ITEMS = [
         <circle cx="8" cy="8" r="2.5" />
         <circle cx="16" cy="16" r="2.5" />
         <path d="M17 7 7 17" />
+      </svg>
+    ),
+  },
+  {
+    key: "organizations",
+    href: "/organizations",
+    label: "Organizations",
+    tip: "Manage and promote your organization",
+    icon: (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
+        <path d="M12 3 3 20h18L12 3Z" />
+        <path d="M7.6 12h8.8M5.4 16h13.2" />
       </svg>
     ),
   },

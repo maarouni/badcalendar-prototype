@@ -2182,13 +2182,13 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 }
 
 /* ---------- 4-section icon row: compact, tooltips, edit = dark icon ---------- */
-.icon-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 112px)); gap: 8px; }
+.icon-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 112px)); gap: 8px; }
 .icon-nav-item { width: auto; position: relative; padding: 10px 6px; }
 .icon-nav-edit .icon-nav-item.active { background: #262626; border-color: #262626; color: #fff; }
 @media (max-width: 600px) {
-  .icon-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
-  .icon-nav-item { padding: 8px 4px; font-size: 10px; border-radius: 10px; }
-  .icon-nav-label { overflow-wrap: anywhere; }
+  .icon-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .icon-nav-item { padding: 8px 2px; font-size: 9px; border-radius: 10px; letter-spacing: -.01em; }
+  .icon-nav-label { overflow-wrap: normal; word-break: normal; hyphens: auto; }
 }
 
 /* Hover tooltips for every icon that has data-tip (no tooltips on touch) */
@@ -2448,3 +2448,49 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 .refer-levels .refer-vendor b { color: var(--ink); font-size: 13px; }
 @media (max-width: 760px) { .refer-grid { grid-template-columns: 1fr; } }
 .pages-grid { margin-top: 14px; }
+
+/* ---------- Organizations (Cesar's Figma, Oct 14) ---------- */
+.org-subnav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; max-width: 600px; }
+.org-subnav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px;
+  border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--ink-soft);
+  text-decoration: none; text-align: center; font-size: 11px; font-weight: 700; line-height: 1.2;
+}
+.org-subnav-item:hover { border-color: var(--gold); color: var(--ink); }
+.org-subnav-item.active { background: #d9d9d9; border-color: #bdbdbd; color: var(--ink); }
+.org-status { display: inline-flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.org-status-label { font-weight: 700; color: var(--ink); }
+.org-status select { padding: 6px 8px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border); background: #fff; }
+.org-status-compact select { padding: 3px 4px; font-size: 11px; max-width: 120px; }
+.org-status-member select { border-color: #2e7d32; color: #2e7d32; font-weight: 600; }
+.org-status-considering select { border-color: var(--gold); color: var(--gold-dark); font-weight: 600; }
+.org-status-icon { display: inline-block; width: 1.1em; text-align: center; }
+.org-status-card { display: block; }
+.org-detail { margin-top: 14px; }
+.org-hero { display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; background: #fff; }
+.org-hero h1 { margin: 0 0 4px; font-size: 24px; line-height: 1.2; }
+.org-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0 4px; }
+.org-stats div { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: #fff; display: flex; flex-direction: column; }
+.org-stats b { font-size: 17px; color: var(--gold-dark); }
+.org-stats span { font-size: 11px; color: var(--ec-faint); text-transform: uppercase; letter-spacing: .04em; }
+.org-roster-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.org-roster-tools .table-search { flex: 1; min-width: 200px; }
+.org-sort { display: flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 600; }
+.org-sort select { padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; }
+.org-roster-group { margin-bottom: 18px; }
+.org-roster-head { margin: 0 0 8px; padding: 6px 10px; background: #ffe14d; border-radius: 8px; font-size: 14px; }
+.org-minicards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.org-minicard { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: #fff; }
+.org-minicard-name { font-weight: 700; font-size: 14px; }
+.org-roster-row { display: grid; grid-template-columns: 130px 1fr 1fr 1fr auto; gap: 6px; margin-bottom: 6px; }
+.org-roster-row input, .org-roster-row select { padding: 8px 10px; font-size: 13px; }
+.org-cat-picker summary { cursor: pointer; list-style: revert; }
+.org-cat-group { border: none; padding: 0; margin: 8px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0 10px; }
+.org-cat-group legend { font-size: 12px; font-weight: 700; padding: 0; margin-bottom: 2px; }
+.ed-hint { font-style: normal; font-weight: 400 !important; color: var(--ec-faint) !important; }
+@media (max-width: 600px) {
+  .org-subnav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .org-stats { grid-template-columns: 1fr 1fr 1fr; }
+  .org-roster-row { grid-template-columns: 1fr 1fr; }
+  .org-hero { flex-direction: column; }
+}

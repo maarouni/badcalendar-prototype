@@ -11,10 +11,10 @@ const INDEX = [
 // Site index from Cesar's Legend Icons page (Public vs Personal pages).
 const PUBLIC_PAGES = [
   ["/", "HOME · One Big Calendar"], ["/notifications", "Notifications"], ["/employment", "Employment"],
-  ["/discounts", "Discount / Gift Certificates"], ["/info", "Info"], ["/login", "Registration – Sign Up / Log In"],
+  ["/discounts", "Discount / Gift Certificates"], ["/organizations", "Organizations"], ["/info", "Info"], ["/login", "Registration – Sign Up / Log In"],
 ];
 const PERSONAL_PAGES = [
-  ["/my-calendar", "My Calendar Digest"], ["/submit", "EDIT My Events"], ["/employment/submit", "EDIT My Employment Listings"], ["/discounts/submit", "EDIT My Discount / Gift Certificates"],
+  ["/my-calendar", "My Calendar Digest"], ["/submit", "EDIT My Events"], ["/employment/submit", "EDIT My Employment Listings"], ["/discounts/submit", "EDIT My Discount / Gift Certificates"], ["/organizations/submit", "EDIT My Organization Details"],
   ["/dashboards", "My Dashboards"], ["/cart", "Account Shopping Cart"], ["/profile", "Settings"],
 ];
 

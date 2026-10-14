@@ -2,7 +2,7 @@
 
 **Live:** https://calendargold.vercel.app · **All pages:** https://calendargold.vercel.app/pages
 
-calendarGold is a Bay Area events, discounts, employment and notifications platform —
+calendarGold is a Bay Area events, discounts, organizations, employment and notifications platform —
 an innovative, results-based marketing and revenue-sharing system (*Connect • Promote • Earn*).
 This repository is the working prototype used to review page designs and flows before
 the production build.
@@ -16,6 +16,7 @@ the production build.
 | **Create Event** | `/submit`: Regular or Premier listing with advertising budget |
 | **My Calendar Digest** | `/my-calendar`: selected events, attendance status, Google Calendar |
 | **Discount / Gift Certificates** | `/discounts`, `/discounts/[id]`, `/discounts/submit` |
+| **Organizations** | `/organizations` (digest: # Members, Annual Dues, My Membership Status filters), `/organizations/[id]`, `/organizations/[id]/members`, `/organizations/submit` |
 | **Employment Listings** | `/employment`, `/employment/submit` |
 | **Notifications** | `/notifications` (Browse, My Notifications, Create Business Notification) |
 | **Results-Based Marketing** | `/advertising`: cost calculator (D = A × B × C), rates, event participation |
@@ -47,4 +48,4 @@ npm run dev
 Then open http://localhost:3000.
 
 **Stack:** Next.js 14 (App Router), React 18, plain CSS (`app/globals.css`).
-Sample data: `data/events.json`, `app/lib/jobs.js`, `app/lib/discounts.js`.
+Sample data: `data/events.json`, `app/lib/jobs.js`, `app/lib/discounts.js`, `app/lib/organizations.js`.

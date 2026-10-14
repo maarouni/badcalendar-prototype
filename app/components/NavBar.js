@@ -32,7 +32,9 @@ export default function NavBar() {
     ? { href: "/discounts/submit", label: "+ Post Certificate" }
     : path.startsWith("/employment")
       ? { href: "/employment/submit", label: "+ Post a Job" }
-      : { href: "/submit", label: "+ Create Event" };
+      : path.startsWith("/organizations")
+        ? { href: "/organizations/submit", label: "+ Add Organization" }
+        : { href: "/submit", label: "+ Create Event" };
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartN, setCartN] = useState(0);
