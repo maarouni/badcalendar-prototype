@@ -650,20 +650,12 @@ export default function Notifications() {
 
   return (
     <div className="page nt-page">
-      <div className="hint">
-        {edit ? (
-          <>
-            <b>Edit mode:</b> rename filters, cards, delivery choices and business section titles. Changes save
-            in this browser as you type. When done, click <b>📧 Email labels to Masoud</b>.
-          </>
-        ) : (
-          <>
-            Prototype with <b>sample</b> notifications. Filter and subscribe on <b>Browse</b>, see them under{" "}
-            <b>My Notifications</b>, and build and test-send one under <b>Create Business Notification</b>.
-            Click <b>✏️ Edit labels</b> to change any wording.
-          </>
-        )}
-      </div>
+      {edit && (
+        <div className="hint">
+          <b>Edit mode:</b> rename filters, cards, delivery choices and business section titles. Changes save
+          in this browser as you type. When done, click <b>📧 Email labels to Masoud</b>.
+        </div>
+      )}
 
       <div className="nt-title-row">
         <h2 style={{ margin: "6px 0 14px" }}>Notifications</h2>
