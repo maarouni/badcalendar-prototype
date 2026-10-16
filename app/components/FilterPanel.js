@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import DigestActions from "./DigestActions";
+import { useState } from "react";
+import { Glyph } from "./Icons";
+import { CountyMap, CaliforniaMap } from "./Explore";
 import {
-  EVENT_FORMATS,
-  EVENT_TIERS,
   DATE_OPTIONS,
   COST_OPTIONS,
   REGION_GROUPS,
@@ -13,88 +12,65 @@ import {
   countFor,
 } from "../lib/taxonomy";
 
-const SETS_KEY = "mc_filter_sets_v1";
-const SET_NAMES = ["A", "B", "C"];
+// One Big Calendar filters, rebuilt from Cesar's Oct 15 Figma review:
+//   - yellow "Filters" bar with Hide, then "1 Select all that apply" with an
+//     X to clear everything
+//   - every section is its own white box with a large collapse arrow in a
+//     circle (pointing up when open, down when closed)
+//   - each section starts with "All (Default)"
+//   - Filter Sets moved out (they belong in My Calendar Digest)
+//   - the maps live inside the Regions boxes, not at the top of the page
+//   - "2 Submit Display Results" at the bottom
 
-function Section({ title, badge, defaultOpen = true, disabled, note, children }) {
+export function CollapseArrow({ open, onClick, label }) {
+  return (
+    <button
+      type="button"
+      className="fp-arrow"
+      onClick={onClick}
+      aria-expanded={open}
+      aria-label={`${open ? "Collapse" : "Expand"} ${label}`}
+      data-tip={open ? "Collapse" : "View / Expand"}
+    >
+      <Glyph name={open ? "collapse" : "expand"} size={16} strokeWidth={2.4} />
+    </button>
+  );
+}
+
+function Box({ title, hint, icon, defaultOpen = true, disabled, note, children }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`fp-section ${disabled ? "fp-disabled" : ""}`}>
-      <button type="button" className="fp-section-head" onClick={() => setOpen((o) => !o)}>
-        <span>
-          {title}
-          {badge > 0 && <span className="fp-badge">{badge}</span>}
+    <section className={`fp-box ${disabled ? "fp-disabled" : ""}`}>
+      <div className="fp-box-head">
+        <span className="fp-box-title">
+          {icon}
+          <b>{title}</b>
+          {hint && <em>{hint}</em>}
         </span>
-        <span className="fp-caret">{open ? "▾" : "▸"}</span>
-      </button>
+        <CollapseArrow open={open} onClick={() => setOpen((o) => !o)} label={title} />
+      </div>
       {open && (
-        <div className="fp-section-body">
+        <div className="fp-box-body">
           {note && <div className="fp-note">{note}</div>}
           {children}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
-function Option({ type = "checkbox", name, checked, onChange, label, count, disabled }) {
+function Option({ type = "checkbox", name, checked, onChange, label, def, count, disabled }) {
   const empty = count === 0 && !checked;
   return (
     <label className={`fp-option ${empty ? "fp-empty" : ""} ${checked ? "fp-checked" : ""}`}>
       <input type={type} name={name} checked={checked} onChange={onChange} disabled={disabled} />
-      <span className="fp-label">{label}</span>
-      {typeof count === "number" && <span className="fp-count">{count}</span>}
+      <span className="fp-label">{label}{def && <em> Default</em>}</span>
     </label>
   );
 }
 
-function SubGroup({ title, options, selected, onToggle, onClearGroup, allLabel, countOf, disabled, defaultOpen = false }) {
-  const picked = options.filter((o) => selected.includes(o)).length;
-  const [open, setOpen] = useState(defaultOpen || picked > 0);
-  return (
-    <div className="fp-subgroup">
-      <button type="button" className="fp-subgroup-head" onClick={() => setOpen((o) => !o)}>
-        <span>
-          {title}
-          {picked > 0 && <span className="fp-badge">{picked}</span>}
-        </span>
-        <span className="fp-caret">{open ? "▾" : "▸"}</span>
-      </button>
-      {open && allLabel && (
-        <Option
-          type="radio"
-          name={`all-${title}`}
-          checked={picked === 0}
-          onChange={() => onClearGroup && onClearGroup(options)}
-          label={<>{allLabel} <em>(default)</em></>}
-          disabled={disabled}
-        />
-      )}
-      {open &&
-        options.map((o) => (
-          <Option
-            key={o}
-            checked={selected.includes(o)}
-            onChange={() => onToggle(o)}
-            label={o}
-            count={countOf(o)}
-            disabled={disabled}
-          />
-        ))}
-    </div>
-  );
-}
-
 export default function FilterPanel({ events, filters, setFilters, today, q, onHide, onDisplay }) {
-  const [sets, setSets] = useState({});
-  const [activeSet, setActiveSet] = useState(null);
-  const [flash, setFlash] = useState("");
-
-  useEffect(() => {
-    try {
-      setSets(JSON.parse(localStorage.getItem(SETS_KEY) || "{}"));
-    } catch {}
-  }, []);
+  const [digestMode, setDigestMode] = useState("manual");
 
   const toggleIn = (key, value) =>
     setFilters((f) => {
@@ -106,77 +82,25 @@ export default function FilterPanel({ events, filters, setFilters, today, q, onH
     countFor(events, filters, section, { [section]: section === "date" ? value : [value] }, today, q);
 
   const onlineOnly = filters.formats.length === 1 && filters.formats[0] === "Online";
-  const totalSelected =
-    filters.formats.length + filters.tiers.length + (filters.date !== "all" ? 1 : 0) +
-    filters.costs.length + filters.regions.length + filters.categories.length;
-
-  function saveSet(name) {
-    const next = { ...sets, [name]: filters };
-    setSets(next);
-    setActiveSet(name);
-    try { localStorage.setItem(SETS_KEY, JSON.stringify(next)); } catch {}
-    setFlash(`Saved as Filter Set ${name}`);
-    setTimeout(() => setFlash(""), 1800);
-  }
-
-  function loadSet(name) {
-    if (!sets[name]) return;
-    setFilters({ ...EMPTY_FILTERS, ...sets[name] });
-    setActiveSet(name);
-  }
-
-  function deleteSet(name) {
-    const next = { ...sets };
-    delete next[name];
-    setSets(next);
-    if (activeSet === name) setActiveSet(null);
-    try { localStorage.setItem(SETS_KEY, JSON.stringify(next)); } catch {}
-  }
+  const [bay, california, national, international] = REGION_GROUPS;
+  const clearRegions = (opts) => setFilters((f) => ({ ...f, regions: f.regions.filter((r) => !opts.includes(r)) }));
+  const noneOf = (opts) => !opts.some((o) => filters.regions.includes(o));
 
   return (
-    <aside className="sidebar filter-panel">
-      <div className="fp-top">
-        <h4><span className="step-badge" aria-hidden="true">1</span> Filters <em className="fp-top-hint">Select all that apply</em></h4>
-        <span className="fp-top-actions">
-          {totalSelected > 0 && (
-            <button type="button" className="fp-clear" data-tip="Clear All" onClick={() => { setFilters(EMPTY_FILTERS); setActiveSet(null); }}>
-              ✕ Clear
-            </button>
-          )}
-          {onHide && <button type="button" className="fp-hide" data-tip="Hide filters" onClick={onHide}>Hide</button>}
-        </span>
+    <aside className="sidebar filter-panel fp-v2">
+      <div className="fp-bar">
+        <b>Filters</b>
+        {onHide && <button type="button" className="fp-hide" data-tip="Hide filters" onClick={onHide}>Hide</button>}
+      </div>
+      <div className="fp-step-pill">
+        <span className="step-badge" aria-hidden="true">1</span>
+        <em>Select all that apply</em>
+        <button type="button" className="fp-clear-x" data-tip="Clear All" aria-label="Clear all filters" onClick={() => setFilters(EMPTY_FILTERS)}>
+          <Glyph name="clearAll" size={18} />
+        </button>
       </div>
 
-      <Section title="Filter Sets" badge={0} defaultOpen>
-        <div className="fp-sets">
-          {SET_NAMES.map((n) => (
-            <div key={n} className={`fp-set ${activeSet === n ? "active" : ""}`}>
-              <button type="button" className="fp-set-load" disabled={!sets[n]} onClick={() => loadSet(n)}>
-                Set {n}{!sets[n] && <em> · empty</em>}
-              </button>
-              <button type="button" className="fp-set-save" onClick={() => saveSet(n)} title={`Save current filters as Set ${n}`}>
-                Save
-              </button>
-              {sets[n] && (
-                <button type="button" className="fp-set-del" onClick={() => deleteSet(n)} title="Delete set">✕</button>
-              )}
-            </div>
-          ))}
-          {flash && <div className="fp-flash">{flash}</div>}
-        </div>
-      </Section>
-
-      <Section title="Event Types" badge={filters.formats.length + filters.tiers.length}>
-        {EVENT_FORMATS.map((o) => (
-          <Option key={o} checked={filters.formats.includes(o)} onChange={() => toggleIn("formats", o)} label={o} count={count("formats", o)} />
-        ))}
-        <div className="fp-divider" />
-        {EVENT_TIERS.map((o) => (
-          <Option key={o} checked={filters.tiers.includes(o)} onChange={() => toggleIn("tiers", o)} label={o} count={count("tiers", o)} />
-        ))}
-      </Section>
-
-      <Section title="Dates" badge={filters.date !== "all" ? 1 : 0}>
+      <Box title="Dates" hint="Select one">
         {DATE_OPTIONS.map((o) => (
           <Option
             key={o.id}
@@ -185,6 +109,7 @@ export default function FilterPanel({ events, filters, setFilters, today, q, onH
             checked={filters.date === o.id}
             onChange={() => setFilters((f) => ({ ...f, date: o.id }))}
             label={o.label}
+            def={o.id === "all"}
             count={o.id === "custom" ? undefined : count("date", o.id)}
           />
         ))}
@@ -195,50 +120,72 @@ export default function FilterPanel({ events, filters, setFilters, today, q, onH
             <input type="date" aria-label="To date" value={filters.dateTo} min={filters.dateFrom || undefined} onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value }))} />
           </div>
         )}
-      </Section>
+      </Box>
 
-      <Section title="Costs" badge={filters.costs.length}>
+      <Box title="Event Types">
+        <Option
+          type="radio"
+          name="fp-types-all"
+          checked={!filters.formats.length && !filters.tiers.length}
+          onChange={() => setFilters((f) => ({ ...f, formats: [], tiers: [] }))}
+          label="All"
+          def
+        />
+        <Option checked={filters.formats.includes("In-Person")} onChange={() => toggleIn("formats", "In-Person")} label="In-Person" count={count("formats", "In-Person")} />
+        <Option checked={filters.formats.includes("Online")} onChange={() => toggleIn("formats", "Online")} label="Online / Virtual" count={count("formats", "Online")} />
+        <div className="fp-gap" />
+        <Option checked={filters.tiers.includes("Premier")} onChange={() => toggleIn("tiers", "Premier")} label="Premier" count={count("tiers", "Premier")} />
+        <Option checked={filters.tiers.includes("Regular")} onChange={() => toggleIn("tiers", "Regular")} label="Regular" count={count("tiers", "Regular")} />
+      </Box>
+
+      <Box title="Event Costs">
+        <Option type="radio" name="fp-costs-all" checked={!filters.costs.length} onChange={() => setFilters((f) => ({ ...f, costs: [] }))} label="All" def />
         {COST_OPTIONS.map((o) => (
           <Option key={o.id} checked={filters.costs.includes(o.id)} onChange={() => toggleIn("costs", o.id)} label={o.label} count={count("costs", o.id)} />
         ))}
-      </Section>
+      </Box>
 
-      <Section
-        title="Regions"
-        badge={filters.regions.length}
-        disabled={onlineOnly}
-        note={onlineOnly ? "Online only is selected — regions don't apply." : null}
-      >
-        {REGION_GROUPS.map((g, i) => (
-          <SubGroup
-            key={g.group + i}
-            title={g.group}
-            options={g.options}
-            selected={filters.regions}
-            onToggle={(o) => toggleIn("regions", o)}
-            onClearGroup={(opts) => setFilters((f) => ({ ...f, regions: f.regions.filter((r) => !opts.includes(r)) }))}
-            allLabel={g.allLabel}
-            countOf={(o) => count("regions", o)}
-            disabled={onlineOnly}
-            defaultOpen={i === 0}
-          />
-        ))}
-      </Section>
+      <Box title="Add Selections to My Listings Digest" hint="Select one" icon={<Glyph name="select" size={14} />}>
+        <Option type="radio" name="fp-digest" checked={digestMode === "manual"} onChange={() => setDigestMode("manual")} label="Manually" def />
+        <Option type="radio" name="fp-digest" checked={digestMode === "auto"} onChange={() => setDigestMode("auto")} label="Automatically" />
+        <p className="fp-aside">Saves time and is a useful reminder to see updates (My Notification Digest)</p>
+      </Box>
 
-      <Section title="Categories" badge={filters.categories.length}>
+      <Box title="Categories" defaultOpen={filters.categories.length > 0}>
         {CATEGORY_GROUPS.map((g) => (
-          <SubGroup
-            key={g.group}
-            title={g.group}
-            options={g.options}
-            selected={filters.categories}
-            onToggle={(o) => toggleIn("categories", o)}
-            countOf={(o) => count("categories", o)}
-          />
+          <div key={g.group} className="fp-cat-group">
+            <div className="fp-cat-title">{g.group}</div>
+            {g.options.map((o) => (
+              <Option key={o} checked={filters.categories.includes(o)} onChange={() => toggleIn("categories", o)} label={o} count={count("categories", o)} />
+            ))}
+          </div>
         ))}
-      </Section>
+      </Box>
 
-      <DigestActions digestLabel="My Calendar Digest" promptLabel="Add Selections to My Calendar Digest" onDisplay={onDisplay} />
+      <Box title={bay.group} disabled={onlineOnly} note={onlineOnly ? "Online only is selected — regions don't apply." : null}>
+        <Option type="radio" name="fp-bay-all" checked={noneOf(bay.options)} onChange={() => clearRegions(bay.options)} label={bay.allLabel} def />
+        <CountyMap compact events={events} filters={filters} setFilters={setFilters} />
+      </Box>
+
+      <Box title={california.group} defaultOpen={!noneOf(california.options)} disabled={onlineOnly}>
+        <CaliforniaMap compact events={events} filters={filters} setFilters={setFilters} />
+        {california.options.map((o) => (
+          <Option key={o} checked={filters.regions.includes(o)} onChange={() => toggleIn("regions", o)} label={o} count={count("regions", o)} />
+        ))}
+      </Box>
+
+      {[national, international].map((g) => (
+        <Box key={g.group} title={g.group} defaultOpen={!noneOf(g.options)} disabled={onlineOnly}>
+          {g.options.map((o) => (
+            <Option key={o} checked={filters.regions.includes(o)} onChange={() => toggleIn("regions", o)} label={o} count={count("regions", o)} />
+          ))}
+        </Box>
+      ))}
+
+      <button type="button" className="fp-submit-pill" onClick={onDisplay}>
+        <span className="step-badge" aria-hidden="true">2</span>
+        Submit <em>Display Results</em>
+      </button>
     </aside>
   );
 }

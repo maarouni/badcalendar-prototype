@@ -36,7 +36,8 @@
     "cost": "$10 RSVP / $20 Door",
     "price": 10,
     "premier": false,
-    "description": "A hands-on session on building a referral engine for your business — scripts, follow-up cadences, and how to ask for introductions without it feeling awkward."
+    "description": "A hands-on session on building a referral engine for your business — scripts, follow-up cadences, and how to ask for introductions without it feeling awkward.",
+    "barter": true
   },
   {
     "id": "3",

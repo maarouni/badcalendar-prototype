@@ -9,10 +9,13 @@
 const P = {
   // ---- Header ----
   info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7.5h.01" /></>,
-  dashboards: <><rect x="3" y="3" width="8" height="8" rx="1.5" /><rect x="13" y="3" width="8" height="5" rx="1.5" /><rect x="13" y="10" width="8" height="11" rx="1.5" /><rect x="3" y="13" width="8" height="8" rx="1.5" /></>,
+  // Oct 15 Figma: header Dashboards icon is a bar chart in a box.
+  dashboards: <><rect x="3" y="3" width="18" height="18" rx="2.5" /><path d="M8 16v-4M12 16V8M16 16v-6" /></>,
   settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" /></>,
   pdf: <><path d="M12 3v12" /><path d="M7 10l5 5 5-5" /><path d="M4 19h16" /></>,
   print: <><path d="M6 9V3h12v6" /><rect x="3" y="9" width="18" height="8" rx="2" /><path d="M6 14h12v7H6z" /></>,
+  login: <><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M10 17l5-5-5-5" /><path d="M15 12H3" /></>,
+  barter: <><path d="M4 8h14l-3-3" /><path d="M20 16H6l3 3" /></>,
   register: <><circle cx="10" cy="8" r="4" /><path d="M2 21c0-4 3.6-7 8-7s8 3 8 7" /><path d="M19 8v6M16 11h6" /></>,
   user: <><circle cx="12" cy="12" r="9.5" /><text x="12" y="16.2" textAnchor="middle" fontSize="11" fontWeight="700" fill="currentColor" stroke="none">M</text></>,
   // ---- Actions ----
@@ -61,7 +64,7 @@ export const LEGEND = [
     items: [
       ["info", "Info"], ["dashboards", "Dashboards"], ["settings", "Settings"],
       ["pdf", "Download this page as a PDF"], ["print", "Print this page"],
-      ["register", "Registration – Sign Up / Log In"], ["user", "Logged In – User's First Name Initial"],
+      ["login", "Registration – Sign Up / Log In"], ["register", "Registration – Sign Up"], ["user", "Logged In – User's First Name Initial"],
       ["cart", "My Shopping Cart"],
     ],
   },
@@ -75,7 +78,7 @@ export const LEGEND = [
       ["viewMode", "View Mode"], ["editMode", "Edit Mode"], ["addNew", "Add New"],
       ["cartAdd", "Add item to My Shopping Cart"], ["ticket", "RSVP / Order Tickets"], ["delete", "Delete"],
       ["pdf", "Download this page as a PDF"], ["print", "Print this page"], ["clearAll", "Clear All"],
-      ["map", "Google Map"], ["qr", "QR Code"],
+      ["map", "Google Map"], ["qr", "QR Code"], ["barter", "Barter – no payment, not tracked"],
     ],
   },
   {

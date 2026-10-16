@@ -24,7 +24,6 @@ export default function RootLayout({ children }) {
 
         <footer className="site-footer site-footer-min">
           <span>© 2026 calendar<b>Gold</b></span>
-          <span>Bay Area, California</span>
         </footer>
       </body>
     </html>

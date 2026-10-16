@@ -20,7 +20,7 @@ const SHORT = { "San Francisco": "SF", "Contra Costa": "Contra Costa", "Santa Cl
 // Nudge a few labels off busy edges so they stay readable.
 const LABEL_NUDGE = { "San Francisco": [-22, 0], "San Mateo": [-14, 4], Marin: [-6, 0], Alameda: [6, 2], "Contra Costa": [4, -2] };
 
-export function CountyMap({ events, filters, setFilters }) {
+export function CountyMap({ events, filters, setFilters, compact = false }) {
   const counts = useMemo(() => {
     const c = {};
     for (const e of events) if (e.type !== "Online" && e.region) c[e.region] = (c[e.region] || 0) + 1;
@@ -45,6 +45,34 @@ export function CountyMap({ events, filters, setFilters }) {
   }
   function clearBay() {
     setFilters((f) => ({ ...f, regions: f.regions.filter((r) => !bayNames.includes(r)) }));
+  }
+
+  // Oct 15: the map lives inside the "Regions - CA Bay Area" filter panel.
+  // No event counts on the counties; a picked county turns gold.
+  if (compact) {
+    return (
+      <svg className="county-map county-map-compact" viewBox={`0 0 ${MAP_W} ${MAP_H}`} role="group" aria-label="Filter by county">
+        {NORCAL_CONTEXT.map((c) => <path key={c.name} className="county-ctx" d={c.d} />)}
+        {BAY_COUNTIES.map((c) => {
+          const on = filters.regions.includes(c.name);
+          return (
+            <path key={c.name} d={c.d} className={`county-shape ${on ? "on" : ""}`} tabIndex={0} role="checkbox" aria-checked={on}
+              aria-label={`${c.name} County`} onClick={() => toggleRegions([c.name])}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), toggleRegions([c.name]))}>
+              <title>{`${c.name} — click to ${on ? "remove" : "add"}`}</title>
+            </path>
+          );
+        })}
+        {BAY_COUNTIES.map((c) => {
+          const [dx, dy] = LABEL_NUDGE[c.name] || [0, 0];
+          return (
+            <text key={c.name} className="county-name" textAnchor="middle" transform={`translate(${c.cx + dx} ${c.cy + dy + 3})`}>
+              {SHORT[c.name] || c.name}
+            </text>
+          );
+        })}
+      </svg>
+    );
   }
 
   return (
@@ -129,7 +157,7 @@ export function CountyMap({ events, filters, setFilters }) {
 // app/lib/californiaRegions.js) — swap in Cesar's version once it's
 // reachable. Same interaction model as the Bay Area map: click (or
 // shift-click) a region to toggle it in the filters.
-export function CaliforniaMap({ events, filters, setFilters }) {
+export function CaliforniaMap({ events, filters, setFilters, compact = false }) {
   const counts = useMemo(() => {
     const c = {};
     for (const e of events) if (e.region) c[e.region] = (c[e.region] || 0) + 1;
@@ -147,6 +175,23 @@ export function CaliforniaMap({ events, filters, setFilters }) {
   }
   function clearRegions() {
     setFilters((f) => ({ ...f, regions: f.regions.filter((r) => !regionNames.includes(r)) }));
+  }
+
+  if (compact) {
+    return (
+      <svg className="county-map ca-region-map county-map-compact" viewBox={`0 0 ${CA_MAP_W} ${CA_MAP_H}`} role="group" aria-label="Filter by California region">
+        {CALIFORNIA_REGIONS.map((r) => {
+          const on = filters.regions.includes(r.name);
+          return (
+            <path key={r.name} d={r.d} className={`region-shape ${on ? "on" : ""}`} tabIndex={0} role="checkbox" aria-checked={on}
+              aria-label={r.name} onClick={() => toggleRegions([r.name])}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), toggleRegions([r.name]))}>
+              <title>{`${r.name} — click to ${on ? "remove" : "add"}`}</title>
+            </path>
+          );
+        })}
+      </svg>
+    );
   }
 
   return (

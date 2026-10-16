@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Glyph } from "./Icons";
 
 // Cesar's 4-step filter page (Figma Rev 261012):
 //   1 Filters  →  2 Submit / Display Results  →  3 Results  →  4 Next step
@@ -20,36 +19,33 @@ export function StepHead({ n, title, hint, children }) {
   );
 }
 
-// Step 4: "Select one — View Selection(s) / EDIT My Digest / Sign Up / Log In"
-export function NextStep({ noun = "Event", digest = "My Calendar Digest", digestHref = "/my-calendar", detailsHref, selectedCount = 0 }) {
-  const router = useRouter();
-  const [pick, setPick] = useState("details");
+// Step 4 (Oct 15 Figma review): a yellow "Select one" box. One click goes
+// straight there — no Submit button, no "0 selected" counter, no "Next Step"
+// label.
+export function NextStep({ noun = "Listing", digest = "My Listing Digest", digestHref = "/my-calendar", detailsHref }) {
   const options = [
-    { id: "details", label: `View Selection(s) – ${noun} Details`, def: true },
-    { id: "digest", label: `View Selection(s) – EDIT ${digest}` },
-    { id: "signup", label: `Sign Up / Log In to ADD ${noun}s & EDIT ${digest}` },
+    { id: "details", icon: "editMode", label: `View Selection(s) - ${noun} Details`, href: detailsHref || digestHref, def: true },
+    { id: "digest", icon: "calendar", label: `View Selection(s) - EDIT ${digest}`, href: digestHref },
+    { id: "signup", icon: "login", label: `Sign Up / Log In to ADD ${noun}s & EDIT ${digest}`, href: "/login" },
   ];
-  function go(e) {
-    e.preventDefault();
-    if (pick === "details") router.push(detailsHref || digestHref);
-    else if (pick === "digest") router.push(digestHref);
-    else router.push("/login");
-  }
   return (
-    <form className="next-step" onSubmit={go}>
-      <StepHead n={4} title="Next Step" hint="Select one" />
-      <div className="next-step-body">
-        {options.map((o) => (
-          <label key={o.id} className="fp-option">
-            <input type="radio" name="next-step" checked={pick === o.id} onChange={() => setPick(o.id)} />
-            <span className="fp-label">{o.label}{o.def && <em> (default)</em>}</span>
-          </label>
-        ))}
-        <div className="next-step-foot">
-          <span className="nt-hint">{selectedCount} selected</span>
-          <button type="submit" className="btn-primary btn-sm">Submit</button>
-        </div>
+    <div className="next-step next-step-box">
+      <div className="step-head">
+        <StepBadge n={4} />
+        <em className="next-step-title">Select one</em>
       </div>
-    </form>
+      <ul className="next-step-list">
+        {options.map((o) => (
+          <li key={o.id}>
+            <a href={o.href} className="next-step-link">
+              <span className="ns-dot" aria-hidden="true" />
+              <Glyph name={o.icon} size={14} />
+              <span>{o.label}</span>
+              {o.def && <em className="ns-default">Default</em>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

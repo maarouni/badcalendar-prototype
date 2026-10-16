@@ -1,48 +1,23 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { slugify } from "./lib/slug";
 import FilterPanel from "./components/FilterPanel";
-import PageTemplate from "./components/PageTemplate";
-import { CountyMap, CaliforniaMap } from "./components/Explore";
-import { StepHead, NextStep } from "./components/Steps";
-import { Glyph, IconButton } from "./components/Icons";
-import {
-  Poster, HostAvatar, Icon, fmtTime, fmtWhen, dayLabel, shortDate, isoOf,
-} from "./components/EventVisuals";
-import { EMPTY_FILTERS, matches, googleCalendarUrl } from "./lib/taxonomy";
+import HomeHero from "./components/HomeHero";
+import { StepBadge, NextStep } from "./components/Steps";
+import { Glyph } from "./components/Icons";
+import { fmtTime, fmtWhen, fmtDateRange, isoOf } from "./components/EventVisuals";
+import { EMPTY_FILTERS, matches } from "./lib/taxonomy";
 import { fetchEvents, localEvents } from "./lib/events";
 import SendToMasoud from "./components/SendToMasoud";
-import { addToCart } from "./lib/cart";
+import { cityCode } from "./lib/cityCodes";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 const FILTERS_KEY = "mc_current_filters_v1";
 const SHOW_FILTERS_KEY = "mc_show_filters_v1";
-const PAGE_SIZE = 8; // events per page in the timeline
+const PAGE_SIZE = 10; // rows per page in the One Big Calendar table
 
 function chrono(a, b) {
   return `${a.date} ${a.time || ""}`.localeCompare(`${b.date} ${b.time || ""}`);
-}
-
-// Oct 10 decision: a small radio-style selector on the right of each
-// listing (instead of the "+" circle), and the whole event box highlights
-// when it's selected. Multi-select, so it's a checkbox drawn as a radio.
-function SelectRadio({ saved, onClick, title }) {
-  return (
-    <label className="sel-radio-hit" data-tip={saved ? "In My Selection" : "Add listing to My Selection"}>
-      <input
-        type="checkbox"
-        className="sel-radio"
-        checked={saved}
-        onChange={onClick}
-        aria-label={`${saved ? "Remove" : "Add"} ${title} ${saved ? "from" : "to"} My Selection`}
-      />
-    </label>
-  );
-}
-
-function PlaceLine({ e }) {
-  return e.type === "Online" ? "Online" : `${e.city}${e.region && e.region !== e.city ? `, ${e.region}` : ""}`;
 }
 
 const multiDay = (e) => e.endDate && e.endDate > e.date;
@@ -51,10 +26,12 @@ const isPrivate = (e) => e.privacy === "Private";
 const fmtEvent = (e) =>
   `${e.title} — hosted by ${e.hostedBy}\n   ${fmtWhen(e)} · ${e.type === "Online" ? "Online" : `${e.city}, ${e.region}`}\n   ${e.cost}${e.premier ? " · PREMIER" : ""}${e.privacy === "Private" ? " · PRIVATE" : ""}`;
 
-function addTicket(e, setFlash) {
-  addToCart({ kind: "tickets", refId: e.id, title: e.title, when: fmtWhen(e), price: e.price || 0 });
-  setFlash(`Ticket for "${e.title}" added to My Shopping Cart`);
-  setTimeout(() => setFlash(""), 2200);
+// Image column for Premier rows: Cesar's legend images by event kind.
+function rowImage(e) {
+  const cats = [...(e.categories || []), e.category].join(" ").toLowerCase();
+  if (cats.includes("dinner")) return "dinner";
+  if (cats.includes("workshop") || cats.includes("seminar")) return "workshop";
+  return "expo";
 }
 
 function SuperCalendarInner() {
@@ -66,10 +43,8 @@ function SuperCalendarInner() {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const today = useMemo(() => new Date(), []);
   const todayIso = isoOf(today);
-  const [showPast, setShowPast] = useState(false);
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(true);
-  const [flash, setFlash] = useState("");
 
   useEffect(() => {
     fetchEvents().then(setEvents);
@@ -94,47 +69,25 @@ function SuperCalendarInner() {
     () => events.filter((e) => matches(e, filters, today, null, q)),
     [events, filters, today, q]
   );
-  // Same, but ignoring the region filter — so the county map can show what
-  // each county would add.
-  const forMap = useMemo(
-    () => events.filter((e) => matches(e, filters, today, "regions", q)),
-    [events, filters, today, q]
-  );
 
   const customRange = filters.date === "custom";
   const lastDay = (e) => (multiDay(e) ? e.endDate : e.date);
-  const pastCount = filtered.filter((e) => lastDay(e) < todayIso).length;
   const visible = useMemo(() => {
     let list = filtered;
-    if (!showPast && !customRange) list = list.filter((e) => lastDay(e) >= todayIso);
+    if (!customRange) list = list.filter((e) => lastDay(e) >= todayIso);
     return [...list].sort(chrono);
-  }, [filtered, showPast, customRange, todayIso]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const featured = visible.filter((e) => e.premier).slice(0, 8);
+  }, [filtered, customRange, todayIso]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageStart = (safePage - 1) * PAGE_SIZE;
   const pageItems = visible.slice(pageStart, pageStart + PAGE_SIZE);
-  const groups = [];
-  for (const e of pageItems) {
-    const last = groups[groups.length - 1];
-    if (last && last.date === e.date) last.items.push(e);
-    else groups.push({ date: e.date, items: [e] });
-  }
 
-  useEffect(() => { setPage(1); }, [filters, q, showPast]);
-
-  const anyFilter =
-    filters.formats.length || filters.tiers.length || filters.date !== "all" ||
-    filters.costs.length || filters.regions.length || filters.categories.length;
+  useEffect(() => { setPage(1); }, [filters, q]);
 
   function clearAllFilters() {
     setFilters(EMPTY_FILTERS);
-    if (q) {
-      window.history.replaceState({}, "", "/");
-      window.location.reload();
-    }
+    setQRaw("");
   }
 
   function toggle(id) {
@@ -152,85 +105,12 @@ function SuperCalendarInner() {
     scrollToResults();
   }
 
-  const selectedIds = Object.keys(selected).filter((k) => selected[k]);
   const firstSelected = events.find((e) => selected[e.id]);
-
-  const chips = [];
-  if (q) chips.push({ key: "q", label: `"${q}"`, clear: () => setQRaw("") });
-  if (customRange && (filters.dateFrom || filters.dateTo)) chips.push({ key: "range", label: `${filters.dateFrom ? shortDate(filters.dateFrom) : "…"} – ${filters.dateTo ? shortDate(filters.dateTo) : "…"}`, clear: () => setFilters((f) => ({ ...f, date: "all", dateFrom: "", dateTo: "" })) });
-  for (const r of filters.regions) chips.push({ key: `r-${r}`, label: r, clear: () => setFilters((f) => ({ ...f, regions: f.regions.filter((x) => x !== r) })) });
-  if (filters.formats.includes("Online")) chips.push({ key: "online", label: "Online", clear: () => setFilters((f) => ({ ...f, formats: f.formats.filter((x) => x !== "Online") })) });
-
-  const listingActions = (e) => (
-    <div className="tl-actions">
-      <SelectRadio saved={!!selected[e.id]} onClick={() => toggle(e.id)} title={e.title} />
-      <div className="tl-icon-row">
-        <IconButton name="gcal" size={16} href={googleCalendarUrl(e)} target="_blank" rel="noopener noreferrer" />
-        {e.price > 0 && <IconButton name="cartAdd" size={16} tip="Add ticket to My Shopping Cart" onClick={() => addTicket(e, setFlash)} />}
-      </div>
-    </div>
-  );
+  const detailsHref = firstSelected ? `/event/${firstSelected.id}` : "/my-calendar";
 
   return (
     <>
-      {/* Cesar's HOME Template (Figma Rev 261012): welcome box, the four
-          sections, then One Big Calendar as the default content. */}
-      <PageTemplate
-        section="calendar"
-        title="Welcome!"
-        subtitle="Connect • Promote • Earn"
-        legend={false}
-        actions={<a href="/login" className="tpl-action" data-tip="Registration – Sign Up / Log In">Sign up</a>}
-        intro={
-          <>
-            <b>Innovative, Results-Based Marketing and Revenue-Sharing System.</b>{" "}
-            Curate specific listings by selecting sets of filters &mdash; includes several innovative custom features.{" "}
-            <a href="/login">Sign up today</a> to create your account and manage Your Custom Digests.
-          </>
-        }
-      >
-        <div className="home-default">
-          <h2 className="home-section-title">One Big Calendar <em>Public</em></h2>
-          <p className="home-section-line"><strong>Save Time!</strong> Select filters to curate (organize, submit, view) events.</p>
-        </div>
-      </PageTemplate>
-
-      <section className="explore" id="browse">
-        <div className="explore-inner">
-          <div className="explore-grid">
-            <CountyMap events={forMap} filters={filters} setFilters={setFilters} />
-            <CaliforniaMap events={forMap} filters={filters} setFilters={setFilters} />
-          </div>
-        </div>
-      </section>
-
-      {featured.length > 0 && (
-        <section className="featured">
-          <div className="featured-head">
-            <h2>Featured</h2>
-            <span className="featured-sub">Premier listings</span>
-          </div>
-          <div className="featured-row">
-            {featured.map((e) => (
-              <article key={e.id} className={`feat-card ${selected[e.id] ? "saved" : ""}`}>
-                <a href={`/event/${e.id}`} className="feat-poster">
-                  <Poster event={e} />
-                </a>
-                <div className="feat-body">
-                  <div className="feat-when">{fmtWhen(e)}</div>
-                  <a href={`/event/${e.id}`} className="feat-title">{e.title}</a>
-                  <div className="feat-where"><PlaceLine e={e} /></div>
-                  <div className="feat-foot">
-                    <span className="feat-host"><HostAvatar name={e.hostedBy} size={20} />{e.hostedBy}</span>
-                    <span className="price-chip">{e.price ? `From $${e.price}` : "Free"}</span>
-                  </div>
-                </div>
-                <SelectRadio saved={!!selected[e.id]} onClick={() => toggle(e.id)} title={e.title} />
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
+      <HomeHero detailsHref={detailsHref} />
 
       <div className={`page browse-page ${showFilters ? "" : "filters-hidden"}`} id="timeline">
         <div className="layout-with-sidebar">
@@ -247,136 +127,98 @@ function SuperCalendarInner() {
           )}
 
           <div className="timeline-col" id="results">
-            <StepHead n={3} title="Results" hint="Select listings with the circle on the right">
+            {/* Oct 15 Figma: "3 One Big Calendar — Select all that apply",
+                search, then a compact table. One text size per role; no
+                event counts, no row icons (the #4 box covers those actions). */}
+            <div className="obc-bar">
+              <StepBadge n={3} />
+              <b>One Big Calendar</b>
+              <em>Select all that apply</em>
               {!showFilters && (
-                <button type="button" className="btn-ghost btn-sm" onClick={() => setFiltersShown(true)}>
-                  <Glyph name="expand" size={14} /> Display Filters
-                </button>
-              )}
-            </StepHead>
-            <div className="table-search-row">
-              <label className="table-search">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search events..."
-                  value={qRaw}
-                  onChange={(e) => setQRaw(e.target.value)}
-                  aria-label="Search events"
-                />
-              </label>
-            </div>
-
-            <div className="results-bar">
-              <div>
-                <strong>{visible.length}</strong> {visible.length === 1 ? "event" : "events"}
-                {customRange ? " in your date range" : showPast ? "" : " coming up"}
-              </div>
-              {!customRange && pastCount > 0 && (
-                <button type="button" className="link-btn" onClick={() => setShowPast((v) => !v)}>
-                  {showPast ? "Hide past events" : `Show ${pastCount} past`}
+                <button type="button" className="obc-show-filters" onClick={() => setFiltersShown(true)}>
+                  <Glyph name="expand" size={14} /> Filters
                 </button>
               )}
             </div>
+            <label className="obc-search">
+              <Glyph name="search" size={18} />
+              <input
+                type="text"
+                placeholder="SEARCH"
+                value={qRaw}
+                onChange={(e) => setQRaw(e.target.value)}
+                aria-label="Search events"
+              />
+            </label>
 
-            {(chips.length > 0 || !!anyFilter) && (
-              <div className="active-filters">
-                {chips.map((c) => (
-                  <button key={c.key} type="button" className="filter-chip" onClick={c.clear}>
-                    {c.label} <span aria-hidden="true">✕</span>
-                  </button>
-                ))}
-                <button type="button" className="clear-filters-btn" onClick={clearAllFilters}>Clear all</button>
-              </div>
-            )}
-            {flash && <div className="fp-flash fp-flash-block">{flash}</div>}
             <SendToMasoud load={localEvents} noun="events" format={fmtEvent} subject="calendarGold - my events" />
 
             {pageItems.length === 0 && (
               <div className="empty-state">
-                <div className="empty-circles" aria-hidden="true"><i /><i /><i /></div>
                 Nothing matches yet.{" "}
                 <button type="button" className="clear-filters-link" onClick={clearAllFilters}>Clear filters</button>{" "}
                 to see every event.
               </div>
             )}
 
-            <div className="timeline">
-              {groups.map((g) => {
-                const l = dayLabel(g.date, today);
-                return (
-                  <section key={g.date} className={`tl-day ${g.date < todayIso ? "past" : ""}`}>
-                    <header className="tl-date">
-                      <span className="tl-dot" aria-hidden="true" />
-                      <div>
-                        <div className="tl-day-main">{l.day}{l.tag && <em>{l.tag}</em>}</div>
-                        <div className="tl-weekday">{l.weekday}</div>
-                      </div>
-                    </header>
-                    <div className="tl-items">
-                      {g.items.map((e) =>
-                        e.premier ? (
-                          <article key={e.id} className={`tl-card premier ${selected[e.id] ? "saved" : ""}`}>
-                            <a href={`/event/${e.id}`} className="tl-thumb"><Poster event={e} label={false} /></a>
-                            <div className="tl-main">
-                              <div className="tl-kicker">Premier{multiDay(e) && <span className="tl-multi">Multiple dates</span>}</div>
-                              <a href={`/event/${e.id}`} className="tl-title">
-                                {isPrivate(e) && <span className="priv-icon" data-tip="Hide, Private — only you see this"><Glyph name="private" size={14} /></span>}
-                                {e.title}
-                              </a>
-                              <div className="tl-line"><Icon name="clock" />{multiDay(e) ? fmtWhen(e) : fmtTime(e.time)}</div>
-                              <div className="tl-line"><Icon name={e.type === "Online" ? "globe" : "pin"} /><PlaceLine e={e} /></div>
-                              <div className="tl-line tl-host">
-                                <HostAvatar name={e.hostedBy} size={18} />
-                                <a href={`/organizer/${slugify(e.hostedBy)}`}>{e.hostedBy}</a>
-                                <span className="tl-sep">·</span>
-                                <Icon name="tag" />{e.cost}
-                              </div>
-                            </div>
-                            {listingActions(e)}
-                          </article>
+            {pageItems.length > 0 && (
+              <div className="obc-table" role="list">
+                {pageItems.map((e) => {
+                  const on = !!selected[e.id];
+                  const href = `/event/${e.id}`;
+                  return (
+                    <article key={e.id} role="listitem" className={`obc-row ${e.premier ? "premier" : "regular"} ${on ? "selected" : ""}`}>
+                      <a href={href} className="obc-cell obc-when" tabIndex={-1}>
+                        <span>{fmtDateRange(e.date, e.endDate)}</span>
+                        <span>{fmtTime(e.time)}</span>
+                      </a>
+                      <a href={href} className="obc-cell obc-main">
+                        <span className="obc-title">
+                          {isPrivate(e) && <span className="priv-icon" data-tip="Hide, Private — only you see this"><Glyph name="private" size={13} /></span>}
+                          {e.title}
+                        </span>
+                        {e.premier ? (
+                          <>
+                            <span title={e.city}>{cityCode(e)}{e.type !== "Online" && e.region ? `, ${e.region}` : ""}</span>
+                            <span>Hosted by <b>{e.hostedBy}</b></span>
+                            <span>{e.cost}</span>
+                          </>
                         ) : (
-                          <article key={e.id} className={`tl-card regular ${selected[e.id] ? "saved" : ""}`}>
-                            <div className="tl-main">
-                              <div className="tl-reg-1">
-                                <span className="tl-time">{multiDay(e) ? fmtWhen(e) : fmtTime(e.time)}</span>
-                                <a href={`/event/${e.id}`} className="tl-title">
-                                  {isPrivate(e) && <span className="priv-icon" data-tip="Hide, Private — only you see this"><Glyph name="private" size={14} /></span>}
-                                  {e.title}
-                                </a>
-                              </div>
-                              <div className="tl-reg-2">
-                                <PlaceLine e={e} /> · <a href={`/organizer/${slugify(e.hostedBy)}`}>{e.hostedBy}</a> · {e.cost}
-                              </div>
-                            </div>
-                            {listingActions(e)}
-                          </article>
-                        )
+                          <span><abbr title={e.city}>{cityCode(e)}</abbr>, Hosted by {e.hostedBy}</span>
+                        )}
+                        {e.barter && <span className="obc-barter" data-tip="Barter – no payment, not tracked"><Glyph name="barter" size={15} /></span>}
+                      </a>
+                      {e.premier && (
+                        <a href={href} className="obc-cell obc-img" tabIndex={-1} aria-hidden="true">
+                          <Glyph name={rowImage(e)} size={34} strokeWidth={1.4} />
+                        </a>
                       )}
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button type="button" className="pagination-btn" onClick={() => goToPage(safePage - 1)} disabled={safePage <= 1}>← Prev</button>
-                <span className="pagination-summary">Page {safePage} of {totalPages}</span>
-                <button type="button" className="pagination-btn" onClick={() => goToPage(safePage + 1)} disabled={safePage >= totalPages}>Next →</button>
+                      <label className="obc-cell obc-sel" data-tip={on ? "In My Selection" : "Add listing to My Selection"}>
+                        <input
+                          type="checkbox"
+                          className="sel-radio"
+                          checked={on}
+                          onChange={() => toggle(e.id)}
+                          aria-label={`${on ? "Remove" : "Add"} ${e.title} ${on ? "from" : "to"} My Selection`}
+                        />
+                      </label>
+                    </article>
+                  );
+                })}
               </div>
             )}
 
-            <NextStep
-              noun="Event"
-              digest="My Calendar Digest"
-              digestHref="/my-calendar"
-              detailsHref={firstSelected ? `/event/${firstSelected.id}` : "/my-calendar"}
-              selectedCount={selectedIds.length}
-            />
+            <div className="obc-pager">
+              <button type="button" className="obc-pg" onClick={() => goToPage(safePage - 1)} disabled={safePage <= 1} aria-label="Previous page" data-tip="Previous">
+                <Glyph name="prev" size={14} strokeWidth={2.4} />
+              </button>
+              <span>Page <b>{safePage}</b> of <b>{totalPages}</b></span>
+              <button type="button" className="obc-pg" onClick={() => goToPage(safePage + 1)} disabled={safePage >= totalPages} aria-label="Next page" data-tip="Next">
+                <Glyph name="next" size={14} strokeWidth={2.4} />
+              </button>
+            </div>
+
+            <NextStep noun="Listing" digest="My Listing Digest" digestHref="/my-calendar" detailsHref={detailsHref} />
           </div>
         </div>
       </div>

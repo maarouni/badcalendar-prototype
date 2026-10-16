@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { IconButton } from "./Icons";
 import { cartCount } from "../lib/cart";
 
@@ -27,14 +27,6 @@ function initials(name) {
 
 export default function NavBar() {
   const router = useRouter();
-  const path = usePathname() || "/";
-  const cta = path.startsWith("/discounts")
-    ? { href: "/discounts/submit", label: "+ Post Certificate" }
-    : path.startsWith("/employment")
-      ? { href: "/employment/submit", label: "+ Post a Job" }
-      : path.startsWith("/organizations")
-        ? { href: "/organizations/submit", label: "+ Add Organization" }
-        : { href: "/submit", label: "+ Create Event" };
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartN, setCartN] = useState(0);
@@ -61,53 +53,55 @@ export default function NavBar() {
     router.push("/");
   }
 
+  // Oct 15 Figma review: no text links or "+ Create" button in the header
+  // (the section tiles and Next Step box cover them), no Log in button
+  // (redundant with the log-in icon), and the icon set is grouped 3 · 2 · 1:
+  //   Info, Dashboards, Settings | Download PDF, Print | Log in / user
   return (
     <nav className="navbar">
-      <a href="/" className="brand">
-        <span className="brand-mark" aria-hidden="true"><i /><i /></span>
-        <span className="brand-word">calendar<b>Gold</b></span>
-      </a>
+      <div className="navbar-inner">
+        <a href="/" className="brand">
+          <span className="brand-mark" aria-hidden="true"><i /><i /></span>
+          <span className="brand-word">calendar<b>Gold</b></span>
+        </a>
 
-      <div className="nav-links">
-        <a href="/">One Big Calendar</a>
-        <a href="/my-calendar">My Calendar</a>
-        <a href={cta.href} className="nav-cta" data-tip="Add New">{cta.label}</a>
-
-        {/* Header icons per Cesar's Legend Icons (Info section, Rev 261012) */}
-        <IconButton name="info" href="/info" />
-        <IconButton name="pdf" onClick={() => window.print()} />
-        <IconButton name="print" onClick={() => window.print()} />
-        <IconButton name="cart" href="/cart" badge={cartN || null} tip={`My Shopping Cart${cartN ? ` (${cartN})` : ""}`} />
-        <IconButton name="notifications" href="/notifications" tip="Notifications" />
-        {user && <IconButton name="dashboards" href="/dashboards" />}
-        {user && <IconButton name="settings" href="/profile" />}
-        {!user && <IconButton name="register" href="/login" />}
-
-        {user ? (
-          <div className="nav-user-menu">
-            <button
-              type="button"
-              className="nav-avatar"
-              data-tip={`Logged in — ${user.name}`}
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              {initials(user.name)}
-            </button>
-            {menuOpen && (
-              <div className="nav-user-dropdown">
-                <div className="nav-user-name">{user.name}</div>
-                <div className="nav-user-id">{user.identifier}</div>
-                <a href="/dashboards" onClick={() => setMenuOpen(false)}>Dashboards</a>
-                <a href="/profile" onClick={() => setMenuOpen(false)}>Profile</a>
-                <button type="button" onClick={logOut}>Log out</button>
-              </div>
+        <div className="nav-links nav-icon-groups">
+          <span className="nav-icon-group">
+            <IconButton name="info" href="/info" />
+            <IconButton name="dashboards" href={user ? "/dashboards" : "/login"} />
+            <IconButton name="settings" href={user ? "/profile" : "/login"} />
+          </span>
+          <span className="nav-icon-group">
+            <IconButton name="pdf" onClick={() => window.print()} />
+            <IconButton name="print" onClick={() => window.print()} />
+          </span>
+          <span className="nav-icon-group">
+            {user ? (
+              <span className="nav-user-menu">
+                <button
+                  type="button"
+                  className="nav-avatar"
+                  data-tip={`Logged in — ${user.name}`}
+                  onClick={() => setMenuOpen((v) => !v)}
+                >
+                  {initials(user.name)}
+                </button>
+                {menuOpen && (
+                  <div className="nav-user-dropdown">
+                    <div className="nav-user-name">{user.name}</div>
+                    <div className="nav-user-id">{user.identifier}</div>
+                    <a href="/dashboards" onClick={() => setMenuOpen(false)}>Dashboards</a>
+                    <a href="/profile" onClick={() => setMenuOpen(false)}>Profile</a>
+                    <a href="/cart" onClick={() => setMenuOpen(false)}>My Shopping Cart{cartN ? ` (${cartN})` : ""}</a>
+                    <button type="button" onClick={logOut}>Log out</button>
+                  </div>
+                )}
+              </span>
+            ) : (
+              <IconButton name="login" href="/login" />
             )}
-          </div>
-        ) : (
-          <a href="/login" className="btn-primary nav-login-btn">
-            Log in
-          </a>
-        )}
+          </span>
+        </div>
       </div>
     </nav>
   );
