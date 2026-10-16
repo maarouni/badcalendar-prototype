@@ -2718,3 +2718,4 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 /* ---- Header tagline: "calendarGold & much more" (Oct 15 call) ---- */
 .brand-more { font-family: "Poppins", "Lexend", sans-serif; font-size: 14px; font-weight: 500; font-style: italic; color: var(--ink-soft); align-self: flex-end; margin: 0 0 3px -2px; white-space: nowrap; }
 @media (max-width: 480px) { .brand-more { font-size: 12px; } }
+.nt-show-filters { margin: 0 0 10px; }

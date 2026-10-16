@@ -104,6 +104,7 @@ function cardMatches(card, sel, except) {
 }
 
 function BrowseTab({ edit, labels, update, subs, toggleSub }) {
+  const [showFilters, setShowFilters] = useState(true);
   const [sel, setSel] = useState(EMPTY_SEL);
   const toggle = (key, v) =>
     setSel((s) => ({ ...s, [key]: s[key].includes(v) ? s[key].filter((x) => x !== v) : [...s[key], v] }));
@@ -118,8 +119,11 @@ function BrowseTab({ edit, labels, update, subs, toggleSub }) {
 
   return (
     <div className="layout-with-sidebar">
-      <aside className="sidebar filter-panel fp-v2">
-        <div className="fp-bar"><b>Filters</b></div>
+      {showFilters && <aside className="sidebar filter-panel fp-v2">
+        <div className="fp-bar">
+          <b>Filters</b>
+          <button type="button" className="fp-hide" data-tip="Hide filters" onClick={() => setShowFilters(false)}>Hide</button>
+        </div>
         <div className="fp-step-pill">
           <span className="step-badge" aria-hidden="true">1</span>
           <em>Select all that apply</em>
@@ -167,9 +171,14 @@ function BrowseTab({ edit, labels, update, subs, toggleSub }) {
               onToggle={(o) => toggle("categories", o)} countOf={(o) => count("categories", o)} />
           ))}
         </Group>
-      </aside>
+      </aside>}
 
       <div style={{ flex: 1, minWidth: 0 }}>
+        {!showFilters && (
+          <button type="button" className="obc-show-filters nt-show-filters" onClick={() => setShowFilters(true)}>
+            <Glyph name="expand" size={14} /> Filters
+          </button>
+        )}
         {edit && <div className="results-bar">Editing notification cards</div>}
         {!edit && shown.length === 0 && (
           <div className="empty-state">
