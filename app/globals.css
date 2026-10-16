@@ -2704,3 +2704,13 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
   .calc2-table, .calc2-dates, .calc2-pick, .calc2-grand { margin-left: 0; }
   .calc2-table { font-size: 12px; }
 }
+
+/* ---- Shared results table (all sections) ---- */
+.obc-row { grid-template-columns: 150px minmax(0, 1fr) minmax(40px, auto); }
+.obc-row.premier { grid-template-columns: 150px minmax(0, 1fr) 64px minmax(40px, auto); }
+.obc-sel { flex-direction: row; gap: 6px; justify-content: center; }
+.obc-sel-hit { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; cursor: pointer; }
+.obc-sel .org-status-compact select { font-size: 11px; max-width: 96px; }
+@media (max-width: 640px) {
+  .obc-row, .obc-row.premier { grid-template-columns: 104px minmax(0, 1fr) minmax(36px, auto); }
+}

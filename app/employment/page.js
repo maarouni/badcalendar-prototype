@@ -2,10 +2,10 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import PageTemplate from "../components/PageTemplate";
-import { StepHead, NextStep } from "../components/Steps";
-import { Glyph } from "../components/Icons";
+import { NextStep } from "../components/Steps";
+import { ResultsHead, ListingTable, Pager, shortYmd } from "../components/ListingTable";
+import { cityCode } from "../lib/cityCodes";
 import EmploymentFilterPanel from "../components/EmploymentFilterPanel";
-import { HostAvatar, shortDate } from "../components/EventVisuals";
 import { EMPTY_JOB_FILTERS, jobMatches, sortJobs } from "../lib/employmentTaxonomy";
 import { fetchJobs } from "../lib/jobs";
 import FillInHere from "../components/FillInHere";
@@ -16,6 +16,7 @@ const fmtJob = (j) =>
   `${j.title} — ${j.company} (${j.industry})\n   ${j.city}, ${j.region} · ${j.level} · ${(j.types || []).join(", ")}\n   Pay: ${compLabel(j)} · Posted ${j.posted}${j.premier ? " · PREMIER" : ""}`;
 
 const PAGE_SIZE = 8;
+const SEL_KEY = "mc_job_selection_v1";
 const FEATURED_CAP = 1; // how many Premier listings show before "More Premier Listings" is needed
 
 function compLabel(j) {
@@ -40,7 +41,16 @@ function EmploymentInner() {
   const [showFilters, setShowFilters] = useState(true);
   const scrollToResults = () => document.getElementById("results")?.scrollIntoView({ block: "start", behavior: "smooth" });
 
-  useEffect(() => { fetchJobs().then(setJobs); }, []);
+  const [selected, setSelected] = useState({});
+  useEffect(() => {
+    fetchJobs().then(setJobs);
+    try { setSelected(JSON.parse(localStorage.getItem(SEL_KEY) || "{}")); } catch {}
+  }, []);
+  function toggle(id) {
+    const next = { ...selected, [id]: !selected[id] };
+    setSelected(next);
+    try { localStorage.setItem(SEL_KEY, JSON.stringify(next)); } catch {}
+  }
 
   const filtered = useMemo(
     () => jobs.filter((j) => jobMatches(j, filters, today, null, q)),
@@ -78,34 +88,15 @@ function EmploymentInner() {
           )}
 
           <div className="timeline-col" id="results">
-            <StepHead n={3} title="Results">
-              {!showFilters && (
-                <button type="button" className="btn-ghost btn-sm" onClick={() => setShowFilters(true)}>
-                  <Glyph name="expand" size={14} /> Display Filters
-                </button>
-              )}
-            </StepHead>
-            <div className="table-search-row">
-              <label className="table-search">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search listings..."
-                  value={qRaw}
-                  onChange={(e) => setQRaw(e.target.value)}
-                  aria-label="Search listings"
-                />
-              </label>
-            </div>
+            <ResultsHead title="Employment Listings" q={qRaw} setQ={setQRaw}
+              showFilters={showFilters} onShowFilters={() => setShowFilters(true)} />
 
-            <div className="results-bar">
-              <div>
-                <strong>{visible.length}</strong> {visible.length === 1 ? "listing" : "listings"} match your filters
-              </div>
-            </div>
+            <FillInHere>
+              These 8 listings are placeholders. Click <strong>+ Post a Listing</strong> to enter real ones. They&rsquo;ll appear on
+              your screen right away. When you&rsquo;re done, click <strong>Send my listings to Masoud</strong> so I can make them
+              permanent for everyone. <em>(Until we set up the database, listings you post are only visible on your computer.)</em>
+            </FillInHere>
+            <SendToMasoud load={localJobs} noun="listings" format={fmtJob} subject="calendarGold - my employment listings" />
 
             {pageItems.length === 0 && featured.length === 0 && (
               <div className="empty-state">
@@ -115,45 +106,21 @@ function EmploymentInner() {
               </div>
             )}
 
-            <FillInHere>
-              These 8 listings are placeholders. Click <strong>+ Post a Listing</strong> to enter real ones. They&rsquo;ll appear on
-              your screen right away. When you&rsquo;re done, click <strong>Send my listings to Masoud</strong> so I can make them
-              permanent for everyone. <em>(Until we set up the database, listings you post are only visible on your computer.)</em>
-            </FillInHere>
+            <ListingTable rows={[...featuredShown, ...pageItems].map((j) => ({
+              id: j.id,
+              href: `#job-${j.id}`,
+              left: [compLabel(j), `Posted ${shortYmd(j.posted)}`],
+              title: j.title,
+              lines: j.premier
+                ? [<>{cityCode({ city: j.city })}, <b>{j.company}</b> · {j.industry}</>, j.level, (j.types || []).join(", ")]
+                : [`${cityCode({ city: j.city })}, ${j.company}`],
+              premier: j.premier,
+              image: "employment",
+              selected: !!selected[j.id],
+              onToggle: () => toggle(j.id),
+            }))} />
 
-            <SendToMasoud load={localJobs} noun="listings" format={fmtJob} subject="calendarGold - my employment listings" />
-
-            <div className="job-list">
-              {[...featuredShown, ...pageItems].map((j) => (
-                <article key={j.id} className={`job-card ${j.premier ? "premier" : ""}`}>
-                  <HostAvatar name={j.company} size={40} />
-                  <div className="job-body">
-                    <div className="job-head">
-                      <a href={`#job-${j.id}`} className="job-title">{j.title}</a>
-                      {j.premier && <span className="price-chip job-premier-chip">PREMIER</span>}
-                    </div>
-                    <div className="job-sub">{j.industry} · {j.company}</div>
-                    <div className="job-meta">
-                      <span>{j.city}, {j.region}</span>
-                      <span>{j.level}</span>
-                      <span>{j.types.join(", ")}</span>
-                    </div>
-                  </div>
-                  <div className="job-side">
-                    <div className="job-comp">{compLabel(j)}</div>
-                    <div className="job-posted">Posted {shortDate(j.posted)}</div>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button type="button" className="pagination-btn" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)}>Prev</button>
-                <span className="pagination-summary">Page {safePage} of {totalPages}</span>
-                <button type="button" className="pagination-btn" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</button>
-              </div>
-            )}
+            <Pager page={safePage} totalPages={totalPages} onGo={(p) => setPage(Math.min(Math.max(1, p), totalPages))} />
 
             {(hasMorePremier || showAllPremier) && (
               <button

@@ -53,6 +53,7 @@ const P = {
   miniCard: <><rect x="2" y="5" width="20" height="14" rx="2" /><circle cx="8" cy="11" r="2.2" /><path d="M5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4" /><path d="M14 10h5M14 13h4" /></>,
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2.5" /><path d="M3 10h18" /><path d="M8 3v4M16 3v4" /></>,
   discount: <><circle cx="8" cy="8" r="2.5" /><circle cx="16" cy="16" r="2.5" /><path d="M17 7 7 17" /></>,
+  organizations: <><path d="M12 3 3 20h18L12 3Z" /><path d="M7.6 12h8.8M5.4 16h13.2" /></>,
   employment: <><rect x="3" y="8" width="18" height="12" rx="2" /><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M3 13h18" /></>,
   notifications: <><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9Z" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></>,
 };

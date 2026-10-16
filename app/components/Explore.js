@@ -20,7 +20,7 @@ const SHORT = { "San Francisco": "SF", "Contra Costa": "Contra Costa", "Santa Cl
 // Nudge a few labels off busy edges so they stay readable.
 const LABEL_NUDGE = { "San Francisco": [-22, 0], "San Mateo": [-14, 4], Marin: [-6, 0], Alameda: [6, 2], "Contra Costa": [4, -2] };
 
-export function CountyMap({ events, filters, setFilters, compact = false }) {
+export function CountyMap({ events = [], filters, setFilters, compact = false, field = "regions" }) {
   const counts = useMemo(() => {
     const c = {};
     for (const e of events) if (e.type !== "Online" && e.region) c[e.region] = (c[e.region] || 0) + 1;
@@ -28,13 +28,15 @@ export function CountyMap({ events, filters, setFilters, compact = false }) {
   }, [events]);
   const onlineCount = events.filter((e) => e.type === "Online").length;
   const bayNames = BAY_COUNTIES.map((c) => c.name);
-  const pickedBay = bayNames.filter((n) => filters.regions.includes(n));
+  const picked0 = filters[field] || [];
+  const pickedBay = bayNames.filter((n) => picked0.includes(n));
 
   function toggleRegions(values) {
     setFilters((f) => {
-      const allOn = values.every((v) => f.regions.includes(v));
-      const regions = allOn ? f.regions.filter((r) => !values.includes(r)) : [...new Set([...f.regions, ...values])];
-      return { ...f, regions };
+      const cur = f[field] || [];
+      const allOn = values.every((v) => cur.includes(v));
+      const next = allOn ? cur.filter((r) => !values.includes(r)) : [...new Set([...cur, ...values])];
+      return { ...f, [field]: next };
     });
   }
   function toggleOnline() {
@@ -54,7 +56,7 @@ export function CountyMap({ events, filters, setFilters, compact = false }) {
       <svg className="county-map county-map-compact" viewBox={`0 0 ${MAP_W} ${MAP_H}`} role="group" aria-label="Filter by county">
         {NORCAL_CONTEXT.map((c) => <path key={c.name} className="county-ctx" d={c.d} />)}
         {BAY_COUNTIES.map((c) => {
-          const on = filters.regions.includes(c.name);
+          const on = picked0.includes(c.name);
           return (
             <path key={c.name} d={c.d} className={`county-shape ${on ? "on" : ""}`} tabIndex={0} role="checkbox" aria-checked={on}
               aria-label={`${c.name} County`} onClick={() => toggleRegions([c.name])}
@@ -100,7 +102,7 @@ export function CountyMap({ events, filters, setFilters, compact = false }) {
           ))}
           {BAY_COUNTIES.map((c) => {
             const n = counts[c.name] || 0;
-            const on = filters.regions.includes(c.name);
+            const on = picked0.includes(c.name);
             return (
               <path
                 key={c.name}
@@ -119,7 +121,7 @@ export function CountyMap({ events, filters, setFilters, compact = false }) {
           })}
           {BAY_COUNTIES.map((c) => {
             const n = counts[c.name] || 0;
-            const on = filters.regions.includes(c.name);
+            const on = picked0.includes(c.name);
             const [dx, dy] = LABEL_NUDGE[c.name] || [0, 0];
             return (
               <g key={c.name} className={`county-label ${on ? "on" : ""} ${n ? "has" : "none"}`} transform={`translate(${c.cx + dx} ${c.cy + dy})`}>
@@ -157,20 +159,22 @@ export function CountyMap({ events, filters, setFilters, compact = false }) {
 // app/lib/californiaRegions.js) — swap in Cesar's version once it's
 // reachable. Same interaction model as the Bay Area map: click (or
 // shift-click) a region to toggle it in the filters.
-export function CaliforniaMap({ events, filters, setFilters, compact = false }) {
+export function CaliforniaMap({ events = [], filters, setFilters, compact = false, field = "regions" }) {
   const counts = useMemo(() => {
     const c = {};
     for (const e of events) if (e.region) c[e.region] = (c[e.region] || 0) + 1;
     return c;
   }, [events]);
   const regionNames = CALIFORNIA_REGIONS.map((r) => r.name);
-  const picked = regionNames.filter((n) => filters.regions.includes(n));
+  const picked0 = filters[field] || [];
+  const picked = regionNames.filter((n) => picked0.includes(n));
 
   function toggleRegions(values) {
     setFilters((f) => {
-      const allOn = values.every((v) => f.regions.includes(v));
-      const regions = allOn ? f.regions.filter((r) => !values.includes(r)) : [...new Set([...f.regions, ...values])];
-      return { ...f, regions };
+      const cur = f[field] || [];
+      const allOn = values.every((v) => cur.includes(v));
+      const next = allOn ? cur.filter((r) => !values.includes(r)) : [...new Set([...cur, ...values])];
+      return { ...f, [field]: next };
     });
   }
   function clearRegions() {
@@ -181,7 +185,7 @@ export function CaliforniaMap({ events, filters, setFilters, compact = false }) 
     return (
       <svg className="county-map ca-region-map county-map-compact" viewBox={`0 0 ${CA_MAP_W} ${CA_MAP_H}`} role="group" aria-label="Filter by California region">
         {CALIFORNIA_REGIONS.map((r) => {
-          const on = filters.regions.includes(r.name);
+          const on = picked0.includes(r.name);
           return (
             <path key={r.name} d={r.d} className={`region-shape ${on ? "on" : ""}`} tabIndex={0} role="checkbox" aria-checked={on}
               aria-label={r.name} onClick={() => toggleRegions([r.name])}
@@ -210,7 +214,7 @@ export function CaliforniaMap({ events, filters, setFilters, compact = false }) 
         <g>
           {CALIFORNIA_REGIONS.map((r) => {
             const n = counts[r.name] || 0;
-            const on = filters.regions.includes(r.name);
+            const on = picked0.includes(r.name);
             return (
               <path
                 key={r.name}
@@ -229,7 +233,7 @@ export function CaliforniaMap({ events, filters, setFilters, compact = false }) 
           })}
           {CALIFORNIA_REGIONS.map((r) => {
             const n = counts[r.name] || 0;
-            const on = filters.regions.includes(r.name);
+            const on = picked0.includes(r.name);
             return (
               <g key={r.name} className={`region-label ${on ? "on" : ""} ${n ? "has" : "none"}`} transform={`translate(${r.cx} ${r.cy})`}>
                 <text className="region-name" textAnchor="middle" y="-2">{r.name}</text>

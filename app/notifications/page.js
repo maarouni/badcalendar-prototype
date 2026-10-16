@@ -11,6 +11,8 @@ import {
   MAX_BUSINESSES_PER_USER,
 } from "../lib/notificationConfig";
 import { fetchEvents } from "../lib/events";
+import { Box, Option } from "../components/FilterKit";
+import { Glyph } from "../components/Icons";
 
 const LABELS_KEY = "cg_notification_labels_v2";
 const SUBS_KEY = "cg_subscriptions_v1";
@@ -64,55 +66,23 @@ const optLabel = (labels, gid, idx) => {
 // Small building blocks
 // ---------------------------------------------------------------------------
 
-function Group({ title, hint, badge, children, defaultOpen = true }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="fp-section">
-      <button type="button" className="fp-section-head" onClick={() => setOpen((o) => !o)}>
-        <span>
-          {title}
-          {badge > 0 && <span className="fp-badge">{badge}</span>}
-        </span>
-        <span className="fp-caret">{open ? "▾" : "▸"}</span>
-      </button>
-      {open && (
-        <div className="fp-section-body">
-          {hint && <div className="nt-hint">{hint}</div>}
-          {children}
-        </div>
-      )}
-    </div>
-  );
+// Same filter look as every other section (shared FilterKit, Oct 15 review):
+// white boxes, large arrows in circles, small dot options.
+function Group({ title, hint, children, defaultOpen = true }) {
+  return <Box title={title} defaultOpen={defaultOpen}>{hint && <p className="fp-aside">{hint}</p>}{children}</Box>;
 }
 
 function CheckOption({ checked, onChange, label, count, disabled }) {
-  const empty = count === 0 && !checked;
-  return (
-    <label className={`fp-option ${empty ? "fp-empty" : ""} ${checked ? "fp-checked" : ""}`}>
-      <input type="checkbox" checked={checked} onChange={onChange} disabled={disabled} />
-      <span className="fp-label">{label}</span>
-      {typeof count === "number" && <span className="fp-count">{count}</span>}
-    </label>
-  );
+  return <Option checked={checked} onChange={onChange} label={label} count={count} disabled={disabled} />;
 }
 
 function SubGroup({ title, options, selected, onToggle, countOf }) {
-  const picked = options.filter((o) => selected.includes(o)).length;
-  const total = options.reduce((n, o) => n + countOf(o), 0);
-  const [open, setOpen] = useState(picked > 0);
   return (
-    <div className="fp-subgroup">
-      <button type="button" className="fp-subgroup-head" onClick={() => setOpen((o) => !o)}>
-        <span>
-          {title} <span className="fp-count">({total})</span>
-          {picked > 0 && <span className="fp-badge">{picked}</span>}
-        </span>
-        <span className="fp-caret">{open ? "▾" : "▸"}</span>
-      </button>
-      {open &&
-        options.map((o) => (
-          <CheckOption key={o} checked={selected.includes(o)} onChange={() => onToggle(o)} label={o} count={countOf(o)} />
-        ))}
+    <div className="fp-cat-group">
+      <div className="fp-cat-title">{title}</div>
+      {options.map((o) => (
+        <CheckOption key={o} checked={selected.includes(o)} onChange={() => onToggle(o)} label={o} count={countOf(o)} />
+      ))}
     </div>
   );
 }
@@ -137,7 +107,6 @@ function BrowseTab({ edit, labels, update, subs, toggleSub }) {
   const [sel, setSel] = useState(EMPTY_SEL);
   const toggle = (key, v) =>
     setSel((s) => ({ ...s, [key]: s[key].includes(v) ? s[key].filter((x) => x !== v) : [...s[key], v] }));
-  const anySel = Object.values(sel).some((a) => a.length);
 
   const shown = edit ? labels.cards : labels.cards.filter((c) => cardMatches(c, sel));
   const count = (key, v) =>
@@ -149,16 +118,20 @@ function BrowseTab({ edit, labels, update, subs, toggleSub }) {
 
   return (
     <div className="layout-with-sidebar">
-      <aside className="sidebar filter-panel">
-        <div className="fp-top">
-          <h4>Notification filters</h4>
-          {anySel && !edit && (
-            <button type="button" className="fp-clear" onClick={() => setSel(EMPTY_SEL)}>✕ Clear all</button>
+      <aside className="sidebar filter-panel fp-v2">
+        <div className="fp-bar"><b>Filters</b></div>
+        <div className="fp-step-pill">
+          <span className="step-badge" aria-hidden="true">1</span>
+          <em>Select all that apply</em>
+          {!edit && (
+            <button type="button" className="fp-clear-x" data-tip="Clear All" aria-label="Clear all filters" onClick={() => setSel(EMPTY_SEL)}>
+              <Glyph name="clearAll" size={18} />
+            </button>
           )}
         </div>
 
         {labels.filters.map((g, gi) => (
-          <Group key={g.id} title={g.title} hint={edit ? "Rename, add or remove options." : g.hint} badge={edit ? 0 : sel[g.id].length}>
+          <Group key={g.id} title={g.title} hint={edit ? "Rename, add or remove options." : g.hint} >
             {edit ? (
               <>
                 {g.options.map((o, i) => (
@@ -182,13 +155,13 @@ function BrowseTab({ edit, labels, update, subs, toggleSub }) {
           </Group>
         ))}
 
-        <Group title="Regions" badge={sel.regions.length} defaultOpen={false}>
+        <Group title="Regions" defaultOpen={false}>
           {REGION_GROUPS.map((g) => (
             <SubGroup key={g.group} title={g.group} options={g.options} selected={sel.regions}
               onToggle={(o) => toggle("regions", o)} countOf={(o) => count("regions", o)} />
           ))}
         </Group>
-        <Group title="Categories" badge={sel.categories.length} defaultOpen={false}>
+        <Group title="Categories" defaultOpen={false}>
           {CATEGORY_GROUPS.map((g) => (
             <SubGroup key={g.group} title={g.group} options={g.options} selected={sel.categories}
               onToggle={(o) => toggle("categories", o)} countOf={(o) => count("categories", o)} />
@@ -197,9 +170,7 @@ function BrowseTab({ edit, labels, update, subs, toggleSub }) {
       </aside>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="results-bar">
-          {edit ? "Editing notification cards" : `${shown.length} of ${labels.cards.length} notifications match your filters`}
-        </div>
+        {edit && <div className="results-bar">Editing notification cards</div>}
         {!edit && shown.length === 0 && (
           <div className="empty-state">
             No notifications match. <button type="button" className="clear-filters-link" onClick={() => setSel(EMPTY_SEL)}>Clear filters</button>

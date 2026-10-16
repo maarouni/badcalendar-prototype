@@ -3,13 +3,12 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import PageTemplate from "../components/PageTemplate";
 import DiscountFilterPanel from "../components/DiscountFilterPanel";
-import { StepHead, NextStep } from "../components/Steps";
-import { Glyph, IconButton } from "../components/Icons";
-import { HostAvatar, shortDate } from "../components/EventVisuals";
+import { NextStep } from "../components/Steps";
+import { ResultsHead, ListingTable, Pager, shortYmd } from "../components/ListingTable";
+import { cityCode } from "../lib/cityCodes";
 import FillInHere from "../components/FillInHere";
 import SendToMasoud from "../components/SendToMasoud";
 import { EMPTY_DISCOUNT_FILTERS, discountMatches, fetchDiscounts, localDiscounts, discountLabel } from "../lib/discounts";
-import { addToCart } from "../lib/cart";
 
 const SEL_KEY = "mc_discount_selection_v1";
 const PAGE_SIZE = 8;
@@ -25,7 +24,6 @@ function DiscountsInner() {
   const [selected, setSelected] = useState({});
   const [showFilters, setShowFilters] = useState(true);
   const [page, setPage] = useState(1);
-  const [flash, setFlash] = useState("");
   const today = useMemo(() => new Date(), []);
 
   useEffect(() => {
@@ -50,11 +48,6 @@ function DiscountsInner() {
     setSelected(next);
     try { localStorage.setItem(SEL_KEY, JSON.stringify(next)); } catch {}
   }
-  function cart(d) {
-    addToCart({ kind: "discounts", refId: d.id, title: d.offer, when: `${d.company} · expires ${d.expires}`, price: 0 });
-    setFlash(`"${d.offer}" added to My Shopping Cart`);
-    setTimeout(() => setFlash(""), 2200);
-  }
   const scrollToResults = () => document.getElementById("results")?.scrollIntoView({ block: "start", behavior: "smooth" });
 
   return (
@@ -76,32 +69,8 @@ function DiscountsInner() {
           )}
 
           <div className="timeline-col" id="results">
-            <StepHead n={3} title="Results" hint="Select certificates with the circle on the right">
-              {!showFilters && (
-                <button type="button" className="btn-ghost btn-sm" onClick={() => setShowFilters(true)}>
-                  <Glyph name="expand" size={14} /> Display Filters
-                </button>
-              )}
-            </StepHead>
-            <div className="table-search-row">
-              <label className="table-search">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search certificates..."
-                  value={qRaw}
-                  onChange={(e) => setQRaw(e.target.value)}
-                  aria-label="Search certificates"
-                />
-              </label>
-            </div>
-
-            <div className="results-bar">
-              <div><strong>{visible.length}</strong> {visible.length === 1 ? "certificate" : "certificates"} match your filters</div>
-            </div>
+            <ResultsHead title="Discount / Gift Certificates" q={qRaw} setQ={setQRaw}
+              showFilters={showFilters} onShowFilters={() => setShowFilters(true)} />
 
             <FillInHere>
               These 6 certificates are placeholders. Click <strong>+ Post a Certificate</strong> to enter real ones. They&rsquo;ll
@@ -109,7 +78,6 @@ function DiscountsInner() {
               make them permanent for everyone. <em>(Until we set up the database, what you post is only visible on your computer.)</em>
             </FillInHere>
             <SendToMasoud load={localDiscounts} noun="certificates" format={fmtDiscount} subject="calendarGold - my discount / gift certificates" />
-            {flash && <div className="fp-flash fp-flash-block">{flash}</div>}
 
             {pageItems.length === 0 && (
               <div className="empty-state">
@@ -118,48 +86,24 @@ function DiscountsInner() {
               </div>
             )}
 
-            <div className="job-list">
-              {pageItems.map((d) => (
-                <article key={d.id} className={`job-card disc-card ${d.premier ? "premier" : ""} ${selected[d.id] ? "saved" : ""}`}>
-                  <HostAvatar name={d.company} size={40} />
-                  <div className="job-body">
-                    <div className="job-head">
-                      <a href={`/discounts/${d.id}`} className="job-title">{d.offer}</a>
-                      {d.premier && <span className="price-chip job-premier-chip">PREMIER</span>}
-                    </div>
-                    <div className="disc-desc">{d.description}</div>
-                    <div className="job-sub">{d.industry} · {d.company}</div>
-                    <div className="job-meta">
-                      <span>{d.city}, {d.state || "CA"}</span>
-                      <span>Redeem {(d.redeem || []).join(" / ")}</span>
-                    </div>
-                  </div>
-                  <div className="job-side">
-                    <div className="job-comp">{discountLabel(d)}</div>
-                    <div className="job-posted">Expires {shortDate(d.expires)}</div>
-                    <div className="job-posted">Posted {shortDate(d.posted)}</div>
-                    <div className="disc-actions">
-                      <IconButton name="cartAdd" size={16} tip="Add certificate to My Shopping Cart" onClick={() => cart(d)} />
-                      <label className="sel-radio-hit" data-tip={selected[d.id] ? "In My Selection" : "Add listing to My Selection"}>
-                        <input type="checkbox" className="sel-radio" checked={!!selected[d.id]} onChange={() => toggle(d.id)} aria-label={`Select ${d.offer}`} />
-                      </label>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <ListingTable rows={pageItems.map((d) => ({
+              id: d.id,
+              href: `/discounts/${d.id}`,
+              left: [discountLabel(d), `Exp ${shortYmd(d.expires)}`],
+              title: d.offer,
+              lines: d.premier
+                ? [d.description, <>{cityCode({ city: d.city })}, <b>{d.company}</b> · {d.industry}</>, `Redeem ${(d.redeem || []).join(" / ")}`]
+                : [`${cityCode({ city: d.city })}, ${d.company}`],
+              premier: d.premier,
+              image: "discount",
+              selected: !!selected[d.id],
+              onToggle: () => toggle(d.id),
+            }))} />
 
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button type="button" className="pagination-btn" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)}>Prev</button>
-                <span className="pagination-summary">Page {safePage} of {totalPages}</span>
-                <button type="button" className="pagination-btn" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</button>
-              </div>
-            )}
+            <Pager page={safePage} totalPages={totalPages} onGo={(p) => setPage(Math.min(Math.max(1, p), totalPages))} />
 
             <NextStep noun="Certificate" digest="My Certificates Digest" digestHref="/discounts"
-              detailsHref={firstSel ? `/discounts/${firstSel.id}` : "/discounts"}
-              selectedCount={Object.values(selected).filter(Boolean).length} />
+              detailsHref={firstSel ? `/discounts/${firstSel.id}` : "/discounts"} />
           </div>
         </div>
       </div>

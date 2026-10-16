@@ -4,9 +4,9 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import PageTemplate from "../components/PageTemplate";
 import OrgSubNav from "../components/OrgSubNav";
 import OrgFilterPanel from "../components/OrgFilterPanel";
-import { StepHead, NextStep } from "../components/Steps";
-import { Glyph } from "../components/Icons";
-import { HostAvatar, shortDate } from "../components/EventVisuals";
+import { NextStep } from "../components/Steps";
+import { ResultsHead, ListingTable, Pager, shortYmd } from "../components/ListingTable";
+import { cityCode } from "../lib/cityCodes";
 import FillInHere from "../components/FillInHere";
 import SendToMasoud from "../components/SendToMasoud";
 import OrgStatusPicker from "../components/OrgStatusPicker";
@@ -78,27 +78,8 @@ function OrgsInner() {
           )}
 
           <div className="timeline-col" id="results">
-            <StepHead n={3} title="My Organizations Digest" hint="Select all that apply">
-              {!showFilters && (
-                <button type="button" className="btn-ghost btn-sm" onClick={() => setShowFilters(true)}>
-                  <Glyph name="expand" size={14} /> Display Filters
-                </button>
-              )}
-            </StepHead>
-            <div className="table-search-row">
-              <label className="table-search">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input type="text" placeholder="Search organizations..." value={qRaw}
-                  onChange={(e) => setQRaw(e.target.value)} aria-label="Search organizations" />
-              </label>
-            </div>
-
-            <div className="results-bar">
-              <div><strong>{visible.length}</strong> {visible.length === 1 ? "organization" : "organizations"} match your filters</div>
-            </div>
+            <ResultsHead title="My Organizations Digest" q={qRaw} setQ={setQRaw}
+              showFilters={showFilters} onShowFilters={() => setShowFilters(true)} />
 
             <FillInHere>
               These 6 organizations are placeholders. Click <strong>+ Add an Organization</strong> to enter real ones. They&rsquo;ll
@@ -114,52 +95,25 @@ function OrgsInner() {
               </div>
             )}
 
-            <div className="job-list">
-              {pageItems.map((o) => (
-                <article key={o.id} className={`job-card org-card ${o.premier ? "premier" : ""} ${selected[o.id] ? "saved" : ""}`}>
-                  <HostAvatar name={o.name} size={40} />
-                  <div className="job-body">
-                    <div className="job-head">
-                      <a href={`/organizations/${o.id}`} className="job-title">{o.name}</a>
-                      {o.premier && <span className="price-chip job-premier-chip">PREMIER</span>}
-                    </div>
-                    <div className="disc-desc"><em>{o.tagline}</em></div>
-                    {/* Premier listings show the full row; Regular (free) show name, tagline, city — per Figma */}
-                    {o.premier && (
-                      <>
-                        <div className="job-sub">Type: {(o.formats || []).join(" / ")}</div>
-                        <div className="job-sub">{(o.categories || []).join(" • ")} • {o.industry}</div>
-                      </>
-                    )}
-                    <div className="job-meta">
-                      <span>{o.city}, {o.state || "CA"}</span>
-                      {o.premier && <span>{fmtMembers(o.members)} • {fmtDues(o.dues)}</span>}
-                    </div>
-                  </div>
-                  <div className="job-side">
-                    <div className="job-posted">Posted / Revised {shortDate(o.posted)}</div>
-                    <div className="disc-actions">
-                      <OrgStatusPicker value={membership[o.id] || ""} onChange={(s) => setStatus(o.id, s)} compact />
-                      <label className="sel-radio-hit" data-tip={selected[o.id] ? "In My Selection" : "Add listing to My Selection"}>
-                        <input type="checkbox" className="sel-radio" checked={!!selected[o.id]} onChange={() => toggle(o.id)} aria-label={`Select ${o.name}`} />
-                      </label>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <ListingTable rows={pageItems.map((o) => ({
+              id: o.id,
+              href: `/organizations/${o.id}`,
+              left: [`Revised ${shortYmd(o.posted)}`, o.premier ? fmtMembers(o.members) : null],
+              title: o.name,
+              lines: o.premier
+                ? [<i key="t">{o.tagline}</i>, `${cityCode({ city: o.city })}, ${(o.formats || []).join(" / ")}`, `${(o.categories || []).join(" • ")} • ${o.industry}`, fmtDues(o.dues)]
+                : [`${cityCode({ city: o.city })}, ${o.tagline}`],
+              premier: o.premier,
+              image: "organizations",
+              selected: !!selected[o.id],
+              onToggle: () => toggle(o.id),
+              extra: <OrgStatusPicker value={membership[o.id] || ""} onChange={(st) => setStatus(o.id, st)} compact />,
+            }))} />
 
-            {totalPages > 1 && (
-              <div className="pagination">
-                <button type="button" className="pagination-btn" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)}>Prev</button>
-                <span className="pagination-summary">Page {safePage} of {totalPages}</span>
-                <button type="button" className="pagination-btn" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</button>
-              </div>
-            )}
+            <Pager page={safePage} totalPages={totalPages} onGo={(p) => setPage(Math.min(Math.max(1, p), totalPages))} />
 
             <NextStep noun="Organization" digest="My Organizations Digest" digestHref="/organizations"
-              detailsHref={firstSel ? `/organizations/${firstSel.id}` : "/organizations"}
-              selectedCount={Object.values(selected).filter(Boolean).length} />
+              detailsHref={firstSel ? `/organizations/${firstSel.id}` : "/organizations"} />
           </div>
         </div>
       </div>

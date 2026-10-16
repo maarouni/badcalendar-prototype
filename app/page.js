@@ -3,7 +3,8 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import FilterPanel from "./components/FilterPanel";
 import HomeHero from "./components/HomeHero";
-import { StepBadge, NextStep } from "./components/Steps";
+import { NextStep } from "./components/Steps";
+import { ResultsHead, ListingTable, Pager } from "./components/ListingTable";
 import { Glyph } from "./components/Icons";
 import { fmtTime, fmtWhen, fmtDateRange, isoOf } from "./components/EventVisuals";
 import { EMPTY_FILTERS, matches } from "./lib/taxonomy";
@@ -127,30 +128,8 @@ function SuperCalendarInner() {
           )}
 
           <div className="timeline-col" id="results">
-            {/* Oct 15 Figma: "3 One Big Calendar — Select all that apply",
-                search, then a compact table. One text size per role; no
-                event counts, no row icons (the #4 box covers those actions). */}
-            <div className="obc-bar">
-              <StepBadge n={3} />
-              <b>One Big Calendar</b>
-              <em>Select all that apply</em>
-              {!showFilters && (
-                <button type="button" className="obc-show-filters" onClick={() => setFiltersShown(true)}>
-                  <Glyph name="expand" size={14} /> Filters
-                </button>
-              )}
-            </div>
-            <label className="obc-search">
-              <Glyph name="search" size={18} />
-              <input
-                type="text"
-                placeholder="SEARCH"
-                value={qRaw}
-                onChange={(e) => setQRaw(e.target.value)}
-                aria-label="Search events"
-              />
-            </label>
-
+            <ResultsHead title="One Big Calendar" q={qRaw} setQ={setQRaw}
+              showFilters={showFilters} onShowFilters={() => setFiltersShown(true)} />
             <SendToMasoud load={localEvents} noun="events" format={fmtEvent} subject="calendarGold - my events" />
 
             {pageItems.length === 0 && (
@@ -161,62 +140,22 @@ function SuperCalendarInner() {
               </div>
             )}
 
-            {pageItems.length > 0 && (
-              <div className="obc-table" role="list">
-                {pageItems.map((e) => {
-                  const on = !!selected[e.id];
-                  const href = `/event/${e.id}`;
-                  return (
-                    <article key={e.id} role="listitem" className={`obc-row ${e.premier ? "premier" : "regular"} ${on ? "selected" : ""}`}>
-                      <a href={href} className="obc-cell obc-when" tabIndex={-1}>
-                        <span>{fmtDateRange(e.date, e.endDate)}</span>
-                        <span>{fmtTime(e.time)}</span>
-                      </a>
-                      <a href={href} className="obc-cell obc-main">
-                        <span className="obc-title">
-                          {isPrivate(e) && <span className="priv-icon" data-tip="Hide, Private — only you see this"><Glyph name="private" size={13} /></span>}
-                          {e.title}
-                        </span>
-                        {e.premier ? (
-                          <>
-                            <span title={e.city}>{cityCode(e)}{e.type !== "Online" && e.region ? `, ${e.region}` : ""}</span>
-                            <span>Hosted by <b>{e.hostedBy}</b></span>
-                            <span>{e.cost}</span>
-                          </>
-                        ) : (
-                          <span><abbr title={e.city}>{cityCode(e)}</abbr>, Hosted by {e.hostedBy}</span>
-                        )}
-                        {e.barter && <span className="obc-barter" data-tip="Barter – no payment, not tracked"><Glyph name="barter" size={15} /></span>}
-                      </a>
-                      {e.premier && (
-                        <a href={href} className="obc-cell obc-img" tabIndex={-1} aria-hidden="true">
-                          <Glyph name={rowImage(e)} size={34} strokeWidth={1.4} />
-                        </a>
-                      )}
-                      <label className="obc-cell obc-sel" data-tip={on ? "In My Selection" : "Add listing to My Selection"}>
-                        <input
-                          type="checkbox"
-                          className="sel-radio"
-                          checked={on}
-                          onChange={() => toggle(e.id)}
-                          aria-label={`${on ? "Remove" : "Add"} ${e.title} ${on ? "from" : "to"} My Selection`}
-                        />
-                      </label>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
+            <ListingTable rows={pageItems.map((e) => ({
+              id: e.id,
+              href: `/event/${e.id}`,
+              left: [fmtDateRange(e.date, e.endDate), fmtTime(e.time)],
+              title: <>{isPrivate(e) && <span className="priv-icon" data-tip="Hide, Private — only you see this"><Glyph name="private" size={13} /></span>}{e.title}</>,
+              lines: e.premier
+                ? [`${cityCode(e)}${e.type !== "Online" && e.region ? `, ${e.region}` : ""}`, <>Hosted by <b>{e.hostedBy}</b></>, e.cost]
+                : [`${cityCode(e)}, Hosted by ${e.hostedBy}`],
+              premier: e.premier,
+              image: rowImage(e),
+              barter: e.barter,
+              selected: !!selected[e.id],
+              onToggle: () => toggle(e.id),
+            }))} />
 
-            <div className="obc-pager">
-              <button type="button" className="obc-pg" onClick={() => goToPage(safePage - 1)} disabled={safePage <= 1} aria-label="Previous page" data-tip="Previous">
-                <Glyph name="prev" size={14} strokeWidth={2.4} />
-              </button>
-              <span>Page <b>{safePage}</b> of <b>{totalPages}</b></span>
-              <button type="button" className="obc-pg" onClick={() => goToPage(safePage + 1)} disabled={safePage >= totalPages} aria-label="Next page" data-tip="Next">
-                <Glyph name="next" size={14} strokeWidth={2.4} />
-              </button>
-            </div>
+            <Pager page={safePage} totalPages={totalPages} onGo={goToPage} />
 
             <NextStep noun="Listing" digest="My Listing Digest" digestHref="/my-calendar" detailsHref={detailsHref} />
           </div>
