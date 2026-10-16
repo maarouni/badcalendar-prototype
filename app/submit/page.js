@@ -4,13 +4,15 @@ import { useMemo, useState } from "react";
 import { REGION_GROUPS, CATEGORY_GROUPS } from "../lib/taxonomy";
 import { saveLocalEvent } from "../lib/events";
 import { Poster, HostAvatar, Icon, fmtTime, startTime, shortDate, isoOf, parseDate } from "../components/EventVisuals";
+import { RATES } from "../lib/adRates";
 
 // Cesar's spec "EDIT My Events" (rev 260924): preview strip on top, filter
 // attributes on the left, the event form on the right, and — for Premier
 // listings — "Calculate My Advertising Budget".
 
-const RATE_VIEW = 0.005; // $ per view per week (spec)
-const RATE_CLICK = 0.35; // $ per click per week (spec)
+// Rates come from the one shared table (app/lib/adRates.js).
+const RATE_VIEW = RATES.premierPerView;
+const RATE_CLICK = RATES.premierPerClick;
 const BIG_COUNTIES = new Set(["Santa Clara", "San Francisco", "Alameda"]);
 const MAX_DESC = 1250;
 const MAX_EXTRA_DATES = 6;

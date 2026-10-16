@@ -19,7 +19,7 @@ the production build.
 | **Organizations** | `/organizations` (digest: # Members, Annual Dues, My Membership Status filters), `/organizations/[id]`, `/organizations/[id]/members`, `/organizations/submit` |
 | **Employment Listings** | `/employment`, `/employment/submit` |
 | **Notifications** | `/notifications` (Browse, My Notifications, Create Business Notification) |
-| **Results-Based Marketing** | `/advertising`: cost calculator (D = A × B × C), rates, event participation |
+| **Earn with Advertising** | `/advertising` hub, `/advertising/calculate` (views vs. clicks side by side, D = A × B × C), rate pages `/advertising/listings`, `/expos`, `/dinners`, `/workshops`. All rates live in `app/lib/adRates.js` |
 | **Earn / Invite & Refer** | `/refer`: referral QR code + link, 5% / 3% / 2% revenue share |
 | **Shopping Cart** | `/cart`: tickets, certificates and listings in one cart |
 | **Account** | `/login` (sign up / log in), `/dashboards`, `/profile` |

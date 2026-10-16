@@ -1,19 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { Glyph } from "./Icons";
+import CollapseArrow from "./CollapseArrow";
+import { RATES } from "../lib/adRates";
 
-// Cesar's spec (Figma, Oct 9 rev): "Premier Listing: Calculate My Advertising
-// Cost" — D = A x B x C, where A = estimated total allotment across
-// locations, B = # weeks (rounded up) to advertise, C = the rate per view or
-// per click. Prototype-level: the per-location allotments are placeholder
-// numbers (real tracking needs the "# views / # clicks" counter he also
-// asked for) — but the math, inputs and layout match his wireframe.
+// "Calculate Advertising Cost" from Cesar's Figma, Oct 15 version:
+// a collapsible yellow bar, then Views and Clicks side by side so people can
+// compare without clicking back and forth.
+//   1  dates, est. reach per location, A · B · C, D = A × B × C (both columns)
+//   2  compare D and pick one format
+//   3  total for this Premier listing
+// Rates come from app/lib/adRates.js, so the Rates pages and this calculator
+// always match. Prototype: the per-location reach numbers are placeholders
+// until view/click tracking exists, and nothing is charged.
 
-const RATE = { views: 0.005, clicks: 0.35 };
-
-// Placeholder weekly reach per location, per format — swap for real counts
-// once view/click tracking exists.
-const ALLOTMENT = {
+const LOCATIONS = ["One Big Calendar", "My Calendars", "Notifications"];
+const REACH = {
   views: { "One Big Calendar": 4200, "My Calendars": 1800, Notifications: 2600 },
   clicks: { "One Big Calendar": 180, "My Calendars": 90, Notifications: 140 },
 };
@@ -25,96 +28,122 @@ function todayPlus(days) {
 }
 
 function weeksBetween(startIso, endIso) {
-  const start = new Date(startIso);
-  const end = new Date(endIso);
-  const ms = end - start;
+  const ms = new Date(endIso) - new Date(startIso);
   if (!(ms > 0)) return 1;
   return Math.max(1, Math.ceil(ms / (7 * 24 * 60 * 60 * 1000)));
 }
 
-export default function PremierCalculator({ onConfirm }) {
+const fmt$ = (n) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+
+export default function PremierCalculator({ onConfirm, defaultOpen = true }) {
+  const [open, setOpen] = useState(defaultOpen);
   const [start, setStart] = useState(todayPlus(0));
   const [end, setEnd] = useState(todayPlus(14));
   const [format, setFormat] = useState("views");
-  const [paid, setPaid] = useState(false);
-  const [flash, setFlash] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-  const weeks = weeksBetween(start, end);
-  const allotment = ALLOTMENT[format];
-  const perWeekTotal = useMemo(
-    () => Object.values(allotment).reduce((a, b) => a + b, 0),
-    [allotment]
-  );
-  const A = perWeekTotal; // estimated total allotment across locations, per week
-  const B = weeks;
-  const C = RATE[format];
-  const D = A * B * C;
+  const B = weeksBetween(start, end);
+  const A = { views: sum(REACH.views), clicks: sum(REACH.clicks) };
+  const C = { views: RATES.premierPerView, clicks: RATES.premierPerClick };
+  const D = { views: A.views * B * C.views, clicks: A.clicks * B * C.clicks };
 
-  function submitPayment(e) {
-    e.preventDefault();
-    setPaid(true);
-    setFlash(`Payment of $${D.toFixed(2)} recorded (prototype — no real charge). Your listing is marked Premier through ${end}.`);
-    onConfirm?.({ start, end, format, weeks, total: D });
-    setTimeout(() => setFlash(""), 6000);
+  function submit() {
+    setSubmitted(true);
+    onConfirm?.({ start, end, format, weeks: B, total: D[format] });
   }
+  const touch = (fn) => (e) => { fn(e.target.value); setSubmitted(false); };
 
   return (
-    <div className="prem-calc">
-      <div className="prem-calc-head">
-        <b>Calculate My Advertising Cost</b>
-        <span className="nt-hint">Start/end dates, your estimated reach, and the rate — same formula as his wireframe: D = A × B × C.</span>
+    <div className="calc2">
+      <div className="calc2-bar">
+        <Glyph name="calculate" size={30} strokeWidth={1.6} />
+        <b>Calculate Advertising Cost</b>
+        <CollapseArrow open={open} onClick={() => setOpen((o) => !o)} label="calculator" />
       </div>
 
-      <div className="prem-calc-row">
-        <label className="ed-field">
-          <span className="ed-label">Start date</span>
-          <input type="date" value={start} onChange={(e) => { setStart(e.target.value); setPaid(false); }} />
-        </label>
-        <label className="ed-field">
-          <span className="ed-label">End date</span>
-          <input type="date" value={end} min={start} onChange={(e) => { setEnd(e.target.value); setPaid(false); }} />
-        </label>
-      </div>
+      {open && (
+        <div className="calc2-body">
+          <h3>Premier Listing: Calculate My Advertising Cost</h3>
 
-      <div className="prem-calc-row">
-        <span className="ed-label">Advertising format</span>
-        <div className="prem-calc-seg">
-          {["views", "clicks"].map((f) => (
-            <label key={f} className="fp-option">
-              <input type="radio" name="prem-format" checked={format === f} onChange={() => { setFormat(f); setPaid(false); }} />
-              <span className="fp-label">
-                {f === "views" ? "# Views of the listing" : "# Clicks to Listing Details"} <em>(${RATE[f]}/{f === "views" ? "view" : "click"})</em>
-              </span>
-            </label>
-          ))}
+          <div className="calc2-step">
+            <span className="step-badge" aria-hidden="true">1</span>
+            <b>Submit below for this listing:</b>
+          </div>
+          <div className="calc2-dates">
+            <input type="date" aria-label="Start date" value={start} onChange={touch(setStart)} />
+            <input type="date" aria-label="End date" value={end} min={start} onChange={touch(setEnd)} />
+            <span><b>Start and End Dates to Advertise</b><br /><i>If applicable, edit these automatically submitted dates</i></span>
+          </div>
+
+          <table className="calc2-table">
+            <thead>
+              <tr><th>Views</th><th>Clicks / Week</th><th>Locations</th></tr>
+            </thead>
+            <tbody>
+              {LOCATIONS.map((l) => (
+                <tr key={l}>
+                  <td className="calc2-num">{REACH.views[l].toLocaleString()}</td>
+                  <td className="calc2-num">{REACH.clicks[l].toLocaleString()}</td>
+                  <td>{l}</td>
+                </tr>
+              ))}
+              <tr>
+                <td className="calc2-num">{A.views.toLocaleString()}</td>
+                <td className="calc2-num">{A.clicks.toLocaleString()}</td>
+                <td><b>A. My estimated total allotment for all locations</b></td>
+              </tr>
+              <tr>
+                <td className="calc2-num">{B}</td>
+                <td className="calc2-num">{B}</td>
+                <td><b>B. # Weeks</b> <i>(rounded up)</i> <b>to Advertise</b></td>
+              </tr>
+              <tr>
+                <td className="calc2-rate">${C.views}</td>
+                <td className="calc2-rate">${C.clicks.toFixed(2)}</td>
+                <td><b>C. Advertising Rates per View and per Click</b></td>
+              </tr>
+              <tr className="calc2-total">
+                <td className={format === "views" ? "on" : ""}>{fmt$(D.views)}</td>
+                <td className={format === "clicks" ? "on" : ""}>{fmt$(D.clicks)}</td>
+                <td><b>D. Total:</b> <i>D = A x B x C</i></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className="calc2-step">
+            <span className="step-badge" aria-hidden="true">2</span>
+            <b>Compare the results (D) and select one Advertising Format:</b>
+          </div>
+          <div className="calc2-pick">
+            {[["views", "# Views of the listing"], ["clicks", "# Clicks from the listing to the Listing Details pages"]].map(([k, label]) => (
+              <label key={k} className={`fp-option ${format === k ? "fp-checked" : ""}`}>
+                <input type="radio" name="calc2-format" checked={format === k} onChange={() => { setFormat(k); setSubmitted(false); }} />
+                <span className="fp-label">{label}</span>
+              </label>
+            ))}
+          </div>
+
+          <div className="calc2-step">
+            <span className="step-badge" aria-hidden="true">3</span>
+            <b>Total Advertising Cost for this Premier Listing</b>
+          </div>
+          <p className="calc2-grand">{fmt$(D[format])}</p>
+
+          <p className="calc2-note">
+            <b>NOTE:</b> Your Premier Listing is displayed until it expires <b>OR</b> its {format === "views" ? "views" : "clicks"} / week
+            allotment is depleted. It will then be automatically converted into a Regular listing. Any remaining budget
+            will be retained in your account.
+          </p>
+
+          <div className="calc2-actions">
+            <button type="button" className="btn-primary" onClick={submit} disabled={submitted}>
+              {submitted ? "✓ Submitted as Premier Listing" : "Submit as Premier Listing"}
+            </button>
+            <span className="nt-hint">Prototype — no payment is taken.</span>
+          </div>
         </div>
-      </div>
-
-      <table className="prem-calc-table">
-        <thead>
-          <tr><th>Location</th><th>Est. {format} / week</th></tr>
-        </thead>
-        <tbody>
-          {Object.entries(allotment).map(([loc, n]) => (
-            <tr key={loc}><td>{loc}</td><td>{n.toLocaleString()}</td></tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr><td>A &middot; My estimated total allotment (all locations, per week)</td><td>{A.toLocaleString()}</td></tr>
-          <tr><td>B &middot; # Weeks (rounded up) to advertise</td><td>{B}</td></tr>
-          <tr><td>C &middot; Rate per {format === "views" ? "view" : "click"}</td><td>${C}</td></tr>
-          <tr className="prem-calc-total"><td>D &middot; Total advertising cost (D = A × B × C)</td><td>${D.toFixed(2)}</td></tr>
-        </tfoot>
-      </table>
-
-      <button type="button" className="btn-primary" onClick={submitPayment} disabled={paid}>
-        {paid ? "✓ Payment submitted (prototype)" : `Submit payment — $${D.toFixed(2)}`}
-      </button>
-      {flash && <div className="fp-flash fp-flash-block">{flash}</div>}
-      <p className="nt-hint">
-        Your Premier listing shows until it expires or its {format}/week allotment is used up, then it converts to a
-        Regular listing. Any remaining budget stays in your account.
-      </p>
+      )}
     </div>
   );
 }

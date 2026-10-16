@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Glyph } from "./Icons";
+import CollapseArrow from "./CollapseArrow";
 import { CountyMap, CaliforniaMap } from "./Explore";
 import {
   DATE_OPTIONS,
@@ -21,21 +22,6 @@ import {
 //   - Filter Sets moved out (they belong in My Calendar Digest)
 //   - the maps live inside the Regions boxes, not at the top of the page
 //   - "2 Submit Display Results" at the bottom
-
-export function CollapseArrow({ open, onClick, label }) {
-  return (
-    <button
-      type="button"
-      className="fp-arrow"
-      onClick={onClick}
-      aria-expanded={open}
-      aria-label={`${open ? "Collapse" : "Expand"} ${label}`}
-      data-tip={open ? "Collapse" : "View / Expand"}
-    >
-      <Glyph name={open ? "collapse" : "expand"} size={16} strokeWidth={2.4} />
-    </button>
-  );
-}
 
 function Box({ title, hint, icon, defaultOpen = true, disabled, note, children }) {
   const [open, setOpen] = useState(defaultOpen);

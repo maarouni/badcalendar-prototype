@@ -2644,3 +2644,63 @@ input.sel-radio { --sel-radius: 50%; border-radius: 50% !important; }
 .next-step-link:hover span { text-decoration: underline; }
 .next-step-link .glyph { color: var(--ink); }
 .ns-default { color: var(--ink); font-size: 13px; }
+
+/* ---- Oct 15: same box style on every section page ---- */
+.icon-nav-output .icon-nav-item { background: #fff; border: 1px solid var(--cg-box-line); color: var(--cg-blue); font-weight: 600; }
+.icon-nav-output .icon-nav-item .icon-nav-glyph { color: var(--ink); }
+.icon-nav-output .icon-nav-item.active { background: var(--cg-yellow); border-color: var(--cg-yellow-line); color: var(--cg-blue); box-shadow: none; }
+.tpl-intro { background: #fff; border: 1px solid var(--cg-box-line); border-radius: 12px; padding: 10px 14px; max-width: none; margin: 8px 0 12px; }
+.tpl-title { border-radius: 12px; }
+
+/* ---- Earn with Advertising pages ---- */
+.ad-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 0 0 12px; }
+.ad-nav-item, .ad-hub-item { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 8px 6px; background: #fff; border: 1px solid var(--cg-box-line); border-radius: 12px; color: var(--cg-blue); font-size: 12px; font-weight: 600; text-decoration: none; }
+.ad-nav-item .glyph, .ad-hub-item .glyph { color: var(--ink); }
+.ad-nav-item.active { background: var(--cg-yellow); border-color: var(--cg-yellow-line); }
+.ad-nav-item:hover, .ad-hub-item:hover { border-color: var(--gold); }
+.ad-box { display: block; background: #fff; border: 1px solid var(--cg-box-line); border-radius: 12px; padding: 12px 16px; margin: 0 0 10px; font-size: 14px; line-height: 1.5; }
+.ad-box h2 { margin: 0 0 6px; font-size: 18px; }
+.ad-box p { margin: 4px 0; }
+.ad-box-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ad-hub { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.ad-hub-item { margin: 0; font-size: 14px; padding: 14px 8px; }
+.ad-rates { width: 100%; border-collapse: collapse; margin: 6px 0 10px; }
+.ad-rates th { text-align: left; font-size: 13px; border-bottom: 2px solid var(--ink); padding: 4px 6px; }
+.ad-rates th:last-child, .ad-rates td:last-child { text-align: right; white-space: nowrap; }
+.ad-rates td { padding: 4px 6px; border-bottom: 1px solid var(--border); }
+.ad-rates td:last-child { font-weight: 700; color: var(--cg-red); }
+.ad-detail h3 { margin: 10px 0 2px; font-size: 15px; color: var(--cg-red); }
+.ad-fine { font-size: 12px; font-style: italic; opacity: .8; }
+@media (max-width: 640px) { .ad-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* ---- Calculate Advertising Cost (two columns: Views | Clicks) ---- */
+.calc2 { margin: 0 0 12px; }
+.calc2-bar { display: flex; align-items: center; gap: 12px; background: var(--cg-yellow); border: 1px solid var(--cg-yellow-line); border-radius: 10px; padding: 6px 12px; }
+.calc2-bar b { flex: 1; text-align: center; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 26px; }
+.calc2-body { background: #fff; border: 1px solid var(--cg-box-line); border-radius: 12px; padding: 12px 16px; margin-top: 8px; font-size: 14px; }
+.calc2-body h3 { margin: 0 0 8px; font-size: 19px; }
+.calc2-step { display: flex; align-items: center; gap: 2px; margin: 12px 0 6px; }
+.calc2-dates { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: 24px; }
+.calc2-dates input { background: #ececec; border: 1px solid #b5b5b5; border-radius: 999px; padding: 3px 10px; font: inherit; font-size: 13px; }
+.calc2-dates span { font-size: 13px; line-height: 1.35; }
+.calc2-table { border-collapse: collapse; margin: 10px 0 0 24px; }
+.calc2-table th { text-align: left; font-weight: 400; text-decoration: underline; padding: 3px 14px 3px 0; }
+.calc2-table td { padding: 3px 14px 3px 0; }
+.calc2-num { color: var(--cg-red); font-weight: 600; text-align: right; }
+.calc2-rate { color: var(--cg-blue); font-weight: 600; text-align: right; }
+.calc2-total td:not(:last-child) { color: var(--cg-red); font-weight: 700; text-align: right; }
+.calc2-total td.on { background: var(--cg-yellow); border-radius: 6px; }
+.calc2-pick { margin-left: 24px; }
+.calc2-pick .fp-option { color: var(--cg-blue); }
+.calc2-pick .fp-option input, .calc2-pick .fp-option input:checked { -webkit-appearance: none; appearance: none; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid currentColor; background: #fff; margin: 0 4px 0 2px; }
+.calc2-pick .fp-option input:checked { background: var(--cg-red); border-color: var(--cg-red); }
+.calc2-pick .fp-checked .fp-label { color: var(--cg-red); font-weight: 700; }
+.calc2-grand { margin: 0 0 0 24px; font-size: 18px; font-weight: 700; color: var(--cg-red); }
+.calc2-note { font-size: 13px; margin: 10px 0; }
+.calc2-note > b:first-child { color: var(--cg-red); }
+.calc2-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+@media (max-width: 640px) {
+  .calc2-bar b { font-size: 19px; }
+  .calc2-table, .calc2-dates, .calc2-pick, .calc2-grand { margin-left: 0; }
+  .calc2-table { font-size: 12px; }
+}

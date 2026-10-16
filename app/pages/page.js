@@ -26,7 +26,12 @@ const GROUPS = [
     ["Organization Members", "/organizations/o1/members", "Leadership, Staff, Members mini-cards"],
     ["EDIT Organization Details", "/organizations/submit", "Add or edit an organization"],
     ["Employment Listings", "/employment", "Browse, filter, post a job"],
-    ["Results-Based Marketing", "/advertising", "Cost calculator, rates, event participation"],
+    ["Earn with Advertising", "/advertising", "Hub for the advertising pages"],
+    ["Calculate Advertising Cost", "/advertising/calculate", "Views vs. clicks, side by side"],
+    ["Rates – calendarGold Listings", "/advertising/listings", "Regular / Premier listing rates"],
+    ["Rates – Networking Expos", "/advertising/expos", "Tickets, exhibitors, sponsors"],
+    ["Rates – Dinners & Networking", "/advertising/dinners", "Tickets, restaurant hosts"],
+    ["Rates – Workshops", "/advertising/workshops", "Tickets, presenters"],
     ["Earn / Invite & Refer", "/refer", "Your QR code + 5/3/2% revenue share"],
   ]],
   ["Account", [

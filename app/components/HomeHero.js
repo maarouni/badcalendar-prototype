@@ -3,7 +3,7 @@
 import { useState } from "react";
 import IconNav from "./IconNav";
 import { Glyph } from "./Icons";
-import { CollapseArrow } from "./FilterPanel";
+import CollapseArrow from "./CollapseArrow";
 
 // Home hero from Cesar's Oct 15 Figma review — "replace completely as":
 // every line of text inside a white box, the section tiles, a second row of
