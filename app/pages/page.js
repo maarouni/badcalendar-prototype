@@ -14,8 +14,7 @@ const GROUPS = [
     ["Edit / Submit Event", "/submit", "Create Event form, Regular or Premier"],
   ]],
   ["Commerce", [
-    ["Tickets / RSVP", "/event/15#tickets", "Pick quantity, add tickets to cart", "Checkout on hold"],
-    ["Shopping Cart", "/cart", "Tickets, certificates, listings in one cart", "Checkout on hold"],
+    ["Tickets / RSVP", "/event/15#tickets", "RSVP / Order Tickets into My Calendar", "Payment on hold"],
   ]],
   ["Modules", [
     ["Notifications", "/notifications", "Browse and subscribe"],

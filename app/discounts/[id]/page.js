@@ -7,7 +7,6 @@ import PageTemplate from "../../components/PageTemplate";
 import { Glyph, IconButton } from "../../components/Icons";
 import { HostAvatar, shortDate } from "../../components/EventVisuals";
 import { fetchDiscounts, discountLabel } from "../../lib/discounts";
-import { addToCart } from "../../lib/cart";
 
 const SEL_KEY = "mc_discount_selection_v1";
 
@@ -36,11 +35,6 @@ export default function DiscountDetail() {
       setSaved(!!sel[id]);
     } catch {}
   }
-  function cart() {
-    addToCart({ kind: "discounts", refId: d.id, title: d.offer, when: `${d.company} · expires ${d.expires}`, price: 0 });
-    setFlash("Added to My Shopping Cart");
-    setTimeout(() => setFlash(""), 2200);
-  }
 
   return (
     <PageTemplate
@@ -65,7 +59,6 @@ export default function DiscountDetail() {
 
           <div className="event-icon-bar">
             <IconButton name="select" tip={saved ? "In My Selection — click to remove" : "Add listing to My Selection"} onClick={toggle} className={saved ? "on" : ""} />
-            <IconButton name="cartAdd" tip="Add certificate to My Shopping Cart" onClick={cart} />
             <IconButton name="like" tip="Like (coming soon)" />
             <IconButton name="share" onClick={() => navigator.clipboard?.writeText(window.location.href).then(() => { setFlash("Link copied"); setTimeout(() => setFlash(""), 1800); })} />
             <IconButton name="pdf" onClick={() => window.print()} />
@@ -102,7 +95,7 @@ export default function DiscountDetail() {
             {qr ? <img src={qr} alt={`QR code for ${d.offer}`} /> : <div style={{ padding: 40 }}>Generating QR code…</div>}
             <div className="qr-card-label"><b>Certificate QR Code</b> — show it when you redeem.</div>
           </div>
-          <button type="button" className="btn-primary rsvp-btn" onClick={cart}><Glyph name="cartAdd" size={17} /> Add to My Shopping Cart</button>
+          <button type="button" className="btn-primary rsvp-btn" onClick={toggle}><Glyph name="select" size={17} /> {saved ? "In My Selection" : "Add to My Selection"}</button>
         </aside>
       </div>
     </PageTemplate>

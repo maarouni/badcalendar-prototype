@@ -15,7 +15,7 @@ const PUBLIC_PAGES = [
 ];
 const PERSONAL_PAGES = [
   ["/my-calendar", "My Calendar Digest"], ["/submit", "EDIT My Events"], ["/employment/submit", "EDIT My Employment Listings"], ["/discounts/submit", "EDIT My Discount / Gift Certificates"], ["/organizations/submit", "EDIT My Organization Details"],
-  ["/dashboards", "My Dashboards"], ["/cart", "Account Shopping Cart"], ["/profile", "Settings"],
+  ["/dashboards", "My Dashboards"], ["/profile", "Settings"],
 ];
 
 // Cesar's wireframe (Figma, Oct 9 rev): "calendarGold.com Info" —

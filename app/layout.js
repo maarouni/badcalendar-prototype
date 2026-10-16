@@ -2,7 +2,7 @@ import "./globals.css";
 import NavBar from "./components/NavBar";
 
 export const metadata = {
-  title: "calendarGold (Prototype)",
+  title: "calendarGold & much more (Prototype)",
   description: "Bay Area event calendar — internal prototype, not the live product",
 };
 

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconButton } from "./Icons";
-import { cartCount } from "../lib/cart";
 
 const USER_KEY = "mc_user_v1";
 
@@ -29,20 +28,15 @@ export default function NavBar() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cartN, setCartN] = useState(0);
 
   useEffect(() => {
     setUser(readUser());
-    setCartN(cartCount());
-    const onCart = () => setCartN(cartCount());
-    window.addEventListener("mc-cart-changed", onCart);
-    const onChange = () => { setUser(readUser()); setCartN(cartCount()); };
+    const onChange = () => setUser(readUser());
     window.addEventListener("mc-auth-changed", onChange);
     window.addEventListener("storage", onChange);
     return () => {
       window.removeEventListener("mc-auth-changed", onChange);
       window.removeEventListener("storage", onChange);
-      window.removeEventListener("mc-cart-changed", onCart);
     };
   }, []);
 
@@ -63,6 +57,7 @@ export default function NavBar() {
         <a href="/" className="brand">
           <span className="brand-mark" aria-hidden="true"><i /><i /></span>
           <span className="brand-word">calendar<b>Gold</b></span>
+          <span className="brand-more">&amp; much more</span>
         </a>
 
         <div className="nav-links nav-icon-groups">
@@ -92,7 +87,6 @@ export default function NavBar() {
                     <div className="nav-user-id">{user.identifier}</div>
                     <a href="/dashboards" onClick={() => setMenuOpen(false)}>Dashboards</a>
                     <a href="/profile" onClick={() => setMenuOpen(false)}>Profile</a>
-                    <a href="/cart" onClick={() => setMenuOpen(false)}>My Shopping Cart{cartN ? ` (${cartN})` : ""}</a>
                     <button type="button" onClick={logOut}>Log out</button>
                   </div>
                 )}

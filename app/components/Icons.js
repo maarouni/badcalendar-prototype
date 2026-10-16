@@ -65,8 +65,7 @@ export const LEGEND = [
     items: [
       ["info", "Info"], ["dashboards", "Dashboards"], ["settings", "Settings"],
       ["pdf", "Download this page as a PDF"], ["print", "Print this page"],
-      ["login", "Registration – Sign Up / Log In"], ["register", "Registration – Sign Up"], ["user", "Logged In – User's First Name Initial"],
-      ["cart", "My Shopping Cart"],
+      ["login", "Registration – Sign Up / Log In"], ["register", "Registration – Sign Up"], ["user", "Logged In – User's First Name Initial"]
     ],
   },
   {
@@ -77,7 +76,7 @@ export const LEGEND = [
       ["select", "Add listing(s) to My Selection"], ["gcal", "Add event(s) to My Google Calendar"],
       ["calculate", "Calculate"], ["gallery", "Gallery"], ["comments", "Comments"], ["like", "Like"], ["share", "Share"],
       ["viewMode", "View Mode"], ["editMode", "Edit Mode"], ["addNew", "Add New"],
-      ["cartAdd", "Add item to My Shopping Cart"], ["ticket", "RSVP / Order Tickets"], ["delete", "Delete"],
+      ["ticket", "RSVP / Order Tickets"], ["delete", "Delete"],
       ["pdf", "Download this page as a PDF"], ["print", "Print this page"], ["clearAll", "Clear All"],
       ["map", "Google Map"], ["qr", "QR Code"], ["barter", "Barter – no payment, not tracked"],
     ],

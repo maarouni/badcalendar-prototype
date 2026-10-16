@@ -8,7 +8,6 @@ import { googleCalendarUrl, eventCategories } from "../../lib/taxonomy";
 import { fetchEvents } from "../../lib/events";
 import { fmtWhen, dateFormatOf } from "../../components/EventVisuals";
 import { Glyph, IconButton } from "../../components/Icons";
-import { addToCart } from "../../lib/cart";
 
 const STORAGE_KEY = "mc_my_calendar_v1";
 
@@ -17,7 +16,6 @@ export default function EventDetail() {
   const [event, setEvent] = useState(undefined);
   const [saved, setSaved] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState(null);
-  const [qty, setQty] = useState(1);
   const [flash, setFlash] = useState("");
 
   useEffect(() => {
@@ -68,11 +66,6 @@ export default function EventDetail() {
     else navigator.clipboard?.writeText(url).then(() => { setFlash("Link copied"); setTimeout(() => setFlash(""), 1800); });
   }
 
-  function addTickets() {
-    addToCart({ kind: "tickets", refId: event.id, title: event.title, when: fmtWhen(event), price: event.price || 0, qty });
-    setFlash(`${qty} ticket${qty > 1 ? "s" : ""} added to My Shopping Cart`);
-    setTimeout(() => setFlash(""), 2400);
-  }
   const ctaLabel = event.cost.toLowerCase().includes("free") && !event.cost.includes("$")
     ? "RSVP"
     : "Get Tickets";
@@ -148,14 +141,10 @@ export default function EventDetail() {
             <div className="rsvp-cost">{event.cost}</div>
             {paid ? (
               <>
-                <label className="rsvp-qty">
-                  <span><Glyph name="ticket" size={15} /> Tickets</span>
-                  <input type="number" min="1" max="20" value={qty} onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))} />
-                </label>
-                <button type="button" className="btn-primary rsvp-btn" onClick={addTickets}>
-                  <Glyph name="cartAdd" size={17} /> Add Ticket(s) to My Shopping Cart
+                <button type="button" className="btn-primary rsvp-btn" onClick={toggleSaved}>
+                  <Glyph name="ticket" size={17} /> {saved ? "RSVP'd — on My Calendar" : "RSVP / Order Tickets"}
                 </button>
-                <a href="/cart" className="rsvp-hint rsvp-cart-link"><Glyph name="cart" size={13} /> View My Shopping Cart</a>
+                <div className="rsvp-hint">Adds the event to My Calendar Digest. Ticket payment comes in a later build.</div>
               </>
             ) : (
               <>

@@ -196,7 +196,7 @@ export default function SubmitEvent() {
       <div className="page ed-page">
         <div className="ed-done">
           <div className="ed-done-circle"><Icon name="check" /></div>
-          <h1>{done.premier ? "Added to your shopping cart" : "Your event is listed"}</h1>
+          <h1>{done.premier ? "Submitted as a Premier listing" : "Your event is listed"}</h1>
           <p>
             {done.premier
               ? `Premier listing, ${money(done.adBudget?.total || 0)} advertising budget. Checkout and payment come with the next build — for this demo it's live on One Big Calendar as Premier.`
@@ -488,7 +488,7 @@ export default function SubmitEvent() {
 
           <div className="ed-submit">
             <button type="submit" className="btn-primary ed-submit-btn" disabled={busy}>
-              {busy ? "Saving…" : f.premier ? `Add event to shopping cart · ${money(budget)}` : "Submit free listing"}
+              {busy ? "Saving…" : f.premier ? `Submit as Premier Listing · ${money(budget)}` : "Submit free listing"}
             </button>
           </div>
         </section>
